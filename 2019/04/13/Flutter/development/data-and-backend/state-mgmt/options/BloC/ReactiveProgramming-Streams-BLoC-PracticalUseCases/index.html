@@ -1,0 +1,1812 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例 难度：中级">
+<meta name="keywords" content="状态管理,BLoC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例 难度：中级">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.didierboelens.com/images/bloc_event_state.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/bloc_authentication.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/bloc_combine.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/bloc_part_of.png">
+<meta property="og:updated_time" content="2019-06-25T05:05:40.673Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例">
+<meta name="twitter:description" content="原文链接 Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例 难度：中级">
+<meta name="twitter:image" content="https://www.didierboelens.com/images/bloc_event_state.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-13 13:51:17" itemprop="dateCreated datePublished" datetime="2019-04-13T13:51:17+08:00">2019-04-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:05:40" itemprop="dateModified" datetime="2019-06-25T13:05:40+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/" class="leancloud_visitors" data-flag-title="(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.didierboelens.com/2018/12/reactive-programming---streams---bloc---practical-use-cases/" target="_blank" rel="noopener">原文链接</a></p>
+<p>Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例</p>
+<p>难度：中级</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>在前一段时间介绍了业务逻辑组件(BloC)，响应式编程(Reactive Programming)和流(Streams)这些概念之后，我想与你分享一些我经常使用的并且个人觉得十分有用的模式，应该会是很有趣的。在我的开发过程中，这些模式使我节省了大量时间，并使我的代码更易于阅读和调试。</p>
+<p>我要讨论的话题有：</p>
+<ul>
+<li><p><code>BLoC Provider</code> 以及 <code>InheritedWidget</code></p>
+</li>
+<li><p>在哪初始化 <code>BLoC</code></p>
+</li>
+<li><p>事件-状态</p>
+<p>允许基于事件对状态转换作出响应</p>
+</li>
+<li><p>表单验证<br>允许依据条目和验证控制表单的行为。(我解释的解决方案还包括密码和重新输入密码的比较)。</p>
+</li>
+<li><p><code>Part of</code></p>
+<p>允许Widget根据其在列表中的是否存在来调整其行为。</p>
+<p>完整的源代码可以在 <a href="https://github.com/boeledi/blocs" target="_blank" rel="noopener">GitHub</a> 上下载。</p>
+<hr>
+</li>
+</ul>
+<h2 id="BlocProvider-和-InheritedWidget"><a href="#BlocProvider-和-InheritedWidget" class="headerlink" title="BlocProvider 和 InheritedWidget"></a><code>BlocProvider</code> 和 <code>InheritedWidget</code></h2><p>我借此文章的机会介绍我的另一个版本的<code>BlocProvider</code>，它现在依赖于一个<code>InheritedWidget</code>。</p>
+<p>使用<code>InheritedWidget</code>的优点是我们获得了性能上的提升。</p>
+<p>让我来解释下。</p>
+<h3 id="之前的实现"><a href="#之前的实现" class="headerlink" title="之前的实现"></a>之前的实现</h3><p>我之前版本的BlocProvider是按常规的StatefulWidget实现的，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="keyword">void</span> dispose();</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//泛型Bloc Provider</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlocProvider</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BlocBase</span>&gt; <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  BlocProvider(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.child,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.bloc,</span><br><span class="line">  &#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> T bloc;</span><br><span class="line">  <span class="keyword">final</span> Widget child;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _BlocProviderState&lt;T&gt; createState() =&gt; _BlocProviderState&lt;T&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> T of&lt;T <span class="keyword">extends</span> BlocBase&gt;(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">final</span> type = _typeOf&lt;BlocProvider&lt;T&gt;&gt;();</span><br><span class="line">    BlocProvider&lt;T&gt; provider = context.ancestorWidgetOfExactType(type);</span><br><span class="line">    <span class="keyword">return</span> provider.bloc;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="built_in">Type</span> _typeOf&lt;T&gt;() =&gt; T;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_BlocProviderState</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">BlocProvider</span>&lt;<span class="title">BlocBase</span>&gt;&gt;</span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    widget.bloc.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> widget.child;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我使用了 StatefulWidget 从而从它的 dispose() 方法中受益，以确保在不再需要时释放BLoC 分配的资源。</p>
+<p>这很好用但从性能角度来看并不是最佳的。</p>
+<p>context.ancestorWidgetOfExactType() 是一个 O(n) 方法。为了获取要求的祖先widget，而这个祖先对应某种乐行，它从<code>context</code>开始向上遍历树，每向上移动一个都要递归一遍，直到遍历完成。如果<code>context</code>到祖先的距离很小，则这个方法调用是可以接受的，否则应该避免对其进行调用。这是这个方法的代码。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@override</span></span><br><span class="line">Widget ancestorWidgetOfExactType(<span class="built_in">Type</span> targetType) &#123;</span><br><span class="line">    <span class="keyword">assert</span>(_debugCheckStateIsActiveForAncestorLookup());</span><br><span class="line">    <span class="built_in">Element</span> ancestor = _parent;</span><br><span class="line">    <span class="keyword">while</span> (ancestor != <span class="keyword">null</span> &amp;&amp; ancestor.widget.runtimeType != targetType)</span><br><span class="line">        ancestor = ancestor._parent;</span><br><span class="line">    <span class="keyword">return</span> ancestor?.widget;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="新的实现"><a href="#新的实现" class="headerlink" title="新的实现"></a>新的实现</h3><p>新的实现依赖于一个与 InheritedWidget 结合 StatefulWidget：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="built_in">Type</span> _typeOf&lt;T&gt;() =&gt; T;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="keyword">void</span> dispose();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlocProvider</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BlocBase</span>&gt; <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  BlocProvider(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.child,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.bloc,</span><br><span class="line">  &#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> Widget child;</span><br><span class="line">  <span class="keyword">final</span> T bloc;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _BlocProviderState&lt;T&gt; createState() =&gt; _BlocProviderState&lt;T&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> T of&lt;T <span class="keyword">extends</span> BlocBase&gt;(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">final</span> type = _typeOf&lt;_BlocProviderInherited&lt;T&gt;&gt;();</span><br><span class="line">    _BlocProviderInherited&lt;T&gt; provider = </span><br><span class="line">            context.ancestorInheritedElementForWidgetOfExactType(type)?.widget;</span><br><span class="line">    <span class="keyword">return</span> provider?.bloc;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_BlocProviderState</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BlocBase</span>&gt; <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">BlocProvider</span>&lt;<span class="title">T</span>&gt;&gt;</span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    widget.bloc?.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> _BlocProviderInherited&lt;T&gt;(</span><br><span class="line">      bloc: widget.bloc,</span><br><span class="line">      child: widget.child,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_BlocProviderInherited</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">InheritedWidget</span> </span>&#123;</span><br><span class="line">  _BlocProviderInherited(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> Widget child,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.bloc,</span><br><span class="line">  &#125;) : <span class="keyword">super</span>(key: key, child: child);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> T bloc;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="built_in">bool</span> updateShouldNotify(_BlocProviderInherited oldWidget) =&gt; <span class="keyword">false</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个解决方案的优点是性能。</p>
+<p>由于使用了 <code>InheritedWidget</code>，它现在可以调用context.ancestorInheritedElementForWidgetOfExactType() 方法，它是一个O(1)方法。这意味祖先是立即获取的，如其源代码所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@override</span></span><br><span class="line">InheritedElement ancestorInheritedElementForWidgetOfExactType(<span class="built_in">Type</span> targetType) &#123;</span><br><span class="line">    <span class="keyword">assert</span>(_debugCheckStateIsActiveForAncestorLookup());</span><br><span class="line">    <span class="keyword">final</span> InheritedElement ancestor = _inheritedWidgets == <span class="keyword">null</span> </span><br><span class="line">                                    ? <span class="keyword">null</span> </span><br><span class="line">                                    : _inheritedWidgets[targetType];</span><br><span class="line">    <span class="keyword">return</span> ancestor;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这是因为事实上，所有<code>InheritedWidgets</code>都由框架记住了。</p>
+<p>为什么使用 <code>ancestorInheritedElementForWidgetOfExactType</code>？</p>
+<p>你可能已经注意到我使用 ancestorInheritedElementForWidgetOfExactType 方法,而不是通常的 inheritFromWidgetOfExactType。</p>
+<p>原因是我不希望调用 <code>BlocProvider</code> 的 <code>context</code> 被注册为 <code>InheritedWidget</code>的依赖项，因为我不需要它。</p>
+<h3 id="如何使用新的-BlocProvider"><a href="#如何使用新的-BlocProvider" class="headerlink" title="如何使用新的 BlocProvider?"></a>如何使用新的 BlocProvider?</h3><h4 id="Bloc的注入"><a href="#Bloc的注入" class="headerlink" title="Bloc的注入"></a>Bloc的注入</h4><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> BlocProvider&lt;MyBloc&gt;&#123;</span><br><span class="line">        bloc: myBloc,</span><br><span class="line">        child: ...</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="Bloc的获取"><a href="#Bloc的获取" class="headerlink" title="Bloc的获取"></a>Bloc的获取</h4><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">Widget build(BuildContext context)&#123;</span><br><span class="line">    MyBloc myBloc = BlocProvider.of&lt;MyBloc&gt;(context);</span><br><span class="line">    ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="从哪初始化-BLoc"><a href="#从哪初始化-BLoc" class="headerlink" title="从哪初始化 BLoc"></a>从哪初始化 BLoc</h2><p>要回答这个问题，你需要确认它的使用范围。</p>
+<h3 id="应用中随处可用"><a href="#应用中随处可用" class="headerlink" title="应用中随处可用"></a>应用中随处可用</h3><p>假设你必须处理与用户身份验证/配置文件，用户设置，购物篮相关的一些机制……任何需要从应用程序的任何可能部分（例如，从不同页面）获得BLoC的任何机制，存在两种方式使这个BLoC可访问。</p>
+<h4 id="全局单例的使用"><a href="#全局单例的使用" class="headerlink" title="全局单例的使用"></a>全局单例的使用</h4><p>此解决方案依赖于使用 Global 对象，对所有对象实例化，而不是任何 Widget 树的一部分。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:rxdart/rxdart.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GlobalBloc</span> </span>&#123;</span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Streams related to this BLoC</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  BehaviorSubject&lt;<span class="built_in">String</span>&gt; _controller = BehaviorSubject&lt;<span class="built_in">String</span>&gt;();</span><br><span class="line">  <span class="built_in">Function</span>(<span class="built_in">String</span>) <span class="keyword">get</span> push =&gt; _controller.sink.add;</span><br><span class="line">  Stream&lt;<span class="built_in">String</span>&gt; <span class="keyword">get</span> stream =&gt; _controller;</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Singleton factory</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">final</span> GlobalBloc _bloc = <span class="keyword">new</span> GlobalBloc._internal();</span><br><span class="line">  <span class="keyword">factory</span> GlobalBloc()&#123;</span><br><span class="line">    <span class="keyword">return</span> _bloc;</span><br><span class="line">  &#125;</span><br><span class="line">  GlobalBloc._internal();</span><br><span class="line">  </span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Resource disposal</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    _controller?.close();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">GlobalBloc globalBloc = GlobalBloc();</span><br></pre></td></tr></table></figure>
+
+<p>要使用此 <code>BLoC</code>，你只需导入该类并直接调用其方法，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'global_bloc.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyWidget</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">    <span class="meta">@override</span></span><br><span class="line">    Widget build(BuildContext context)&#123;</span><br><span class="line">        globalBloc.push(<span class="string">'building MyWidget'</span>);</span><br><span class="line">        <span class="keyword">return</span> Container();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果你需要一个独特的 BLoC 并且需要从应用程序内部的任何位置访问，这是一个可接受的解决方案。</p>
+<ul>
+<li>这是非常容易使用;</li>
+<li>它不依赖于任何 <code>BuildContext</code>;</li>
+<li>无需通过任何 <code>BlocProvider</code> 来查找 <code>BLoC</code>，</li>
+<li>为了释放它的资源，只需确保将应用程序实现为 StatefulWidget，并在应用程序Widget的重载 dispose() 方法中调用 globalBloc.dispose()。</li>
+</ul>
+<p>许多纯粹主义者反对这种解决方案。我不知道为什么，但是…所以让我们看看另一个……</p>
+<h4 id="把它放在所有东西的顶部"><a href="#把它放在所有东西的顶部" class="headerlink" title="把它放在所有东西的顶部"></a>把它放在所有东西的顶部</h4><p>在 Flutter 中，所有页面的祖先本身必须是 MaterialApp 的父级。这是因为页面（或路径）被包装在 OverlayEntry 中，这是所有页面的公共堆栈的子项。</p>
+<p>换句话说，每个页面都有一个 Buildcontext，它独立于任何其他页面。这就解释了为什么在不使用任何技巧的情况下，两个页面(路由)不可能有任何共同点。</p>
+<p>因此，如果你需要在应用程序中的任何位置使用 <code>BLoC</code>，则必须将其作为 MaterialApp 的父级，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() =&gt; runApp(Application());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> BlocProvider&lt;AuthenticationBloc&gt;(</span><br><span class="line">      bloc: AuthenticationBloc(),</span><br><span class="line">      child: MaterialApp(</span><br><span class="line">        title: <span class="string">'BLoC Samples'</span>,</span><br><span class="line">        theme: ThemeData(</span><br><span class="line">          primarySwatch: Colors.blue,</span><br><span class="line">        ),</span><br><span class="line">        home: InitializationPage(),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="在子树上能访问"><a href="#在子树上能访问" class="headerlink" title="在子树上能访问"></a>在子树上能访问</h3><p>大多数情况下，您可能需要在应用程序的某些特定部分使用<code>BLoC</code>。</p>
+<p>作为一个例子，我们可以考虑将<code>BLoC</code>用于一个讨论线程</p>
+<ul>
+<li>与服务器交互以获取，添加，更新帖子</li>
+<li>列出要在某一页面中显示的线程</li>
+<li>…</li>
+</ul>
+<p>对于此示例，您不需要此 <code>BLoC</code> 可用于整个应用程序，而是需要某些 <code>Widget</code> (树的一部分)。</p>
+<p>第一种解决方案可能是将 <code>BLoC</code> 注入 <code>Widget</code> 树的根目录，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTree</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> BlocProvider&lt;MyBloc&gt;(</span><br><span class="line">      bloc: MyBloc(),</span><br><span class="line">      child: Column(</span><br><span class="line">        children: &lt;Widget&gt;[</span><br><span class="line">          MyChildWidget(),</span><br><span class="line">        ],</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyChildWidget</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span> </span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    MyBloc = BlocProvider.of&lt;MyBloc&gt;(context);</span><br><span class="line">    <span class="keyword">return</span> Container();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这样，所有 widget 都将通过调用 <code>BlocProvider.of</code> 方法访问<code>BLoC</code>。</p>
+<p>边注</p>
+<p>如上所示的解决方案并不是最佳的，因为它将在每次重建时实例化BLoC。</p>
+<p>后果：</p>
+<ul>
+<li>你将丢失现有<code>BLoC</code>所有内容</li>
+<li>它会耗费CPU时间，因为它需要在每次构建时实例化它。</li>
+</ul>
+<p>在这种情况下，更好的方法是使用 <code>StatefulWidget</code> 从其持久状态中受益，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTree</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line"> <span class="meta">@override</span></span><br><span class="line">  _MyTreeState createState() =&gt; _MyTreeState();</span><br><span class="line">&#125;</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyTreeState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyTree</span>&gt;</span>&#123;</span><br><span class="line">  MyBloc bloc;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> initState()&#123;</span><br><span class="line">    <span class="keyword">super</span>.initState();</span><br><span class="line">    bloc = MyBloc();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    bloc?.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> BlocProvider&lt;MyBloc&gt;(</span><br><span class="line">      bloc: bloc,</span><br><span class="line">      child: Column(</span><br><span class="line">        children: &lt;Widget&gt;[</span><br><span class="line">          MyChildWidget(),</span><br><span class="line">        ],</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用这种方法，如果 “MyTree” widget 需要重建，则不必重新实例化 BLoC 并直接重用现有实例。</p>
+<h3 id="只对一个widget可访问"><a href="#只对一个widget可访问" class="headerlink" title="只对一个widget可访问"></a>只对一个widget可访问</h3><p>这涉及 <code>BLoC</code>仅由一个 Widget 使用的情况。</p>
+<p>在这种情况下，可以在 Widget 中实例化 BLoC。</p>
+<h2 id="事件状态"><a href="#事件状态" class="headerlink" title="事件状态"></a>事件状态</h2><p>有时，处理一系列可能是顺序或并行，长或短，同步或异步以及可能导致各种结果的活动可能变得非常难以编程。你可能要随着进度或根据状态更新显示的内容。</p>
+<p>第一个实例的目的是使这种情况更容易处理。</p>
+<p>该解决方案是基于以下原则的：</p>
+<ul>
+<li>一个事件被发送出来</li>
+<li>此事件触发一些导致一个或多个状态的动作;</li>
+<li>这些状态中的每一个都可以反过来发出其他事件或导致另一个状态;</li>
+<li>然后，这些事件将根据有效的状态触发其它动作;</li>
+<li>等等…</li>
+</ul>
+<p>为了阐明这个概念，我们来看两个常见的例子：</p>
+<ul>
+<li>应用初始化</li>
+</ul>
+<p>假设你需要运行一系列动作来初始化应用程序。动作可能与服务器的交互相关联(例如，加载一些数据)。在此初始化过程中，您可能需要显示进度条和一系列图像来让用户等待。</p>
+<ul>
+<li>认证</li>
+</ul>
+<p>在启动时，应用程序可能需要用户进行身份验证或注册。用户通过身份验证后，将重定向到应用程序的主页面。然后，如果用户注销，则将其重定向到认证页面。</p>
+<p>为了能够处理所有可能的情况以及事件序列，但是如果我们考虑到事件可以在应用程序中的任何地方被触发，这可能变得非常难以管理。</p>
+<p>这正是<code>BlocEventState</code>与<code>BlocEventStateBuilder</code>相结合可以帮助很多的地方。</p>
+<h3 id="BlocEventState"><a href="#BlocEventState" class="headerlink" title="BlocEventState"></a>BlocEventState</h3><p><code>BlocEventState</code>背后的思想是定义一个<code>BLoC</code>：</p>
+<ul>
+<li>接受事件(<code>Event</code>)作为输入;</li>
+<li>在新事件(<code>event</code>)被发送的时候调用事件处理器(<code>eventHandler</code>);</li>
+<li>事件处理器(<code>eventHandler</code>)负责根据事件(<code>event</code>)采取适当的行动(<code>action</code>)并发出状态(<code>State</code>)作为响应。</li>
+</ul>
+<p>下图展示了这个思想：</p>
+<p><img src="https://www.didierboelens.com/images/bloc_event_state.png" alt></p>
+<p>这是这个类的源代码。解释如下：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:blocs/bloc_helpers/bloc_provider.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:meta/meta.dart'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:rxdart/rxdart.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocEvent</span> <span class="keyword">extends</span> <span class="title">Object</span> </span>&#123;&#125;</span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocState</span> <span class="keyword">extends</span> <span class="title">Object</span> </span>&#123;&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocEventStateBase</span>&lt;<span class="title">BlocEvent</span>, <span class="title">BlocState</span>&gt; <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  PublishSubject&lt;BlocEvent&gt; _eventController = PublishSubject&lt;BlocEvent&gt;();</span><br><span class="line">  BehaviorSubject&lt;BlocState&gt; _stateController = BehaviorSubject&lt;BlocState&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// To be invoked to emit an event</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="built_in">Function</span>(BlocEvent) <span class="keyword">get</span> emitEvent =&gt; _eventController.sink.add;</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Current/New state</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  Stream&lt;BlocState&gt; <span class="keyword">get</span> state =&gt; _stateController.stream;</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// External processing of the event</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  Stream&lt;BlocState&gt; eventHandler(BlocEvent event, BlocState currentState);</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// initialState</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="keyword">final</span> BlocState initialState;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Constructor</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  BlocEventStateBase(&#123;</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.initialState,</span><br><span class="line">  &#125;)&#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// For each received event, we invoke the [eventHandler] and</span></span><br><span class="line">    <span class="comment">// emit any resulting newState</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    _eventController.listen((BlocEvent event)&#123;</span><br><span class="line">      BlocState currentState = _stateController.value ?? initialState;</span><br><span class="line">      eventHandler(event, currentState).forEach((BlocState newState)&#123;</span><br><span class="line">        _stateController.sink.add(newState);</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _eventController.close();</span><br><span class="line">    _stateController.close();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如你所见，这是一个需要扩展的抽象类，要在扩展类中定义<code>eventHandler</code>方法的行为。</p>
+<p>它暴露了：</p>
+<ul>
+<li>一个<code>Sink</code>(<code>emitEvent</code>)来推送一个事件;</li>
+<li>一个<code>Stream</code>(<code>state</code>)来监听发出的状态。</li>
+</ul>
+<p>在初始化时（请参阅构造函数）：</p>
+<ul>
+<li>需要提供<code>initialState</code>;</li>
+<li>它创建一个<code>StreamSubscription</code>来监听传入的事件<ul>
+<li>将它们发送到<code>eventHandler</code></li>
+<li>发出作为结果的状态。</li>
+</ul>
+</li>
+</ul>
+<h3 id="专门的-BlocEventState"><a href="#专门的-BlocEventState" class="headerlink" title="专门的 BlocEventState"></a>专门的 <code>BlocEventState</code></h3><p>用于实现此类 BlocEventState 的模板在下面给出。之后，我们将实现一个真正的。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">TemplateEventStateBloc</span> <span class="keyword">extends</span> <span class="title">BlocEventStateBase</span>&lt;<span class="title">BlocEvent</span>, <span class="title">BlocState</span>&gt; </span>&#123;</span><br><span class="line">  TemplateEventStateBloc()</span><br><span class="line">      : <span class="keyword">super</span>(</span><br><span class="line">          initialState: BlocState.notInitialized(),</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Stream&lt;BlocState&gt; eventHandler( BlocEvent event, BlocState currentState) <span class="keyword">async</span>* &#123;</span><br><span class="line">     <span class="keyword">yield</span> BlocState.notInitialized();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line"></span><br><span class="line">如果这个模板没有编译通过，请不要担心......这是正常的，因为我们还没有定义`BlocState.notInitialized()`......过一会就有了。</span><br><span class="line"></span><br><span class="line">此模板仅在初始化时提供 `initialState` 并覆盖了 `eventHandler`。</span><br><span class="line"></span><br><span class="line">这里有一些非常有趣的事情需要注意。我们使用异步生成器：<span class="keyword">async</span>* 和 <span class="keyword">yield</span> 声明。</span><br><span class="line"></span><br><span class="line">使用 <span class="keyword">async</span>* 修饰符标记方法，将方法标识为异步生成器：</span><br><span class="line"></span><br><span class="line">每次 <span class="keyword">yield</span> 语句被调用的时候，它都会将 <span class="keyword">yield</span> 后面的表达式结果添加到输出流。</span><br><span class="line"></span><br><span class="line">如果我们需要发送作为一系列动作结果的一系列状态，这是特别有用的。</span><br><span class="line"></span><br><span class="line">有关异步生成器的其它详细信息，请单击此[链接](/dart/<span class="keyword">async</span>/<span class="number">2019</span>/<span class="number">05</span>/<span class="number">04</span>/Dart-Language-Asynchrony-SupportPhase2/)。</span><br><span class="line"></span><br><span class="line">### BlocEvent 和 BlocState</span><br><span class="line"></span><br><span class="line">正如你已经注意到的，我们已经定义了一个 `BlocEvent` 和 `BlocState` 抽象类。</span><br><span class="line"></span><br><span class="line">这些类需要被你想要发出的专门的事件和状态进行扩展。</span><br><span class="line"></span><br><span class="line">### `BlocEventStateBuilder` widget</span><br><span class="line"></span><br><span class="line">这个模式的最后一部分是 `BlocEventStateBuilder` Widget，它允许对`BlocEventState` 发出的`State`作出响应。</span><br><span class="line"></span><br><span class="line">这里是源代码</span><br><span class="line"></span><br><span class="line">```dart</span><br><span class="line"><span class="keyword">typedef</span> Widget AsyncBlocEventStateBuilder&lt;BlocState&gt;(BuildContext context, BlocState state);</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlocEventStateBuilder</span>&lt;<span class="title">BlocEvent</span>,<span class="title">BlocState</span>&gt; <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="keyword">const</span> BlocEventStateBuilder(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.builder,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.bloc,</span><br><span class="line">  &#125;): <span class="keyword">assert</span>(builder != <span class="keyword">null</span>),</span><br><span class="line">      <span class="keyword">assert</span>(bloc != <span class="keyword">null</span>),</span><br><span class="line">      <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> BlocEventStateBase&lt;BlocEvent,BlocState&gt; bloc;</span><br><span class="line">  <span class="keyword">final</span> AsyncBlocEventStateBuilder&lt;BlocState&gt; builder;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> StreamBuilder&lt;BlocState&gt;(</span><br><span class="line">      stream: bloc.state,</span><br><span class="line">      initialData: bloc.initialState,</span><br><span class="line">      builder: (BuildContext context, AsyncSnapshot&lt;BlocState&gt; snapshot)&#123;</span><br><span class="line">        <span class="keyword">return</span> builder(context, snapshot.data);</span><br><span class="line">      &#125;,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个 Widget 不是别的，就是一个专门的 <code>StreamBuilder</code>，它会在每次新的 BlocState被发出之后调用<code>builder</code>输入参数。</p>
+<hr>
+<p>好的。现在我们什么都有了，现在是时候展示我们可以用它们做些什么了……</p>
+<h3 id="例1-应用程序初始化"><a href="#例1-应用程序初始化" class="headerlink" title="例1: 应用程序初始化"></a>例1: 应用程序初始化</h3><p>第一个例子举例说明了你需要应用程序在启动时执行某些任务的情况。</p>
+<p>常见的用途是游戏最初显示启动页(不一定有动画)，同时从服务器获取一些文件，检查是否有更新，尝试连接到所有的游戏中心……在显示真正的主页面之前。为了不给应用程序什么都不做的感觉，它可能会显示一个进度条并间隔地显示一些图片，同时它会完成所有初始化过程。</p>
+<p>我要向你展示的实现非常简单。它只会在屏幕上显示一些完成百分比，但这可以很容易地扩展从而以满足你的需求。</p>
+<p>首先要做的是定义事件和状态……</p>
+<h4 id="应用初始化事件"><a href="#应用初始化事件" class="headerlink" title="应用初始化事件"></a>应用初始化事件</h4><p>在这个例子中，我只会考虑2个事件：</p>
+<ul>
+<li>start：此事件将触发初始化过程;</li>
+<li>stop：该事件可用于强制初始化进程停止</li>
+</ul>
+<p>这里是定义：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationInitializationEvent</span> <span class="keyword">extends</span> <span class="title">BlocEvent</span> </span>&#123;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">final</span> ApplicationInitializationEventType type;</span><br><span class="line"></span><br><span class="line">  ApplicationInitializationEvent(&#123;</span><br><span class="line">    <span class="keyword">this</span>.type: ApplicationInitializationEventType.start,</span><br><span class="line">  &#125;) : <span class="keyword">assert</span>(type != <span class="keyword">null</span>);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">enum</span> ApplicationInitializationEventType &#123;</span><br><span class="line">  start,</span><br><span class="line">  stop,</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="应用初始化件状态"><a href="#应用初始化件状态" class="headerlink" title="应用初始化件状态"></a>应用初始化件状态</h4><p>该类将提供与初始化过程相关的信息。</p>
+<p>对于这个例子，我会考虑：</p>
+<ul>
+<li><p>2个标记：</p>
+<ul>
+<li>isInitialized指示初始化是否完成</li>
+<li>isInitializing以了解我们是否处于初始化过程的中间</li>
+</ul>
+</li>
+<li><p>进度完成率</p>
+</li>
+</ul>
+<p>这里是源代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationInitializationState</span> <span class="keyword">extends</span> <span class="title">BlocState</span> </span>&#123;</span><br><span class="line">  ApplicationInitializationState(&#123;</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.isInitialized,</span><br><span class="line">    <span class="keyword">this</span>.isInitializing: <span class="keyword">false</span>,</span><br><span class="line">    <span class="keyword">this</span>.progress: <span class="number">0</span>,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> isInitialized;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> isInitializing;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">int</span> progress;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> ApplicationInitializationState.notInitialized() &#123;</span><br><span class="line">    <span class="keyword">return</span> ApplicationInitializationState(</span><br><span class="line">      isInitialized: <span class="keyword">false</span>,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> ApplicationInitializationState.progressing(<span class="built_in">int</span> progress) &#123;</span><br><span class="line">    <span class="keyword">return</span> ApplicationInitializationState(</span><br><span class="line">      isInitialized: progress == <span class="number">100</span>,</span><br><span class="line">      isInitializing: <span class="keyword">true</span>,</span><br><span class="line">      progress: progress,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> ApplicationInitializationState.initialized() &#123;</span><br><span class="line">    <span class="keyword">return</span> ApplicationInitializationState(</span><br><span class="line">      isInitialized: <span class="keyword">true</span>,</span><br><span class="line">      progress: <span class="number">100</span>,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="应用初始化-Bloc"><a href="#应用初始化-Bloc" class="headerlink" title="应用初始化 Bloc"></a>应用初始化 Bloc</h4><p>该 BLoC 负责基于事件处理初始化过程。</p>
+<p>这里是代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationInitializationBloc</span></span></span><br><span class="line"><span class="class">    <span class="keyword">extends</span> <span class="title">BlocEventStateBase</span>&lt;<span class="title">ApplicationInitializationEvent</span>, <span class="title">ApplicationInitializationState</span>&gt; </span>&#123;</span><br><span class="line">  ApplicationInitializationBloc()</span><br><span class="line">      : <span class="keyword">super</span>(</span><br><span class="line">          initialState: ApplicationInitializationState.notInitialized(),</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Stream&lt;ApplicationInitializationState&gt; eventHandler(</span><br><span class="line">      ApplicationInitializationEvent event, ApplicationInitializationState currentState) <span class="keyword">async</span>* &#123;</span><br><span class="line">    </span><br><span class="line">    <span class="keyword">if</span> (!currentState.isInitialized)&#123;</span><br><span class="line">      <span class="keyword">yield</span> ApplicationInitializationState.notInitialized();</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (event.type == ApplicationInitializationEventType.start) &#123;</span><br><span class="line">      <span class="keyword">for</span> (<span class="built_in">int</span> progress = <span class="number">0</span>; progress &lt; <span class="number">101</span>; progress += <span class="number">10</span>)&#123;</span><br><span class="line">        <span class="keyword">await</span> Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(milliseconds: <span class="number">300</span>));</span><br><span class="line">        <span class="keyword">yield</span> ApplicationInitializationState.progressing(progress);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (event.type == ApplicationInitializationEventType.stop)&#123;</span><br><span class="line">      <span class="keyword">yield</span> ApplicationInitializationState.initialized();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一些解释：</p>
+<ul>
+<li>当收到事件“ApplicationInitializationEventType.start”时，它从0到100开始计数（步骤10），并且对于每个值（0,10,20，……），它发出（通过yield）一个告诉的新状态初始化正在运行（isInitializing = true）及其进度值。</li>
+<li>当收到事件“ApplicationInitializationEventType.stop”时，它认为初始化已完成。</li>
+<li>正如你所看到的，我在计数器循环中放了一些延迟。这将向您展示如何使用任何Future（例如，您需要联系服务器的情况</li>
+</ul>
+<h4 id="将它们全部包装在一起"><a href="#将它们全部包装在一起" class="headerlink" title="将它们全部包装在一起"></a>将它们全部包装在一起</h4><p>现在，剩下的部分是显示显示计数器的伪 Splash 页面……</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">InitializationPage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _InitializationPageState createState() =&gt; _InitializationPageState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_InitializationPageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">InitializationPage</span>&gt; </span>&#123;</span><br><span class="line">  ApplicationInitializationBloc bloc;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> initState()&#123;</span><br><span class="line">    <span class="keyword">super</span>.initState();</span><br><span class="line">    bloc = ApplicationInitializationBloc();</span><br><span class="line">    bloc.emitEvent(ApplicationInitializationEvent());</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    bloc?.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext pageContext) &#123;</span><br><span class="line">    <span class="keyword">return</span> SafeArea(</span><br><span class="line">      child: Scaffold(</span><br><span class="line">        body: Container(</span><br><span class="line">          child: Center(</span><br><span class="line">            child: BlocEventStateBuilder&lt;ApplicationInitializationEvent, ApplicationInitializationState&gt;(</span><br><span class="line">              bloc: bloc,</span><br><span class="line">              builder: (BuildContext context, ApplicationInitializationState state)&#123;</span><br><span class="line">                <span class="keyword">if</span> (state.isInitialized)&#123;</span><br><span class="line">                  <span class="comment">//</span></span><br><span class="line">                  <span class="comment">// Once the initialization is complete, let's move to another page</span></span><br><span class="line">                  <span class="comment">//</span></span><br><span class="line">                  WidgetsBinding.instance.addPostFrameCallback((_)&#123;</span><br><span class="line">                    Navigator.of(context).pushReplacementNamed(<span class="string">'/home'</span>);</span><br><span class="line">                  &#125;);</span><br><span class="line">                &#125;</span><br><span class="line">                <span class="keyword">return</span> Text(<span class="string">'Initialization in progress... <span class="subst">$&#123;state.progress&#125;</span>%'</span>);</span><br><span class="line">              &#125;,</span><br><span class="line">            ),</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ul>
+<li>由于<code>ApplicationInitializationBloc</code>不需要在应用程序的任何地方使用，我们可以在<code>StatefulWidget</code>中初始化它;</li>
+<li>我们直接发出<code>ApplicationInitializationEventType.start</code>事件来触发<code>eventHandler</code></li>
+<li>每次发出<code>ApplicationInitializationState</code>时，我们都会更新文本</li>
+<li>初始化完成后，我们将用户重定向到主页。</li>
+</ul>
+<p>技巧</p>
+<p>由于我们无法在build内部直接重定向到主页,我们使用<code>WidgetsBinding.instance.addPostFrameCallback()</code>方法请求Flutter在渲染完成后立即执行方法。</p>
+<h3 id="例2：应用程序身份验证和注销"><a href="#例2：应用程序身份验证和注销" class="headerlink" title="例2：应用程序身份验证和注销"></a>例2：应用程序身份验证和注销</h3><p>对于此示例，我将考虑以下用例：</p>
+<ul>
+<li>在启动时，如果用户未经过身份验证，则会自动显示“身份验证/注册”页面;</li>
+<li>在用户认证期间，显示一个圆形进度条;</li>
+<li>经过身份验证后，用户将被重定向到主页面;</li>
+<li>在应用程序的任何地方，用户都可以注销;</li>
+<li>当用户注销时，用户将自动重定向到“身份验证”页面。</li>
+</ul>
+<p>当然，很有可能以编程方式处理所有这些，但将所有这些委托给<code>BLoC</code>要容易得多。</p>
+<p>下图解释了我要解释的解决方案</p>
+<p><img src="https://www.didierboelens.com/images/bloc_authentication.png" alt></p>
+<p>名为“DecisionPage”的中间页面将负责将用户自动重定向到“身份验证”页面或主页面，具体取决于用户身份验证的状态。当然，此DecisionPage从不显示，也不应被视为页面。</p>
+<p>首先要做的是定义事件和状态……</p>
+<h4 id="AuthenticationEvent"><a href="#AuthenticationEvent" class="headerlink" title="AuthenticationEvent"></a>AuthenticationEvent</h4><p>在这个例子中，我只考虑2个事件：</p>
+<ul>
+<li>login：当用户正确验证时发出此事件;</li>
+<li>logout：用户注销时发出的事件。</li>
+</ul>
+<p>这里是定义：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">bstract <span class="class"><span class="keyword">class</span> <span class="title">AuthenticationEvent</span> <span class="keyword">extends</span> <span class="title">BlocEvent</span> </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">String</span> name;</span><br><span class="line"></span><br><span class="line">  AuthenticationEvent(&#123;</span><br><span class="line">    <span class="keyword">this</span>.name: <span class="string">''</span>,</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthenticationEventLogin</span> <span class="keyword">extends</span> <span class="title">AuthenticationEvent</span> </span>&#123;</span><br><span class="line">  AuthenticationEventLogin(&#123;</span><br><span class="line">    <span class="built_in">String</span> name,</span><br><span class="line">  &#125;) : <span class="keyword">super</span>(</span><br><span class="line">          name: name,</span><br><span class="line">        );</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthenticationEventLogout</span> <span class="keyword">extends</span> <span class="title">AuthenticationEvent</span> </span>&#123;&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="AuthenticationState"><a href="#AuthenticationState" class="headerlink" title="AuthenticationState"></a>AuthenticationState</h4><p>该类将提供与身份验证过程相关的信息。</p>
+<p>对于这个例子，我会考虑：</p>
+<ul>
+<li>3个标记：<ul>
+<li>isAuthenticated指示身份验证是否完整</li>
+<li>isAuthenticating以了解我们是否处于身份验证过程的中间</li>
+<li>hasFailed表示身份验证失败</li>
+</ul>
+</li>
+<li>经过身份验证的用户名</li>
+</ul>
+<p>这里是源代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthenticationState</span> <span class="keyword">extends</span> <span class="title">BlocState</span> </span>&#123;</span><br><span class="line">  AuthenticationState(&#123;</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.isAuthenticated,</span><br><span class="line">    <span class="keyword">this</span>.isAuthenticating: <span class="keyword">false</span>,</span><br><span class="line">    <span class="keyword">this</span>.hasFailed: <span class="keyword">false</span>,</span><br><span class="line">    <span class="keyword">this</span>.name: <span class="string">''</span>,</span><br><span class="line">  &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> isAuthenticated;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> isAuthenticating;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">bool</span> hasFailed;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">String</span> name;</span><br><span class="line">  </span><br><span class="line">  <span class="keyword">factory</span> AuthenticationState.notAuthenticated() &#123;</span><br><span class="line">    <span class="keyword">return</span> AuthenticationState(</span><br><span class="line">      isAuthenticated: <span class="keyword">false</span>,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> AuthenticationState.authenticated(<span class="built_in">String</span> name) &#123;</span><br><span class="line">    <span class="keyword">return</span> AuthenticationState(</span><br><span class="line">      isAuthenticated: <span class="keyword">true</span>,</span><br><span class="line">      name: name,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> AuthenticationState.authenticating() &#123;</span><br><span class="line">    <span class="keyword">return</span> AuthenticationState(</span><br><span class="line">      isAuthenticated: <span class="keyword">false</span>,</span><br><span class="line">      isAuthenticating: <span class="keyword">true</span>,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">factory</span> AuthenticationState.failure() &#123;</span><br><span class="line">    <span class="keyword">return</span> AuthenticationState(</span><br><span class="line">      isAuthenticated: <span class="keyword">false</span>,</span><br><span class="line">      hasFailed: <span class="keyword">true</span>,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="AuthenticationBloc"><a href="#AuthenticationBloc" class="headerlink" title="AuthenticationBloc"></a>AuthenticationBloc</h4><p>此<code>BLoC</code>负责根据事件处理身份验证过程。</p>
+<p>这是代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthenticationBloc</span></span></span><br><span class="line"><span class="class">    <span class="keyword">extends</span> <span class="title">BlocEventStateBase</span>&lt;<span class="title">AuthenticationEvent</span>, <span class="title">AuthenticationState</span>&gt; </span>&#123;</span><br><span class="line">  AuthenticationBloc()</span><br><span class="line">      : <span class="keyword">super</span>(</span><br><span class="line">          initialState: AuthenticationState.notAuthenticated(),</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Stream&lt;AuthenticationState&gt; eventHandler(</span><br><span class="line">      AuthenticationEvent event, AuthenticationState currentState) <span class="keyword">async</span>* &#123;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">is</span> AuthenticationEventLogin) &#123;</span><br><span class="line">      <span class="comment">// Inform that we are proceeding with the authentication</span></span><br><span class="line">      <span class="keyword">yield</span> AuthenticationState.authenticating();</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Simulate a call to the authentication server</span></span><br><span class="line">      <span class="keyword">await</span> Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">2</span>));</span><br><span class="line"></span><br><span class="line">      <span class="comment">// Inform that we have successfuly authenticated, or not</span></span><br><span class="line">      <span class="keyword">if</span> (event.name == <span class="string">"failure"</span>)&#123;</span><br><span class="line">        <span class="keyword">yield</span> AuthenticationState.failure();</span><br><span class="line">      &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">        <span class="keyword">yield</span> AuthenticationState.authenticated(event.name);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    <span class="keyword">if</span> (event <span class="keyword">is</span> AuthenticationEventLogout)&#123;</span><br><span class="line">      <span class="keyword">yield</span> AuthenticationState.notAuthenticated();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>一些解释：</p>
+<ul>
+<li>当收到事件“AuthenticationEventLogin”时，它会（通过yield）发出一个新状态，告知身份验证正在运行（isAuthenticating = true）。</li>
+<li>然后它运行身份验证，一旦完成，就会发出另一个状态，告知身份验证已完成。</li>
+<li>当收到事件“AuthenticationEventLogout”时，它将发出一个新状态，告诉用户不再进行身份验证。</li>
+</ul>
+<h4 id="AuthenticationPage"><a href="#AuthenticationPage" class="headerlink" title="AuthenticationPage"></a>AuthenticationPage</h4><p>正如你将要看到的那样，为了便于解释，此页面非常基本且不会做太多的事情。</p>
+<p>这是代码。解释如下：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AuthenticationPage</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Prevents the use of the "back" button</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  Future&lt;<span class="built_in">bool</span>&gt; _onWillPopScope() <span class="keyword">async</span> &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">false</span>;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    AuthenticationBloc bloc = BlocProvider.of&lt;AuthenticationBloc&gt;(context);</span><br><span class="line">    <span class="keyword">return</span> WillPopScope(</span><br><span class="line">      onWillPop: _onWillPopScope,</span><br><span class="line">      child: SafeArea(</span><br><span class="line">        child: Scaffold(</span><br><span class="line">          appBar: AppBar(</span><br><span class="line">            title: Text(<span class="string">'Authentication Page'</span>),</span><br><span class="line">            leading: Container(),</span><br><span class="line">          ),</span><br><span class="line">          body: Container(</span><br><span class="line">            child:</span><br><span class="line">                BlocEventStateBuilder&lt;AuthenticationEvent, AuthenticationState&gt;(</span><br><span class="line">              bloc: bloc,</span><br><span class="line">              builder: (BuildContext context, AuthenticationState state) &#123;</span><br><span class="line">                <span class="keyword">if</span> (state.isAuthenticating) &#123;</span><br><span class="line">                  <span class="keyword">return</span> PendingAction();</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">if</span> (state.isAuthenticated)&#123;</span><br><span class="line">                  <span class="keyword">return</span> Container();</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">                <span class="built_in">List</span>&lt;Widget&gt; children = &lt;Widget&gt;[];</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Button to fake the authentication (success)</span></span><br><span class="line">                children.add(</span><br><span class="line">                  ListTile(</span><br><span class="line">                      title: RaisedButton(</span><br><span class="line">                        child: Text(<span class="string">'Log in (success)'</span>),</span><br><span class="line">                        onPressed: () &#123;</span><br><span class="line">                            bloc.emitEvent(AuthenticationEventLogin(name: <span class="string">'Didier'</span>));</span><br><span class="line">                        &#125;,</span><br><span class="line">                      ),</span><br><span class="line">                    ),</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Button to fake the authentication (failure)</span></span><br><span class="line">                children.add(</span><br><span class="line">                  ListTile(</span><br><span class="line">                      title: RaisedButton(</span><br><span class="line">                        child: Text(<span class="string">'Log in (failure)'</span>),</span><br><span class="line">                        onPressed: () &#123;</span><br><span class="line">                            bloc.emitEvent(AuthenticationEventLogin(name: <span class="string">'failure'</span>));</span><br><span class="line">                        &#125;,</span><br><span class="line">                      ),</span><br><span class="line">                    ),</span><br><span class="line">                );</span><br><span class="line"></span><br><span class="line">                <span class="comment">// Display a text if the authentication failed</span></span><br><span class="line">                <span class="keyword">if</span> (state.hasFailed)&#123;</span><br><span class="line">                  children.add(</span><br><span class="line">                    Text(<span class="string">'Authentication failure!'</span>),</span><br><span class="line">                  );</span><br><span class="line">                &#125;</span><br><span class="line"></span><br><span class="line">                <span class="keyword">return</span> Column(</span><br><span class="line">                  children: children,</span><br><span class="line">                );    </span><br><span class="line">              &#125;,</span><br><span class="line">            ),</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ul>
+<li>第11行：页面获取指向<code>AuthenticationBloc</code>的引用</li>
+<li>第24-70行：它监听发出的<code>AuthenticationState</code>：</li>
+<li>如果身份验证正在进行中，它会显示一个CircularProgressIndicator，告诉用户正在进行某些操作并阻止用户访问该页面（第25-27行）</li>
+<li>如果验证成功，我们不需要显示任何内容（第29-31行）。</li>
+<li>如果用户未经过身份验证，则会显示2个按钮以模拟成功的身份验证和失败。</li>
+<li>当我们点击其中一个按钮时，我们发出一个<code>AuthenticationEventLogin</code>事件，以及一些参数（通常由认证过程使用）</li>
+<li>如果验证失败，我们会显示错误消息（第60-64行）</li>
+</ul>
+<p>仅此而已！没有别的事情需要做……是不是很容易？</p>
+<p>小贴士</p>
+<p>您可能已经注意到，我将页面包装在WillPopScope中。</p>
+<p>理由是我不希望用户能够使用Android’后退’按钮，如此示例中所示，身份验证是一个必须的步骤，它阻止用户访问任何其他部分，除非经过正确的身份验证。</p>
+<h4 id="DecisionPage"><a href="#DecisionPage" class="headerlink" title="DecisionPage"></a>DecisionPage</h4><p>如前所述，我希望应用程序根据身份验证状态自动重定向到<code>AuthenticationPage</code>或<code>HomePage</code>。</p>
+<p>以下是此DecisionPage的代码，说明如下：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DecisionPage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  DecisionPageState createState() &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> DecisionPageState();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">DecisionPageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">DecisionPage</span>&gt; </span>&#123;</span><br><span class="line">  AuthenticationState oldAuthenticationState;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    AuthenticationBloc bloc = BlocProvider.of&lt;AuthenticationBloc&gt;(context);</span><br><span class="line">    <span class="keyword">return</span> BlocEventStateBuilder&lt;AuthenticationEvent, AuthenticationState&gt;(</span><br><span class="line">      bloc: bloc,</span><br><span class="line">      builder: (BuildContext context, AuthenticationState state) &#123;</span><br><span class="line">        <span class="keyword">if</span> (state != oldAuthenticationState)&#123;</span><br><span class="line">          oldAuthenticationState = state;</span><br><span class="line"></span><br><span class="line">          <span class="keyword">if</span> (state.isAuthenticated)&#123;</span><br><span class="line">            _redirectToPage(context, HomePage());</span><br><span class="line">          &#125; <span class="keyword">else</span> <span class="keyword">if</span> (state.isAuthenticating || state.hasFailed)&#123;</span><br><span class="line">  <span class="comment">//do nothing</span></span><br><span class="line">          &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">            _redirectToPage(context, AuthenticationPage());</span><br><span class="line">          &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="comment">// This page does not need to display anything since it will</span></span><br><span class="line">        <span class="comment">// always remind behind any active page (and thus 'hidden').</span></span><br><span class="line">        <span class="keyword">return</span> Container();</span><br><span class="line">      &#125;</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> _redirectToPage(BuildContext context, Widget page)&#123;</span><br><span class="line">    WidgetsBinding.instance.addPostFrameCallback((_)&#123;</span><br><span class="line">      MaterialPageRoute newRoute = MaterialPageRoute(</span><br><span class="line">          builder: (BuildContext context) =&gt; page</span><br><span class="line">        );</span><br><span class="line"></span><br><span class="line">      Navigator.of(context).pushAndRemoveUntil(newRoute, ModalRoute.withName(<span class="string">'/decision'</span>));</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>提醒</p>
+<p>为了详细解释这一点，我们需要回到 Flutter处理Pages（= Route）的方式。要处理路由，我们使用导航器，它创建一个叠加层。</p>
+<p>这个<code>Overlay</code>是一个OverlayEntry栈，每个都包含一个Page。</p>
+<p>当我们通过Navigator.of(context) <code>pushing</code>,<code>poping</code>,替换页面时，后者就会更新它的<code>Overlay</code>(栈也被更新了)，也就是被重建了。</p>
+<p>当栈被重建的时候，每个OverlayEntry(以及它的内容)也被重建了。</p>
+<p>因此,当我们通过Navigator.of(context)进行操作时，所有剩余的页面都会重建！</p>
+<ul>
+<li>那么，为什么我将它实现为 StatefulWidget？</li>
+</ul>
+<p>为了能够响应AuthenticationState的任何更改，此“页面”需要在应用程序的整个生命周期中保持存在。</p>
+<p>这意味着，根据上面的提醒，每次Navigator.of（context）完成操作时，都会重建此页面。</p>
+<p>因此，它的<code>BlocEventStateBuilder</code>也将重建，调用自己的builder方法。</p>
+<p>因为此builder负责将用户重定向到与<code>AuthenticationState</code>对应的页面，所以如果我们每次重建页面时重定向用户，它会由于持续的重建而不断地重定向。</p>
+<p>为了防止这种情况发生，我们只需要记住我们采取行动的最后一个<code>AuthenticationState</code>，并且只在收到另一个<code>AuthenticationState</code>时采取另一个动作。</p>
+<ul>
+<li>这是如何运作的？</li>
+</ul>
+<p>如上所述，每次发出<code>AuthenticationState</code>时，BlocEventStateBuilder都会调用builder。</p>
+<p>基于状态标志（isAuthenticated），我们知道我们需要向哪个页面重定向用户。</p>
+<p>小技巧</p>
+<p>由于我们无法直接从builder重定向到另一个页面，因此我们使用WidgetsBinding.instance.addPostFrameCallback()方法在渲染一完成后就请求Flutter执行方法。</p>
+<p>此外，由于我们需要在重定向用户之前删除任何现有页面，除了需要保留在所有情况下的DecisionPage之外，我们使Navigator.of(context).pushAndRemoveUntil(…)来到达此目的。</p>
+<h4 id="注销"><a href="#注销" class="headerlink" title="注销"></a>注销</h4><p>要让用户注销，您现在可以创建一个“LogOutButton”并将其放在应用程序的任何位置。</p>
+<p>此按钮只需要发出<code>AuthenticationEventLogout()</code>事件，这将导致以下操作的自动链：</p>
+<ol>
+<li>它将由<code>AuthenticationBloc</code>处理</li>
+<li>反过来会发出一个<code>AuthentiationState</code>（isAuthenticated = false）</li>
+<li>这将由DecisionPage通过<code>BlocEventStateBuilder</code>处理</li>
+<li>这会将用户重定向到<code>AuthenticationPage</code></li>
+</ol>
+<p>这是这个按钮的代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LogOutButton</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    AuthenticationBloc bloc = BlocProvider.of&lt;AuthenticationBloc&gt;(context);</span><br><span class="line">    <span class="keyword">return</span> IconButton(</span><br><span class="line">      icon: Icon(Icons.exit_to_app),</span><br><span class="line">      onPressed: () &#123;</span><br><span class="line">        bloc.emitEvent(AuthenticationEventLogout());</span><br><span class="line">      &#125;,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h4 id="AuthenticationBloc-1"><a href="#AuthenticationBloc-1" class="headerlink" title="AuthenticationBloc"></a>AuthenticationBloc</h4><p>由于 AuthenticationBloc 需要可用于此应用程序的任何页面，我们还会将其作为MaterialApp的 父级注入，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() =&gt; runApp(Application());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Application</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> BlocProvider&lt;AuthenticationBloc&gt;(</span><br><span class="line">      bloc: AuthenticationBloc(),</span><br><span class="line">      child: MaterialApp(</span><br><span class="line">        title: <span class="string">'BLoC Samples'</span>,</span><br><span class="line">        theme: ThemeData(</span><br><span class="line">          primarySwatch: Colors.blue,</span><br><span class="line">        ),</span><br><span class="line">        home: DecisionPage(),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="表单验证"><a href="#表单验证" class="headerlink" title="表单验证"></a>表单验证</h2><p><code>BLoC</code>的另一个有趣用途是当您需要验证表单时：</p>
+<ul>
+<li>根据某些业务规则验证与TextField相关的条目;</li>
+<li>根据规则显示验证错误消息;</li>
+<li>根据业务规则自动化widget的可访问性。</li>
+</ul>
+<p>我现在要做的一个例子是RegistrationForm，它由3个TextField电子邮件，密码，确认密码）和1个RaisedButton组成，以启动注册过程。</p>
+<p>我想要实现的业务规则是：</p>
+<ul>
+<li>电子邮件需要是有效的电子邮件地址。如果不是，则需要显示一条消息。</li>
+<li>密码必须有效（必须包含至少8个字符，1个大写，1个小写，1个数字和1个特殊字符。如果无效，则需要显示一条消息。</li>
+<li>重新输入密码需要符合相同的验证规则并且与密码相同。如果不相同，则需要显示消息。</li>
+<li>注册按钮只有在所有规则有效时才有效。</li>
+</ul>
+<h3 id="RegistrationFormBloc"><a href="#RegistrationFormBloc" class="headerlink" title="RegistrationFormBloc"></a>RegistrationFormBloc</h3><p>该<code>BLoC</code>负责处理验证业务规则，如前所述。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RegistrationFormBloc</span> <span class="keyword">extends</span> <span class="title">Object</span> <span class="title">with</span> <span class="title">EmailValidator</span>, <span class="title">PasswordValidator</span> <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> BehaviorSubject&lt;<span class="built_in">String</span>&gt; _emailController = BehaviorSubject&lt;<span class="built_in">String</span>&gt;();</span><br><span class="line">  <span class="keyword">final</span> BehaviorSubject&lt;<span class="built_in">String</span>&gt; _passwordController = BehaviorSubject&lt;<span class="built_in">String</span>&gt;();</span><br><span class="line">  <span class="keyword">final</span> BehaviorSubject&lt;<span class="built_in">String</span>&gt; _passwordConfirmController = BehaviorSubject&lt;<span class="built_in">String</span>&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">//  Inputs</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="built_in">Function</span>(<span class="built_in">String</span>) <span class="keyword">get</span> onEmailChanged =&gt; _emailController.sink.add;</span><br><span class="line">  <span class="built_in">Function</span>(<span class="built_in">String</span>) <span class="keyword">get</span> onPasswordChanged =&gt; _passwordController.sink.add;</span><br><span class="line">  <span class="built_in">Function</span>(<span class="built_in">String</span>) <span class="keyword">get</span> onRetypePasswordChanged =&gt; _passwordConfirmController.sink.add;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Validators</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  Stream&lt;<span class="built_in">String</span>&gt; <span class="keyword">get</span> email =&gt; _emailController.stream.transform(validateEmail);</span><br><span class="line">  Stream&lt;<span class="built_in">String</span>&gt; <span class="keyword">get</span> password =&gt; _passwordController.stream.transform(validatePassword);</span><br><span class="line">  Stream&lt;<span class="built_in">String</span>&gt; <span class="keyword">get</span> confirmPassword =&gt; _passwordConfirmController.stream.transform(validatePassword)</span><br><span class="line">    .doOnData((<span class="built_in">String</span> c)&#123;</span><br><span class="line">      <span class="comment">// If the password is accepted (after validation of the rules)</span></span><br><span class="line">      <span class="comment">// we need to ensure both password and retyped password match</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="number">0</span> != _passwordController.value.compareTo(c))&#123;</span><br><span class="line">        <span class="comment">// If they do not match, add an error</span></span><br><span class="line">        _passwordConfirmController.addError(<span class="string">"No Match"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Registration button</span></span><br><span class="line">  Stream&lt;<span class="built_in">bool</span>&gt; <span class="keyword">get</span> registerValid =&gt; Observable.combineLatest3(</span><br><span class="line">                                      email, </span><br><span class="line">                                      password, </span><br><span class="line">                                      confirmPassword, </span><br><span class="line">                                      (e, p, c) =&gt; <span class="keyword">true</span></span><br><span class="line">                                    );</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _emailController?.close();</span><br><span class="line">    _passwordController?.close();</span><br><span class="line">    _passwordConfirmController?.close();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我详细解释一下……</p>
+<ul>
+<li>我们首先初始化3个<code>BehaviorSubjec</code>来处理表单的每个<code>TextField</code>的<code>Streams</code>。</li>
+<li>我们暴露了3个Function(String），它将用于接受来自<code>TextField</code>的输入。</li>
+<li>我们暴露了3个Stream<string>，<code>TextField</code>将使用它来显示由它们各自的验证产生的潜在错误消息</string></li>
+<li>我们暴露了1个Stream<bool>，它将被RaisedButton使用，以根据整个验证结果启用/禁用它。</bool></li>
+</ul>
+<p>好的，现在是时候深入了解更多细节了……</p>
+<ul>
+<li>您可能已经注意到，此类的签名有点特殊。我们来回顾一下吧。</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RegistrationFormBloc</span> <span class="keyword">extends</span> <span class="title">Object</span> </span></span><br><span class="line"><span class="class">                           <span class="title">with</span> <span class="title">EmailValidator</span>, <span class="title">PasswordValidator</span> </span></span><br><span class="line"><span class="class">                           <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>with关键字表示此类正在使用MIXINS（=“在另一个类中重用某些类代码的方法”），并且为了能够使用with关键字，该类需要扩展Object类。这些mixin包含分别验证电子邮件和密码的代码。</p>
+<p>有关Mixins的更多详细信息，我建议您阅读<a href="https://medium.com/flutter-community/dart-what-are-mixins-3a72344011f3" target="_blank" rel="noopener">Romain Rastel的这篇精彩文章</a>。</p>
+<h4 id="Validator-Mixins"><a href="#Validator-Mixins" class="headerlink" title="Validator Mixins"></a>Validator Mixins</h4><p>我只会解释EmailValidator，因为PasswordValidator非常相似</p>
+<p>首先，是代码</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">const</span> <span class="built_in">String</span> _kEmailRule = <span class="string">r"^[a-zA-Z0-9_.+-]+@[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$"</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">EmailValidator</span> </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> StreamTransformer&lt;<span class="built_in">String</span>,<span class="built_in">String</span>&gt; validateEmail = </span><br><span class="line">      StreamTransformer&lt;<span class="built_in">String</span>,<span class="built_in">String</span>&gt;.fromHandlers(handleData: (email, sink)&#123;</span><br><span class="line">        <span class="keyword">final</span> <span class="built_in">RegExp</span> emailExp = <span class="keyword">new</span> <span class="built_in">RegExp</span>(_kEmailRule);</span><br><span class="line"></span><br><span class="line">        <span class="keyword">if</span> (!emailExp.hasMatch(email) || email.isEmpty)&#123;</span><br><span class="line">          sink.addError(<span class="string">'Entre a valid email'</span>);</span><br><span class="line">        &#125; <span class="keyword">else</span> &#123;</span><br><span class="line">          sink.add(email);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该类暴露了一个<code>final</code>方法（“validateEmail”），它是一个<code>StreamTransformer</code>。</p>
+<p>提醒</p>
+<p><code>StreamTransformer</code>的调用方式如下：stream.transform(StreamTransformer）。</p>
+<p><code>StreamTransformer</code>通过transform方法从<code>Stream</code>引用它的输入。然后它处理此输入，并将转换后的输入重新注入初始<code>Stream</code>。</p>
+<p>在此代码中，输入的处理包括根据正则表达式进行检查。如果输入与正则表达式匹配，我们只需将输入重新注入流中，否则，我们会向流中注入错误消息。</p>
+<h4 id="为什么使用stream-tansform"><a href="#为什么使用stream-tansform" class="headerlink" title="为什么使用stream.tansform()?"></a>为什么使用stream.tansform()?</h4><p>如前所述，如果验证成功，StreamTransformer会将输入重新注入Stream。为什么有用？</p>
+<p>以下是与Observable.combineLatest3()相关的解释…此方法在它引用的所有Streams之前不会发出任何值，至少发出一个值。</p>
+<p>让我们看看下面的图片来说明我们想要实现的目标。</p>
+<p><img src="https://www.didierboelens.com/images/bloc_combine.png" alt></p>
+<ul>
+<li>如果用户输入电子邮件并且后者经过验证，它将由电子邮件流发出，该电子邮件流将是Observable.combineLatest3()的一个输入;</li>
+<li>如果电子邮件无效，则会向流中添加错误（并且流中没有值）;</li>
+<li>这同样适用于密码和重新输入密码;</li>
+<li>当所有这三个验证都成功时（意味着所有这三个流都会发出一个值），Observable.combineLatest3（）将依次发出一个真正的感谢“（e，p，c）=&gt; true”（见第35行）。</li>
+</ul>
+<h4 id="验证2个密码"><a href="#验证2个密码" class="headerlink" title="验证2个密码"></a>验证2个密码</h4><p>我在互联网上看到了很多与这种比较有关的问题。存在几种解决方案，让我解释其中的两种。</p>
+<h5 id="基本解决方案-没有错误消息"><a href="#基本解决方案-没有错误消息" class="headerlink" title="基本解决方案 - 没有错误消息"></a>基本解决方案 - 没有错误消息</h5><p>第一个解决方案可能是以下一个：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;<span class="built_in">bool</span>&gt; <span class="keyword">get</span> registerValid =&gt; Observable.combineLatest3(</span><br><span class="line">                                      email, </span><br><span class="line">                                      password, </span><br><span class="line">                                      confirmPassword, </span><br><span class="line">                                      (e, p, c) =&gt; (<span class="number">0</span> == p.compareTo(c))</span><br><span class="line">                                    );</span><br></pre></td></tr></table></figure>
+
+<p>这个解决方案只需验证两个密码，如果它们匹配，就会发出一个值（= true）。</p>
+<p>我们很快就会看到，Register按钮的可访问性将取决于registerValid流。</p>
+<p>如果两个密码不匹配，则该流不会发出任何值，并且“注册”按钮保持不活动状态，但用户不会收到任何错误消息以帮助他理解原因。</p>
+<h5 id="带错误消息的解决方案"><a href="#带错误消息的解决方案" class="headerlink" title="带错误消息的解决方案"></a>带错误消息的解决方案</h5><p>另一种解决方案包括扩展confirmPassword流的处理，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;<span class="built_in">String</span>&gt; <span class="keyword">get</span> confirmPassword =&gt; _passwordConfirmController.stream.transform(validatePassword)</span><br><span class="line">    .doOnData((<span class="built_in">String</span> c)&#123;</span><br><span class="line">      <span class="comment">// If the password is accepted (after validation of the rules)</span></span><br><span class="line">      <span class="comment">// we need to ensure both password and retyped password match</span></span><br><span class="line">      <span class="keyword">if</span> (<span class="number">0</span> != _passwordController.value.compareTo(c))&#123;</span><br><span class="line">        <span class="comment">// If they do not match, add an error</span></span><br><span class="line">        _passwordConfirmController.addError(<span class="string">"No Match"</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>一旦验证了重新输入密码，它就会被Stream发出，并且使用doOnData，我们可以直接获取此发出的值并将其与密码流的值进行比较。如果两者不匹配，我们现在可以发送错误消息。</p>
+<h3 id="注册表单"><a href="#注册表单" class="headerlink" title="注册表单"></a>注册表单</h3><p>现在让我们先解释一下RegistrationForm：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">RegistrationForm</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _RegistrationFormState createState() =&gt; _RegistrationFormState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_RegistrationFormState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">RegistrationForm</span>&gt; </span>&#123;</span><br><span class="line">  RegistrationFormBloc _registrationFormBloc;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> initState() &#123;</span><br><span class="line">    <span class="keyword">super</span>.initState();</span><br><span class="line">    _registrationFormBloc = RegistrationFormBloc();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _registrationFormBloc?.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> Form(</span><br><span class="line">      child: Column(</span><br><span class="line">        children: &lt;Widget&gt;[</span><br><span class="line">          StreamBuilder&lt;<span class="built_in">String</span>&gt;(</span><br><span class="line">              stream: _registrationFormBloc.email,</span><br><span class="line">              builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">String</span>&gt; snapshot) &#123;</span><br><span class="line">                <span class="keyword">return</span> TextField(</span><br><span class="line">                  decoration: InputDecoration(</span><br><span class="line">                    labelText: <span class="string">'email'</span>,</span><br><span class="line">                    errorText: snapshot.error,</span><br><span class="line">                  ),</span><br><span class="line">                  onChanged: _registrationFormBloc.onEmailChanged,</span><br><span class="line">                  keyboardType: TextInputType.emailAddress,</span><br><span class="line">                );</span><br><span class="line">              &#125;),</span><br><span class="line">          StreamBuilder&lt;<span class="built_in">String</span>&gt;(</span><br><span class="line">              stream: _registrationFormBloc.password,</span><br><span class="line">              builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">String</span>&gt; snapshot) &#123;</span><br><span class="line">                <span class="keyword">return</span> TextField(</span><br><span class="line">                  decoration: InputDecoration(</span><br><span class="line">                    labelText: <span class="string">'password'</span>,</span><br><span class="line">                    errorText: snapshot.error,</span><br><span class="line">                  ),</span><br><span class="line">                  obscureText: <span class="keyword">false</span>,</span><br><span class="line">                  onChanged: _registrationFormBloc.onPasswordChanged,</span><br><span class="line">                );</span><br><span class="line">              &#125;),</span><br><span class="line">          StreamBuilder&lt;<span class="built_in">String</span>&gt;(</span><br><span class="line">              stream: _registrationFormBloc.confirmPassword,</span><br><span class="line">              builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">String</span>&gt; snapshot) &#123;</span><br><span class="line">                <span class="keyword">return</span> TextField(</span><br><span class="line">                  decoration: InputDecoration(</span><br><span class="line">                    labelText: <span class="string">'retype password'</span>,</span><br><span class="line">                    errorText: snapshot.error,</span><br><span class="line">                  ),</span><br><span class="line">                  obscureText: <span class="keyword">false</span>,</span><br><span class="line">                  onChanged: _registrationFormBloc.onRetypePasswordChanged,</span><br><span class="line">                );</span><br><span class="line">              &#125;),</span><br><span class="line">          StreamBuilder&lt;<span class="built_in">bool</span>&gt;(</span><br><span class="line">              stream: _registrationFormBloc.registerValid,</span><br><span class="line">              builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">bool</span>&gt; snapshot) &#123;</span><br><span class="line">                <span class="keyword">return</span> RaisedButton(</span><br><span class="line">                  child: Text(<span class="string">'Register'</span>),</span><br><span class="line">                  onPressed: (snapshot.hasData &amp;&amp; snapshot.data == <span class="keyword">true</span>)</span><br><span class="line">                      ? () &#123;</span><br><span class="line">                          <span class="comment">// launch the registration process</span></span><br><span class="line">                        &#125;</span><br><span class="line">                      : <span class="keyword">null</span>,</span><br><span class="line">                );</span><br><span class="line">              &#125;),</span><br><span class="line">        ],</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ul>
+<li>由于RegisterFormBloc仅供此表单使用，因此适合在此处初始化它。</li>
+<li>每个TextField都包装在StreamBuilder<string>中，以便能够响应验证过程的任何结果（请参阅errorText：snapshot.error）</string></li>
+<li>每次对TextField的内容进行修改时，我们都会通过onChanged发送输入到BLoC进行验证：_registrationFormBloc.onEmailChanged（电子邮件输入的情况）</li>
+<li>对于RegisterButton，后者也包含在StreamBuilder <bool>中。<ul>
+<li>如果_registrationFormBloc.registerValid发出一个值，onPressed方法将执行某些操作</li>
+<li>如果未发出任何值，则onPressed方法将被指定为null，这将取消激活该按钮。</li>
+</ul>
+</bool></li>
+</ul>
+<p>仅此而已！表单中没有任何业务规则，这意味着可以更改规则而无需对表单进行任何修改，这非常好！</p>
+<h2 id="Part-of"><a href="#Part-of" class="headerlink" title="Part of"></a>Part of</h2><p>有时，Widget知道它是否是驱动其行为的集合的一部分是有趣的。</p>
+<p>对于本文的最后一个实际例子，我将考虑以下场景：</p>
+<ul>
+<li>一个处理多个商品的应用程序</li>
+<li>用户可以选择商品并将其放入购物篮篮中;</li>
+<li>一件商品只能放入购物篮一次;</li>
+<li>存放在购物篮中的物品可以从购物篮中取出;</li>
+<li>一旦被移除，有可能把它放回来。</li>
+</ul>
+<p>对于此示例，每个商品将显示为一个按钮，该按钮将取决于购物篮篮物品的存在与否。如果不是购物篮的一部分，该按钮将允许用户将其添加到购物篮中。如果是购物篮的一部分，该按钮将允许用户将其从购物篮中取出。</p>
+<p>为了更好地说明“Part of”模式，我将考虑以下架构：</p>
+<ul>
+<li>购物页面将显示所有可能的条目列表;</li>
+<li>购物页面中的每个商品都会显示一个按钮，用于将商品添加到购物篮或将其移除，具体取决于其在购物篮中是否存在;</li>
+<li>如果购物页面中的商品被添加到购物篮中，其按钮将自动更新以允许用户将其从购物篮中移除（反之亦然），而无需重建购物页面</li>
+<li>另一个页面，购物篮，将列出篮子里的所有物品;</li>
+<li>可以从此页面中删除购物篮中的任何商品。</li>
+</ul>
+<p>边注</p>
+<p>Part Of这个名字是我给的个人名字。这不是官方名称。</p>
+<h3 id="ShoppingBloc"><a href="#ShoppingBloc" class="headerlink" title="ShoppingBloc"></a>ShoppingBloc</h3><p>正如您现在可以想象的那样，我们需要考虑一个专门用于处理所有可能商品列表的<code>BLoC</code>，以及购物篮的一部分。</p>
+<p>这个BLoC可能如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingBloc</span> <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="comment">// List of all items, part of the shopping basket</span></span><br><span class="line">  <span class="built_in">Set</span>&lt;ShoppingItem&gt; _shoppingBasket = <span class="built_in">Set</span>&lt;ShoppingItem&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Stream to list of all possible items</span></span><br><span class="line">  BehaviorSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; _itemsController = BehaviorSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt;();</span><br><span class="line">  Stream&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; <span class="keyword">get</span> items =&gt; _itemsController;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Stream to list the items part of the shopping basket</span></span><br><span class="line">  BehaviorSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; _shoppingBasketController = BehaviorSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt;(seedValue: &lt;ShoppingItem&gt;[]);</span><br><span class="line">  Stream&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; <span class="keyword">get</span> shoppingBasket =&gt; _shoppingBasketController;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _itemsController?.close();</span><br><span class="line">    _shoppingBasketController?.close();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor</span></span><br><span class="line">  ShoppingBloc() &#123;</span><br><span class="line">    _loadShoppingItems();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> addToShoppingBasket(ShoppingItem item)&#123;</span><br><span class="line">    _shoppingBasket.add(item);</span><br><span class="line">    _postActionOnBasket();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> removeFromShoppingBasket(ShoppingItem item)&#123;</span><br><span class="line">    _shoppingBasket.remove(item);</span><br><span class="line">    _postActionOnBasket();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> _postActionOnBasket()&#123;</span><br><span class="line">    <span class="comment">// Feed the shopping basket stream with the new content</span></span><br><span class="line">    _shoppingBasketController.sink.add(_shoppingBasket.toList());</span><br><span class="line">    </span><br><span class="line">    <span class="comment">// any additional processing such as</span></span><br><span class="line">    <span class="comment">// computation of the total price of the basket</span></span><br><span class="line">    <span class="comment">// number of items, part of the basket...</span></span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Generates a series of Shopping Items</span></span><br><span class="line">  <span class="comment">// Normally this should come from a call to the server</span></span><br><span class="line">  <span class="comment">// but for this sample, we simply simulate</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">void</span> _loadShoppingItems() &#123;</span><br><span class="line">    _itemsController.sink.add(<span class="built_in">List</span>&lt;ShoppingItem&gt;.generate(<span class="number">50</span>, (<span class="built_in">int</span> index) &#123;</span><br><span class="line">      <span class="keyword">return</span> ShoppingItem(</span><br><span class="line">        id: index,</span><br><span class="line">        title: <span class="string">"Item <span class="subst">$index</span>"</span>,</span><br><span class="line">        price: ((Random().nextDouble() * <span class="number">40.0</span> + <span class="number">10.0</span>) * <span class="number">100.0</span>).roundToDouble() /</span><br><span class="line">            <span class="number">100.0</span>,</span><br><span class="line">        color: Color((Random().nextDouble() * <span class="number">0xFFFFFF</span>).toInt() &lt;&lt; <span class="number">0</span>)</span><br><span class="line">            .withOpacity(<span class="number">1.0</span>),</span><br><span class="line">      );</span><br><span class="line">    &#125;));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>唯一可能需要解释的方法是_postActionOnBasket（）方法。每次在篮子中添加或删除商品时，我们都需要“刷新”_shoppingBasketController Stream的内容，以便通知所有正在监听此Stream更改的Widgets并能够刷新/重建。</p>
+<h3 id="ShoppingPage"><a href="#ShoppingPage" class="headerlink" title="ShoppingPage"></a>ShoppingPage</h3><p>此页面非常简单，只显示所有项目。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingPage</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    ShoppingBloc bloc = BlocProvider.of&lt;ShoppingBloc&gt;(context);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> SafeArea(</span><br><span class="line">        child: Scaffold(</span><br><span class="line">      appBar: AppBar(</span><br><span class="line">        title: Text(<span class="string">'Shopping Page'</span>),</span><br><span class="line">        actions: &lt;Widget&gt;[</span><br><span class="line">          ShoppingBasket(),</span><br><span class="line">        ],</span><br><span class="line">      ),</span><br><span class="line">      body: Container(</span><br><span class="line">        child: StreamBuilder&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt;(</span><br><span class="line">          stream: bloc.items,</span><br><span class="line">          builder: (BuildContext context,</span><br><span class="line">              AsyncSnapshot&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; snapshot) &#123;</span><br><span class="line">            <span class="keyword">if</span> (!snapshot.hasData) &#123;</span><br><span class="line">              <span class="keyword">return</span> Container();</span><br><span class="line">            &#125;</span><br><span class="line">            <span class="keyword">return</span> GridView.builder(</span><br><span class="line">              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(</span><br><span class="line">                crossAxisCount: <span class="number">3</span>,</span><br><span class="line">                childAspectRatio: <span class="number">1.0</span>,</span><br><span class="line">              ),</span><br><span class="line">              itemCount: snapshot.data.length,</span><br><span class="line">              itemBuilder: (BuildContext context, <span class="built_in">int</span> index) &#123;</span><br><span class="line">                <span class="keyword">return</span> ShoppingItemWidget(</span><br><span class="line">                  shoppingItem: snapshot.data[index],</span><br><span class="line">                );</span><br><span class="line">              &#125;,</span><br><span class="line">            );</span><br><span class="line">          &#125;,</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    ));</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>说明：</p>
+<ul>
+<li>AppBar显示一个按钮：<ul>
+<li>显示出现在购物篮中的商品数量</li>
+<li>单击时将用户重定向到ShoppingBasket页面</li>
+</ul>
+</li>
+<li>项目列表使用GridView构建，包含在StreamBuilder&lt;List<shoppingitem>&gt;中</shoppingitem></li>
+<li>每个商品对应一个<code>ShoppingItemWidget</code></li>
+</ul>
+<h3 id="ShoppingBasketPage"><a href="#ShoppingBasketPage" class="headerlink" title="ShoppingBasketPage"></a>ShoppingBasketPage</h3><p>此页面与ShoppingPage非常相似，只是StreamBuilder现在正在监听由ShoppingBloc暴露的_shoppingBasket流的变体。</p>
+<h3 id="ShoppingItemWidget和ShoppingItemBloc"><a href="#ShoppingItemWidget和ShoppingItemBloc" class="headerlink" title="ShoppingItemWidget和ShoppingItemBloc"></a>ShoppingItemWidget和ShoppingItemBloc</h3><p>Part of 模式的依赖于这两个元素的组合：</p>
+<ul>
+<li>ShoppingItemWidget负责：<ul>
+<li>显示商品和</li>
+<li>用于在购物篮中添加商品或从中取出商品的按钮</li>
+</ul>
+</li>
+<li>ShoppingItemBloc负责告诉ShoppingItemWidget后者是否属于购物篮的一部分。</li>
+</ul>
+<p>让我们看看它们如何一起工作……</p>
+<h4 id="ShoppingItemBloc"><a href="#ShoppingItemBloc" class="headerlink" title="ShoppingItemBloc"></a>ShoppingItemBloc</h4><p>ShoppingItemBloc由每个ShoppingItemWidget实例化，赋予它“身份”。</p>
+<p>此BLoC监听<code>ShoppingBasket</code>流的所有变体，并检查特定商品标识是否是购物篮的一部分。</p>
+<p>如果是，它会发出一个布尔值（= true），它将被<code>ShoppingItemWidget</code>捕获，以确定它是否是购物篮的一部分。</p>
+<p>这里是BLoc的代码</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br><span class="line">141</span><br><span class="line">142</span><br><span class="line">143</span><br><span class="line">144</span><br><span class="line">145</span><br><span class="line">146</span><br><span class="line">147</span><br><span class="line">148</span><br><span class="line">149</span><br><span class="line">150</span><br><span class="line">151</span><br><span class="line">152</span><br><span class="line">153</span><br><span class="line">154</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingItemBloc</span> <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Stream to notify if the ShoppingItemWidget is part of the shopping basket</span></span><br><span class="line">  BehaviorSubject&lt;<span class="built_in">bool</span>&gt; _isInShoppingBasketController = BehaviorSubject&lt;<span class="built_in">bool</span>&gt;();</span><br><span class="line">  Stream&lt;<span class="built_in">bool</span>&gt; <span class="keyword">get</span> isInShoppingBasket =&gt; _isInShoppingBasketController;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Stream that receives the list of all items, part of the shopping basket</span></span><br><span class="line">  PublishSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt; _shoppingBasketController = PublishSubject&lt;<span class="built_in">List</span>&lt;ShoppingItem&gt;&gt;();</span><br><span class="line">  <span class="built_in">Function</span>(<span class="built_in">List</span>&lt;ShoppingItem&gt;) <span class="keyword">get</span> shoppingBasket =&gt; _shoppingBasketController.sink.add;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// Constructor with the 'identity' of the shoppingItem</span></span><br><span class="line">  ShoppingItemBloc(ShoppingItem shoppingItem)&#123;</span><br><span class="line">    <span class="comment">// Each time a variation of the content of the shopping basket</span></span><br><span class="line">    _shoppingBasketController.stream</span><br><span class="line">                          <span class="comment">// we check if this shoppingItem is part of the shopping basket</span></span><br><span class="line">                         .map((list) =&gt; list.any((ShoppingItem item) =&gt; item.id == shoppingItem.id))</span><br><span class="line">                          <span class="comment">// if it is part</span></span><br><span class="line">                         .listen((isInShoppingBasket)</span><br><span class="line">                              <span class="comment">// we notify the ShoppingItemWidget </span></span><br><span class="line">                            =&gt; _isInShoppingBasketController.add(isInShoppingBasket));</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _isInShoppingBasketController?.close();</span><br><span class="line">    _shoppingBasketController?.close();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">``` </span><br><span class="line">#### ShoppingItemWidget</span><br><span class="line"></span><br><span class="line">此Widget负责：</span><br><span class="line"></span><br><span class="line">* 创建ShoppingItemBloc的实例并将其自己的标识传递给BLoC</span><br><span class="line">* 监听ShoppingBasket内容的任何变化并将其转移到BLoC</span><br><span class="line">* 监听ShoppingItemBloc从而知道它是否是篮子的一部分</span><br><span class="line">* 显示相应的按钮（添加/删除），具体取决于它在购物篮中是否存在</span><br><span class="line">* 响应按钮的用户操作</span><br><span class="line">  * 当用户点击添加按钮时，将自己添加到购物篮中</span><br><span class="line">  * 当用户点击删除按钮时，将自己从购物篮中移除。</span><br><span class="line"></span><br><span class="line">让我们看看它是如何工作的（解释在代码中给出）。</span><br><span class="line"></span><br><span class="line">```dart</span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShoppingItemWidget</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  ShoppingItemWidget(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.shoppingItem,</span><br><span class="line">  &#125;) : <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> ShoppingItem shoppingItem;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _ShoppingItemWidgetState createState() =&gt; _ShoppingItemWidgetState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_ShoppingItemWidgetState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">ShoppingItemWidget</span>&gt; </span>&#123;</span><br><span class="line">  StreamSubscription _subscription;</span><br><span class="line">  ShoppingItemBloc _bloc;</span><br><span class="line">  ShoppingBloc _shoppingBloc;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> didChangeDependencies() &#123;</span><br><span class="line">    <span class="keyword">super</span>.didChangeDependencies();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// As the context should not be used in the "initState()" method,</span></span><br><span class="line">    <span class="comment">// prefer using the "didChangeDependencies()" when you need</span></span><br><span class="line">    <span class="comment">// to refer to the context at initialization time</span></span><br><span class="line">    _initBloc();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> didUpdateWidget(ShoppingItemWidget oldWidget) &#123;</span><br><span class="line">    <span class="keyword">super</span>.didUpdateWidget(oldWidget);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// as Flutter might decide to reorganize the Widgets tree</span></span><br><span class="line">    <span class="comment">// it is preferable to recreate the links</span></span><br><span class="line">    _disposeBloc();</span><br><span class="line">    _initBloc();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    _disposeBloc();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">// This routine is reponsible for creating the links</span></span><br><span class="line">  <span class="keyword">void</span> _initBloc() &#123;</span><br><span class="line">    <span class="comment">// Create an instance of the ShoppingItemBloc</span></span><br><span class="line">    _bloc = ShoppingItemBloc(widget.shoppingItem);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Retrieve the BLoC that handles the Shopping Basket content </span></span><br><span class="line">    _shoppingBloc = BlocProvider.of&lt;ShoppingBloc&gt;(context);</span><br><span class="line"></span><br><span class="line">    <span class="comment">// Simple pipe that transfers the content of the shopping</span></span><br><span class="line">    <span class="comment">// basket to the ShoppingItemBloc</span></span><br><span class="line">    _subscription = _shoppingBloc.shoppingBasket.listen(_bloc.shoppingBasket);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> _disposeBloc() &#123;</span><br><span class="line">    _subscription?.cancel();</span><br><span class="line">    _bloc?.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Widget _buildButton() &#123;</span><br><span class="line">    <span class="keyword">return</span> StreamBuilder&lt;<span class="built_in">bool</span>&gt;(</span><br><span class="line">      stream: _bloc.isInShoppingBasket,</span><br><span class="line">      initialData: <span class="keyword">false</span>,</span><br><span class="line">      builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">bool</span>&gt; snapshot) &#123;</span><br><span class="line">        <span class="keyword">return</span> snapshot.data</span><br><span class="line">            ? _buildRemoveFromShoppingBasket()</span><br><span class="line">            : _buildAddToShoppingBasket();</span><br><span class="line">      &#125;,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Widget _buildAddToShoppingBasket()&#123;</span><br><span class="line">    <span class="keyword">return</span> RaisedButton(</span><br><span class="line">      child: Text(<span class="string">'Add...'</span>),</span><br><span class="line">      onPressed: ()&#123;</span><br><span class="line">        _shoppingBloc.addToShoppingBasket(widget.shoppingItem);</span><br><span class="line">      &#125;,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Widget _buildRemoveFromShoppingBasket()&#123;</span><br><span class="line">    <span class="keyword">return</span> RaisedButton(</span><br><span class="line">      child: Text(<span class="string">'Remove...'</span>),</span><br><span class="line">      onPressed: ()&#123;</span><br><span class="line">        _shoppingBloc.removeFromShoppingBasket(widget.shoppingItem);</span><br><span class="line">      &#125;,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> Card(</span><br><span class="line">      child: GridTile(</span><br><span class="line">        header: Center(</span><br><span class="line">          child: Text(widget.shoppingItem.title),</span><br><span class="line">        ),</span><br><span class="line">        footer: Center(</span><br><span class="line">          child: Text(<span class="string">'<span class="subst">$&#123;widget.shoppingItem.price&#125;</span> €'</span>),</span><br><span class="line">        ),</span><br><span class="line">        child: Container(</span><br><span class="line">          color: widget.shoppingItem.color,</span><br><span class="line">          child: Center(</span><br><span class="line">            child: _buildButton(),</span><br><span class="line">          ),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="它是如何工作的？"><a href="#它是如何工作的？" class="headerlink" title="它是如何工作的？"></a>它是如何工作的？</h3><p>下图显示了所有部分是如何协同工作。</p>
+<p><img src="https://www.didierboelens.com/images/bloc_part_of.png" alt></p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>又是一篇长章，我希望我将其变得简略一点，但我一些解释是必要的。</p>
+<p>正如我在介绍中所说，我个人在我的开发中经常使用这些“模式”。这让我节省了大量的时间和精力;我的代码更易读，更容易调试。</p>
+<p>此外，它有助于将业务与视图分离。</p>
+<p>大概率肯定有其他方法可以做到这一点，甚至做得更好。但它对我有用的，这就是我想与你分享的一切。</p>
+<p>请继续关注新文章，同时祝你编程愉快。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/状态管理/" rel="tag"># 状态管理</a>
+          
+            <a href="/tags/BLoC/" rel="tag"># BLoC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/" rel="next" title="(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)">
+                <i class="fa fa-chevron-left"></i> (译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/" rel="prev" title="(译) Flutter 中的 JSON 序列化">
+                (译) Flutter 中的 JSON 序列化 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BlocProvider-和-InheritedWidget"><span class="nav-number">2.</span> <span class="nav-text">BlocProvider 和 InheritedWidget</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#之前的实现"><span class="nav-number">2.1.</span> <span class="nav-text">之前的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#新的实现"><span class="nav-number">2.2.</span> <span class="nav-text">新的实现</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何使用新的-BlocProvider"><span class="nav-number">2.3.</span> <span class="nav-text">如何使用新的 BlocProvider?</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Bloc的注入"><span class="nav-number">2.3.1.</span> <span class="nav-text">Bloc的注入</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#Bloc的获取"><span class="nav-number">2.3.2.</span> <span class="nav-text">Bloc的获取</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从哪初始化-BLoc"><span class="nav-number">3.</span> <span class="nav-text">从哪初始化 BLoc</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#应用中随处可用"><span class="nav-number">3.1.</span> <span class="nav-text">应用中随处可用</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#全局单例的使用"><span class="nav-number">3.1.1.</span> <span class="nav-text">全局单例的使用</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#把它放在所有东西的顶部"><span class="nav-number">3.1.2.</span> <span class="nav-text">把它放在所有东西的顶部</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在子树上能访问"><span class="nav-number">3.2.</span> <span class="nav-text">在子树上能访问</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#只对一个widget可访问"><span class="nav-number">3.3.</span> <span class="nav-text">只对一个widget可访问</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#事件状态"><span class="nav-number">4.</span> <span class="nav-text">事件状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#BlocEventState"><span class="nav-number">4.1.</span> <span class="nav-text">BlocEventState</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#专门的-BlocEventState"><span class="nav-number">4.2.</span> <span class="nav-text">专门的 BlocEventState</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例1-应用程序初始化"><span class="nav-number">4.3.</span> <span class="nav-text">例1: 应用程序初始化</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#应用初始化事件"><span class="nav-number">4.3.1.</span> <span class="nav-text">应用初始化事件</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用初始化件状态"><span class="nav-number">4.3.2.</span> <span class="nav-text">应用初始化件状态</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#应用初始化-Bloc"><span class="nav-number">4.3.3.</span> <span class="nav-text">应用初始化 Bloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#将它们全部包装在一起"><span class="nav-number">4.3.4.</span> <span class="nav-text">将它们全部包装在一起</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#例2：应用程序身份验证和注销"><span class="nav-number">4.4.</span> <span class="nav-text">例2：应用程序身份验证和注销</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthenticationEvent"><span class="nav-number">4.4.1.</span> <span class="nav-text">AuthenticationEvent</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthenticationState"><span class="nav-number">4.4.2.</span> <span class="nav-text">AuthenticationState</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthenticationBloc"><span class="nav-number">4.4.3.</span> <span class="nav-text">AuthenticationBloc</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthenticationPage"><span class="nav-number">4.4.4.</span> <span class="nav-text">AuthenticationPage</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#DecisionPage"><span class="nav-number">4.4.5.</span> <span class="nav-text">DecisionPage</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#注销"><span class="nav-number">4.4.6.</span> <span class="nav-text">注销</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#AuthenticationBloc-1"><span class="nav-number">4.4.7.</span> <span class="nav-text">AuthenticationBloc</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#表单验证"><span class="nav-number">5.</span> <span class="nav-text">表单验证</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#RegistrationFormBloc"><span class="nav-number">5.1.</span> <span class="nav-text">RegistrationFormBloc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Validator-Mixins"><span class="nav-number">5.1.1.</span> <span class="nav-text">Validator Mixins</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#为什么使用stream-tansform"><span class="nav-number">5.1.2.</span> <span class="nav-text">为什么使用stream.tansform()?</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#验证2个密码"><span class="nav-number">5.1.3.</span> <span class="nav-text">验证2个密码</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#基本解决方案-没有错误消息"><span class="nav-number">5.1.3.1.</span> <span class="nav-text">基本解决方案 - 没有错误消息</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#带错误消息的解决方案"><span class="nav-number">5.1.3.2.</span> <span class="nav-text">带错误消息的解决方案</span></a></li></ol></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#注册表单"><span class="nav-number">5.2.</span> <span class="nav-text">注册表单</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Part-of"><span class="nav-number">6.</span> <span class="nav-text">Part of</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#ShoppingBloc"><span class="nav-number">6.1.</span> <span class="nav-text">ShoppingBloc</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShoppingPage"><span class="nav-number">6.2.</span> <span class="nav-text">ShoppingPage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShoppingBasketPage"><span class="nav-number">6.3.</span> <span class="nav-text">ShoppingBasketPage</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ShoppingItemWidget和ShoppingItemBloc"><span class="nav-number">6.4.</span> <span class="nav-text">ShoppingItemWidget和ShoppingItemBloc</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#ShoppingItemBloc"><span class="nav-number">6.4.1.</span> <span class="nav-text">ShoppingItemBloc</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#它是如何工作的？"><span class="nav-number">6.5.</span> <span class="nav-text">它是如何工作的？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">7.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1523 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 你会学到什么  如何使用动画库中的基础类将动画添加到widget。 AnimatedWidget和AnimatedBuilder的使用场景的比较。  本教程将向您展示如何在Flutter中构建显式动画。在介绍了动画库中的一些基本概念、类和方法之后，这个教程会带你亲历5个动画相关的例子。这些示例建立在彼此之上，向你介绍了动画库的不同方面。">
+<meta name="keywords" content="Animations">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)动画教程">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/24/Flutter/development/ui/animations/Animations tutorial/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 你会学到什么  如何使用动画库中的基础类将动画添加到widget。 AnimatedWidget和AnimatedBuilder的使用场景的比较。  本教程将向您展示如何在Flutter中构建显式动画。在介绍了动画库中的一些基本概念、类和方法之后，这个教程会带你亲历5个动画相关的例子。这些示例建立在彼此之上，向你介绍了动画库的不同方面。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://qiantun.oss-cn-beijing.aliyuncs.com/img/WeChat9b8da866d2a9ec4b3372bf11e3597cf3.png">
+<meta property="og:image" content="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986061511.jpg">
+<meta property="og:image" content="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986414707.jpg">
+<meta property="og:image" content="https://flutter.dev/assets/ui/AnimatedBuilder-WidgetTree-99e58a8bbf50268bcb0586c276889534bf31e0dc09f17e355a863b04b06a0ec4.png">
+<meta property="og:image" content="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986662346.jpg">
+<meta property="og:updated_time" content="2019-06-25T05:32:21.968Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)动画教程">
+<meta name="twitter:description" content="原文链接 你会学到什么  如何使用动画库中的基础类将动画添加到widget。 AnimatedWidget和AnimatedBuilder的使用场景的比较。  本教程将向您展示如何在Flutter中构建显式动画。在介绍了动画库中的一些基本概念、类和方法之后，这个教程会带你亲历5个动画相关的例子。这些示例建立在彼此之上，向你介绍了动画库的不同方面。">
+<meta name="twitter:image" content="https://qiantun.oss-cn-beijing.aliyuncs.com/img/WeChat9b8da866d2a9ec4b3372bf11e3597cf3.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/24/Flutter/development/ui/animations/Animations tutorial/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译)动画教程 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/24/Flutter/development/ui/animations/Animations tutorial/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译)动画教程
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-24 09:16:17" itemprop="dateCreated datePublished" datetime="2019-04-24T09:16:17+08:00">2019-04-24</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:32:21" itemprop="dateModified" datetime="2019-06-25T13:32:21+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/24/Flutter/development/ui/animations/Animations tutorial/" class="leancloud_visitors" data-flag-title="(译)动画教程">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://flutter.dev/docs/development/ui/animations/tutorial" target="_blank" rel="noopener">原文链接</a></p>
+<p>你会学到什么</p>
+<ul>
+<li>如何使用动画库中的基础类将动画添加到widget。</li>
+<li>AnimatedWidget和AnimatedBuilder的使用场景的比较。</li>
+</ul>
+<p>本教程将向您展示如何在Flutter中构建显式动画。在介绍了动画库中的一些基本概念、类和方法之后，这个教程会带你亲历5个动画相关的例子。这些示例建立在彼此之上，向你介绍了动画库的不同方面。</p>
+<a id="more"></a>
+
+
+<p>Flutter SDK还提供过渡动画，例如<a href="https://api.flutter.dev/flutter/widgets/FadeTransition-class.html" target="_blank" rel="noopener"><code>FadeTransition</code></a>，<a href="https://api.flutter.dev/flutter/widgets/SizeTransition-class.html" target="_blank" rel="noopener"><code>SizeTransition</code></a>和<a href="https://api.flutter.dev/flutter/widgets/SlideTransition-class.html" target="_blank" rel="noopener"><code>SlideTransition</code></a>。这些简单的动画是通过设置起点和终点来触发的。它们比这里所描述的显式动画更容易实现。</p>
+<h2 id="基本的动画概念和类"><a href="#基本的动画概念和类" class="headerlink" title="基本的动画概念和类"></a>基本的动画概念和类</h2><p>重点是什么 </p>
+<ul>
+<li><code>Animation</code>，是Flutter动画库中的一个核心类，插入了那些用来指导动画的值。</li>
+<li><code>Animation</code>对象知道动画的当前状态（例如，它是开始(started)、停止(stopped)还是向前(moving foreard)或反向(in reverse),但它不知道显示在屏幕上的任何事情。</li>
+<li><code>AnimationController</code>管理着<code>Animation</code></li>
+<li><code>CurvedAnimation</code>把过程定义为非线性曲线</li>
+<li><code>Tween</code>在正在执行动画的对象所使用的数据范围之间插入值。例如，Tween可能会定义从红到蓝的一个插值，或者是从0到255的一个插值。</li>
+<li>使用Listeners和StatusListeners来监控动画状态变化。</li>
+</ul>
+<p>Flutter中的动画系统是基于类型化的<code>Animation</code>对象的。widget可以通过读取它们当前的状态和监听它们的状态变化把这些动画合并进widget的build方法中，也可以使用动画作为更精心制作的动画的基础，并将这些精心制作的动画传递给其它widget。</p>
+<h3 id="Animation-lt-double-gt"><a href="#Animation-lt-double-gt" class="headerlink" title="Animation&lt;double&gt;"></a>Animation&lt;double&gt;</h3><p>在Flutter中，Animation对象对屏幕上的东西一无所知。<code>Animation</code>是一个抽象类，它可以理解其当前值及其状态(已完成或已解除)。一种比较常用的动画类型是Animation&lt;double&gt;。</p>
+<p>一个<code>Animation</code>对象会在一定持续时间内连续生成两个值之间的插值数。<code>Animation</code>对象的输出可以是线性，曲线，阶梯函数或你其它你能想出的任何其它映射。根据动画对象的控制方式，它可以反向运行，甚至可以在中间切换方向。</p>
+<p>动画还可以插入除double之外的类型，例如<code>Animation\&lt;Color&gt;</code>或<code>Animation\&lt;Size&gt;</code>。</p>
+<p><code>Animation</code>对象具有状态。其当前值始终在.value成员中访问。</p>
+<p><code>Animation</code>对象对渲染或build()函数一无所知。</p>
+<h3 id="Curved­Animation"><a href="#Curved­Animation" class="headerlink" title="Curved­Animation"></a>Curved­Animation</h3><p><a href="https://api.flutter.dev/flutter/animation/CurvedAnimation-class.html" target="_blank" rel="noopener">CurvedAnimation</a>将动画的过程定义为非线性曲线。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">animation = CurvedAnimation(parent: controller, curve: Curves.easeIn);</span><br></pre></td></tr></table></figure>
+
+<p>注意：Curves类定义了许多常用曲线，或者你可以创建自己的曲线。例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:math'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ShakeCurve</span> <span class="keyword">extends</span> <span class="title">Curve</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="built_in">double</span> transform(<span class="built_in">double</span> t) =&gt; sin(t * pi * <span class="number">2</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>CurvedAnimation</code>和<code>AnimationController</code>（会在下一节讲到）都是Animation&lt;double&gt;类型，因此你可以互换地传递它们。<code>CurvedAnimation</code>包装了它所修改的对象-你不必继承AnimationController来实现一条曲线。</p>
+<h3 id="AnimationController"><a href="#AnimationController" class="headerlink" title="AnimationController"></a>AnimationController</h3><p><code>AnimationController</code>是一个特殊的Animation对象，只要硬件准备好新帧，它就会生成一个新值。默认情况下，<code>AnimationController</code>在给定的持续时间内线性生成从0.0到1.0的数字。例如，此代码创建一个Animation对象，但不启动它运行：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">controller =</span><br><span class="line">    AnimationController(duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">2</span>), vsync: <span class="keyword">this</span>);</span><br></pre></td></tr></table></figure>
+
+<p><code>AnimationController</code>派生自<code>Animation\&lt;double&gt;</code>，因此可以在需要<code>Animation</code>对象的任何地方使用它。但是，<code>AnimationController</code>还有其他方法来控制动画。例如，使用.forward()方法启动动画。数字的生成与屏幕刷新有关，因此通常每秒生成60个数字。生成每个数字后，每个Animation对象都会调用附加在它上面的监听对象。要为每个子项创建自定义显示列表，请参阅<a href="https://api.flutter.dev/flutter/widgets/RepaintBoundary-class.html" target="_blank" rel="noopener">RepaintBoundary</a>。</p>
+<p>在创建<code>AnimationController</code>时，您将传递一个<code>vsync</code>参数。<code>vsync</code>的存在可防止屏幕外动画消耗不必要的资源。通过将<code>SingleTickerProviderStateMixin</code>添加到类定义，可以将有状态对象用作vsync。你可以在GitHub上的<a href="https://github.com/flutter/website/tree/master/examples/animation/animate1/lib/main.dart" target="_blank" rel="noopener">animate1</a>中看到这样的示例。</p>
+<p>注意：在某些情况下，位置可能会超出<code>AnimationController</code>的0.0-1.0范围。例如，fling()函数允许你通过Force对象提供力度，力和位置。位置可以是任何值，因此可以在0.0到1.0范围之外。</p>
+<p><code>CurvedAnimation</code>也可以超过0.0到1.0范围，即使<code>AnimationController</code>没有超过。根据所选的曲线，CurvedAnimation的输出可以具有比输入更宽的范围。例如，弹性曲线（如Curves.elasticIn）将明显超出或低于默认范围。</p>
+<h3 id="Tween"><a href="#Tween" class="headerlink" title="Tween"></a>Tween</h3><p>默认情况下，<code>AnimationController</code>对象的范围为0.0到1.0。如果需要不同的范围或不同的数据类型，可以使用Tween将动画配置为插入到不同的范围或数据类型。例如，以下Tween的范围是从-200.0到为0.0：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">tween = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">-200</span>, end: <span class="number">0</span>);</span><br></pre></td></tr></table></figure>
+
+<p>Tween是一个只接受开始和结束的无状态对象。 Tween的唯一工作是定义从输入范围到输出范围的映射。输入范围通常为0.0到1.0，但这不是必需的。</p>
+<p>Tween继承自Animatable&lt;T&gt;，而不是Animation<t>。像Animation一样,Animatable不是一定要输出double。例如，ColorTween具体说明两种颜色之间的发展。</t></p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">colorTween = ColorTween(begin: Colors.transparent, end: Colors.black54);</span><br></pre></td></tr></table></figure>
+
+<p><code>Tween</code>对象不存储任何状态。相反，它提供了evaluate（Animation&lt;double&gt; animation）方法，该方法将映射函数应用于动画的当前值。可以在.value方法中找到<code>Animation</code>对象的当前值。evaluate函数还执行一些内务处理，例如确保在动画值分别为0.0和1.0时返回开始和结束。</p>
+<h4 id="Tween-animate"><a href="#Tween-animate" class="headerlink" title="Tween.animate"></a>Tween.animate</h4><p>要使用Tween对象，请在Tween上调用animate（），并传入控制器对象。例如，以下代码在500ms的过程中生成0到255之间的整数值。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">AnimationController controller = AnimationController(</span><br><span class="line">    duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(milliseconds: <span class="number">500</span>), vsync: <span class="keyword">this</span>);</span><br><span class="line">Animation&lt;<span class="built_in">int</span>&gt; alpha = IntTween(begin: <span class="number">0</span>, end: <span class="number">255</span>).animate(controller);</span><br></pre></td></tr></table></figure>
+
+<p>注意：animate()方法返回的是<code>Animation</code>，而不是<code>Animatable</code>。</p>
+<p>以下示例展示了控制器(controller)，曲线(curve)和补间动画(Tween)：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">AnimationController controller = AnimationController(</span><br><span class="line">    duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(milliseconds: <span class="number">500</span>), vsync: <span class="keyword">this</span>);</span><br><span class="line"><span class="keyword">final</span> Animation curve =</span><br><span class="line">    CurvedAnimation(parent: controller, curve: Curves.easeOut);</span><br><span class="line">Animation&lt;<span class="built_in">int</span>&gt; alpha = IntTween(begin: <span class="number">0</span>, end: <span class="number">255</span>).animate(curve);</span><br></pre></td></tr></table></figure>
+
+<h3 id="Animation-notifications"><a href="#Animation-notifications" class="headerlink" title="Animation notifications"></a>Animation notifications</h3><p>Animation对象可以有监听者(Listeners)和状态监听者(StatusListeners)，用addListener()和addStatusListener()来定义。只要动画的值发生变化，就会调用监听器。监听器最常见的行为是调用setState()来引起重建。动画开始，结束，前进或反向时调用<code>StatusListener</code>，如AnimationStatus所定义的。下一节有addListener()方法的示例，监视动画的过程(Monitoring the progress of the animation)展示了addStatusListener()的示例。</p>
+<h2 id="Animation-例子"><a href="#Animation-例子" class="headerlink" title="Animation 例子"></a>Animation 例子</h2><p>本节会带你亲历5个动画的例子。每个部分都提供了该示例源代码的链接。</p>
+<h3 id="渲染动画"><a href="#渲染动画" class="headerlink" title="渲染动画"></a>渲染动画</h3><p>重点是什么？</p>
+<ul>
+<li>如何使用addListener()和setState()向widget添加基础动画。</li>
+<li>每次动画生成一个新数字时，addListener()函数都会调用setState()。</li>
+<li>如何使用所需的vsync参数定义<code>AnimatedController</code>。</li>
+<li>理解“..addListener”中的“..”语法，也称为Dart的级联表示法。</li>
+<li>要使类成为私有，请使用下划线(_)开始其名称。</li>
+</ul>
+<p>到目前为止，您已经学会了如何随着时间的推移生成一系列数字。没有任何内容呈现在屏幕上。要使用<code>Animation</code>对象进行渲染，请将<code>Animation</code>对象存储为widget的成员，然后使用其值来决定如何绘制。</p>
+<p>想想看以下绘制没有动画的Flutter logo的应用程序：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> main() =&gt; runApp(LogoApp());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LogoApp</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  _LogoAppState createState() =&gt; _LogoAppState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_LogoAppState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">LogoApp</span>&gt; </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> Center(</span><br><span class="line">      child: Container(</span><br><span class="line">        margin: EdgeInsets.symmetric(vertical: <span class="number">10</span>),</span><br><span class="line">        height: <span class="number">300</span>,</span><br><span class="line">        width: <span class="number">300</span>,</span><br><span class="line">        child: FlutterLogo(),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>应用来源：<a href="https://github.com/flutter/website/tree/master/examples/animation/animate0" target="_blank" rel="noopener">animate0</a></p>
+<p>以下展示了相同的代码修改，以使logo动画从无到有增长。定义<code>AnimationController</code>时，必须传入vsync对象。vsync参数在AnimationController部分中描述。</p>
+<p>与非动画示例的相比的改动，做了高亮显示处理：</p>
+<p><img src="https://qiantun.oss-cn-beijing.aliyuncs.com/img/WeChat9b8da866d2a9ec4b3372bf11e3597cf3.png" alt></p>
+<p>App源代码:<a href="https://github.com/flutter/website/tree/master/examples/animation/animate1" target="_blank" rel="noopener">animate1</a></p>
+<p>addListener()函数调用setState()，因此每当<code>Animation</code>生成一个新数字时，当前帧都标记为脏的(dirty)，这会强制再次调用build()。在build()中，容器会改变大小，因为它的高度和宽度现在使用animation.value而不是硬编码值。动画完成时销毁控制器以防止内存泄漏。</p>
+<p>通过这些少量更改，您已经在Flutter中创建了第一个动画！</p>
+<p>Dart语言技巧：你可能不熟悉Dart的级联符号 -  ..addListener（）中的两个点。此语法表示使用animate()的返回值调用addListener()方法。请想想看以下示例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">animation = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0</span>, end: <span class="number">300</span>).animate(controller)</span><br><span class="line">  ..addListener(() &#123;</span><br><span class="line">    <span class="comment">// ···</span></span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>此代码相当于：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">animation = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0</span>, end: <span class="number">300</span>).animate(controller);</span><br><span class="line">animation.addListener(() &#123;</span><br><span class="line">    <span class="comment">// ···</span></span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<p>你可以在<a href="https://www.dartlang.org/guides/language/language-tour" target="_blank" rel="noopener">Dart语言之旅</a>中了解有关级联表示法的更多信息。</p>
+<h3 id="使用AnimatedWidget进行简化"><a href="#使用AnimatedWidget进行简化" class="headerlink" title="使用AnimatedWidget进行简化"></a>使用<code>AnimatedWidget</code>进行简化</h3><p>重点是什么？</p>
+<ul>
+<li>如何使用<code>AnimatedWidget</code>帮助类(而不是addListener()和setState()）来创建有动画效果的widget</li>
+<li>使用<code>AnimatedWidget</code>创建一个执行可重用动画的widget。要将widget的过渡分开，请使用<code>AnimatedBuilder</code>。</li>
+<li>Flutter API中的AnimatedWidgets示例：AnimatedBuilder，AnimatedModalBarrier，DecoratedBoxTransition，FadeTransition，PositionedTransition，RelativePositionedTransition，RotationTransition，ScaleTransition，SizeTransition，SlideTransition。</li>
+</ul>
+<p><code>AnimatedWidget</code>基类允许你从动画代码中分离核心widget代码。<code>AnimatedWidget</code>不需要维护State对象来持有动画。添加以下<code>AnimatedLogo</code>类：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnimatedLogo</span> <span class="keyword">extends</span> <span class="title">AnimatedWidget</span> </span>&#123;</span><br><span class="line">  AnimatedLogo(&#123;Key key, Animation&lt;<span class="built_in">double</span>&gt; animation&#125;)</span><br><span class="line">      : <span class="keyword">super</span>(key: key, listenable: animation);</span><br><span class="line"></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> Animation&lt;<span class="built_in">double</span>&gt; animation = listenable;</span><br><span class="line">    <span class="keyword">return</span> Center(</span><br><span class="line">      child: Container(</span><br><span class="line">        margin: EdgeInsets.symmetric(vertical: <span class="number">10</span>),</span><br><span class="line">        height: animation.value,</span><br><span class="line">        width: animation.value,</span><br><span class="line">        child: FlutterLogo(),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><code>AnimatedLogo</code>在绘制自身时使用动画的当前值。</p>
+<p>LogoApp仍然管理<code>AnimationController</code>和<code>Tween</code>，它将<code>Animation</code>对象传递给<code>AnimatedLogo</code>：</p>
+<p><img src="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986061511.jpg" alt></p>
+<p>App源代码:<a href="https://github.com/flutter/website/tree/master/examples/animation/animate2" target="_blank" rel="noopener">animate2</a></p>
+<h3 id="监控动画的过程"><a href="#监控动画的过程" class="headerlink" title="监控动画的过程"></a>监控动画的过程</h3><p>重点是什么？</p>
+<ul>
+<li>使用addStatusListener()通知动画状态的更改，例如启动，停止或反转方向。</li>
+<li>通过在动画完成或返回其起始状态时反转方向，在无限循环中运行动画。</li>
+</ul>
+<p>知道动画何时改变状态通常很有帮助，例如完成，前进或后退。您可以使用addStatusListener()获取此通知。以下代码修改前一个示例，以便它监听状态更改并打印更新。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_LogoAppState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">LogoApp</span>&gt; <span class="title">with</span> <span class="title">SingleTickerProviderStateMixin</span> </span>&#123;</span><br><span class="line">  Animation&lt;<span class="built_in">double</span>&gt; animation;</span><br><span class="line">  AnimationController controller;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> initState() &#123;</span><br><span class="line">    <span class="keyword">super</span>.initState();</span><br><span class="line">    controller =</span><br><span class="line">        AnimationController(duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">2</span>), vsync: <span class="keyword">this</span>);</span><br><span class="line">    animation = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0</span>, end: <span class="number">300</span>).animate(controller)</span><br><span class="line">      ..addStatusListener((state) =&gt; <span class="built_in">print</span>(<span class="string">'<span class="subst">$state</span>'</span>));</span><br><span class="line">    controller.forward();</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// ...</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>运行此代码会产生以下输出：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">AnimationStatus.forward</span><br><span class="line">AnimationStatus.completed</span><br></pre></td></tr></table></figure>
+
+<p>接下来，使用addStatusListener()在开头或结尾反转动画。这会产生“呼吸”效果：</p>
+<p><img src="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986414707.jpg" alt></p>
+<p>App源代码:<a href="https://github.com/flutter/website/tree/master/examples/animation/animate3" target="_blank" rel="noopener">animate3</a></p>
+<h3 id="使用AnimatedBuilder进行重构"><a href="#使用AnimatedBuilder进行重构" class="headerlink" title="使用AnimatedBuilder进行重构"></a>使用AnimatedBuilder进行重构</h3><p>重点是什么？</p>
+<ul>
+<li><code>AnimatedBuilder</code>知道如何渲染过渡。</li>
+<li><code>AnimatedBuilder</code>不知道如何渲染widget，也不管理<code>Animation</code>对象。</li>
+<li>使用<code>AnimatedBuilder</code>将动画描述为另一个widget的build方法的一部分。如果你只想使用可重复使用的动画定义widget，请使用<code>AnimatedWidget</code>。</li>
+<li>Flutter API中的AnimatedBuilders示例：<code>BottomSheet</code>，<code>ExpansionTile</code>，<code>PopupMenu</code>，<code>ProgressIndicator</code>，<code>RefreshIndicator</code>，<code>Scaffold</code>，<code>SnackBar</code>，<code>TabBar</code>，<code>TextField</code>。</li>
+</ul>
+<p>animate3示例中的代码的一个问题是，更改动画需要更改渲染logo的widget。更好的解决方案是将职责分成不同的类：</p>
+<ul>
+<li>渲染logo</li>
+<li>定义<code>Animation</code>对象</li>
+<li>渲染过渡</li>
+</ul>
+<p>你可以在<code>AnimatedBuilder</code>类的帮助下完成此分离。 <code>AnimatedBuilder</code>是渲染树中的单独类。与<code>AnimatedWidget</code>一样，AnimatedBuilder会自动监听来自<code>Animation</code>对象的通知，并根据需要将widget树标记为脏的(dirty)，因此您无需调用addListener()。</p>
+<p><a href="https://github.com/flutter/website/tree/master/examples/animation/animate4/lib/main.dart" target="_blank" rel="noopener">animate4</a>示例的widget树如下所示：</p>
+<p><img src="https://flutter.dev/assets/ui/AnimatedBuilder-WidgetTree-99e58a8bbf50268bcb0586c276889534bf31e0dc09f17e355a863b04b06a0ec4.png" alt></p>
+<p>从widget树的底部开始，用于渲染logo的代码非常简单：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LogoWidget</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Leave out the height and width so it fills the animating parent</span></span><br><span class="line">  Widget build(BuildContext context) =&gt; Container(</span><br><span class="line">        margin: EdgeInsets.symmetric(vertical: <span class="number">10</span>),</span><br><span class="line">        child: FlutterLogo(),</span><br><span class="line">      );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>图中的中间三个块都是在GrowTransition的build()方法中创建的，如下所示。 GrowTransition widget本身是无状态的，并包含定义过渡动画所需的最终变量集。 build()函数创建并返回<code>AnimatedBuilder</code>，它将（Anonymous builder）方法和LogoWidget对象作为参数。渲染过渡的工作实际上发生在（Anonymous builder）方法中，该方法创建适当大小的Container以强制LogoWidget缩小以适应。</p>
+<p>下面代码中的一个棘手问题是孩子看起来像是指定了两次。事情是这样的，child的外部引用传递给<code>AnimatedBuilder</code>，<code>AnimatedBuilder</code>将其传递给匿名闭包，然后匿名闭包将该对象用作其子对象。最终结果是AnimatedBuilder插入到渲染树中的两个widget之间。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">GrowTransition</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  GrowTransition(&#123;<span class="keyword">this</span>.child, <span class="keyword">this</span>.animation&#125;);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> Widget child;</span><br><span class="line">  <span class="keyword">final</span> Animation&lt;<span class="built_in">double</span>&gt; animation;</span><br><span class="line"></span><br><span class="line">  Widget build(BuildContext context) =&gt; Center(</span><br><span class="line">        child: AnimatedBuilder(</span><br><span class="line">            animation: animation,</span><br><span class="line">            builder: (context, child) =&gt; Container(</span><br><span class="line">                  height: animation.value,</span><br><span class="line">                  width: animation.value,</span><br><span class="line">                  child: child,</span><br><span class="line">                ),</span><br><span class="line">            child: child),</span><br><span class="line">      );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>最后，初始化动画的代码看起来与<a href="https://github.com/flutter/website/tree/master/examples/animation/animate2/lib/main.dart" target="_blank" rel="noopener">animate2</a>示例非常相似。 initState()方法创建一个<code>AnimationController</code>和一个<code>Tween</code>，然后用<code>animate()</code>绑定它们。魔术发生在build()方法中，该方法返回一个带LogoWidget作为子项的<code>GrowTransition</code>对象，以及一个驱动转换的动画对象。这些是上面要点中列出的三个要素。</p>
+<p><img src="https://qiantun.oss-cn-beijing.aliyuncs.com/img/1555986662346.jpg" alt></p>
+<p>应用源代码:<a href="https://github.com/flutter/website/tree/master/examples/animation/animate4" target="_blank" rel="noopener">animate4</a></p>
+<h3 id="同步动画"><a href="#同步动画" class="headerlink" title="同步动画"></a>同步动画</h3><p>重点是什么？</p>
+<ul>
+<li>Curves类定义了一个常用曲线数组，你可以将它们与CurvedAnimation一起使用。</li>
+</ul>
+<p>在本节中，您将基于监视动画过程(<a href="https://github.com/flutter/website/tree/master/examples/animation/animate3/lib/main.dart" target="_blank" rel="noopener">animate3</a>）的示例构建，该动画使用<code>AnimatedWidget</code>连续进行动画制作。想想看在不透明度从透明到不透明设置动画时要进行动画处理的情况。</p>
+<p>注意：此示例显示如何在同一动画控制器上使用多个补间，其中每个补间管理动画中的不同效果。它仅用于说明目的。如果你在生产代码中补间不透明度和大小，你可能会使用<code>FadeTransition</code>和<code>SizeTransition</code>。</p>
+<p>每个补间管理动画的一个方面。例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">controller =</span><br><span class="line">    AnimationController(duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">2</span>), vsync: <span class="keyword">this</span>);</span><br><span class="line">sizeAnimation = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0</span>, end: <span class="number">300</span>).animate(controller);</span><br><span class="line">opacityAnimation = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0.1</span>, end: <span class="number">1</span>).animate(controller);</span><br></pre></td></tr></table></figure>
+
+<p>您可以使用sizeAnimation.value获取大小，使用opacityAnimation.value获取不透明度，但AnimatedWidget的构造函数只接受一个Animation对象。要解决此问题，该示例将创建自己的Tween对象并显式计算值。</p>
+<p>更改AnimatedLogo以封装其自己的Tween对象，并且其build()方法在父动画对象上调用Tween.evaluate()以计算所需的大小和不透明度值。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">AnimatedLogo</span> <span class="keyword">extends</span> <span class="title">AnimatedWidget</span> </span>&#123;</span><br><span class="line">  <span class="comment">// Make the Tweens static because they don't change.</span></span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">final</span> _opacityTween = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0.1</span>, end: <span class="number">1</span>);</span><br><span class="line">  <span class="keyword">static</span> <span class="keyword">final</span> _sizeTween = Tween&lt;<span class="built_in">double</span>&gt;(begin: <span class="number">0</span>, end: <span class="number">300</span>);</span><br><span class="line"></span><br><span class="line">  AnimatedLogo(&#123;Key key, Animation&lt;<span class="built_in">double</span>&gt; animation&#125;)</span><br><span class="line">      : <span class="keyword">super</span>(key: key, listenable: animation);</span><br><span class="line"></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> Animation&lt;<span class="built_in">double</span>&gt; animation = listenable;</span><br><span class="line">    <span class="keyword">return</span> Center(</span><br><span class="line">      child: Opacity(</span><br><span class="line">        opacity: _opacityTween.evaluate(animation),</span><br><span class="line">        child: Container(</span><br><span class="line">          margin: EdgeInsets.symmetric(vertical: <span class="number">10</span>),</span><br><span class="line">          height: _sizeTween.evaluate(animation),</span><br><span class="line">          width: _sizeTween.evaluate(animation),</span><br><span class="line">          child: FlutterLogo(),</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">LogoApp</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  _LogoAppState createState() =&gt; _LogoAppState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_LogoAppState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">LogoApp</span>&gt; <span class="title">with</span> <span class="title">SingleTickerProviderStateMixin</span> </span>&#123;</span><br><span class="line">  Animation&lt;<span class="built_in">double</span>&gt; animation;</span><br><span class="line">  AnimationController controller;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> initState() &#123;</span><br><span class="line">    <span class="keyword">super</span>.initState();</span><br><span class="line">    controller =</span><br><span class="line">        AnimationController(duration: <span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">2</span>), vsync: <span class="keyword">this</span>);</span><br><span class="line">    animation = CurvedAnimation(parent: controller, curve: Curves.easeIn)</span><br><span class="line">      ..addStatusListener((status) &#123;</span><br><span class="line">        <span class="keyword">if</span> (status == AnimationStatus.completed) &#123;</span><br><span class="line">          controller.reverse();</span><br><span class="line">        &#125; <span class="keyword">else</span> <span class="keyword">if</span> (status == AnimationStatus.dismissed) &#123;</span><br><span class="line">          controller.forward();</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    controller.forward();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) =&gt; AnimatedLogo(animation: animation);</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose() &#123;</span><br><span class="line">    controller.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>App 源代码:<a href="https://github.com/flutter/website/tree/master/examples/animation/animate5" target="_blank" rel="noopener">animate5</a></p>
+<h2 id="下一步"><a href="#下一步" class="headerlink" title="下一步"></a>下一步</h2><p>本教程为你使用Tweens在Flutter中创建动画提供了基础，但还有许多其他类需要探索。你可以研究专门的<code>Tween</code>类，特定于<code>Material Design</code>的动画，<code>ReverseAnimation</code>，共享元素过渡（也称为Hero动画),物理模拟和fling()方法。有关最新的可用文档和示例，请参阅<a href="https://flutter.dev/docs/development/ui/animations" target="_blank" rel="noopener">动画登录页面</a>。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Animations/" rel="tag"># Animations</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/23/Flutter/development/ui/animations/Animations overview/" rel="next" title="(译)动画概观">
+                <i class="fa fa-chevron-left"></i> (译)动画概观
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/24/Flutter/development/ui/navigation/Navigate to a new screen and back/" rel="prev" title="(转)导航到一个新页面和返回">
+                (转)导航到一个新页面和返回 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#基本的动画概念和类"><span class="nav-number">1.</span> <span class="nav-text">基本的动画概念和类</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Animation-lt-double-gt"><span class="nav-number">1.1.</span> <span class="nav-text">Animation&lt;double&gt;</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Curved­Animation"><span class="nav-number">1.2.</span> <span class="nav-text">Curved­Animation</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#AnimationController"><span class="nav-number">1.3.</span> <span class="nav-text">AnimationController</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Tween"><span class="nav-number">1.4.</span> <span class="nav-text">Tween</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#Tween-animate"><span class="nav-number">1.4.1.</span> <span class="nav-text">Tween.animate</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Animation-notifications"><span class="nav-number">1.5.</span> <span class="nav-text">Animation notifications</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Animation-例子"><span class="nav-number">2.</span> <span class="nav-text">Animation 例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#渲染动画"><span class="nav-number">2.1.</span> <span class="nav-text">渲染动画</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用AnimatedWidget进行简化"><span class="nav-number">2.2.</span> <span class="nav-text">使用AnimatedWidget进行简化</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#监控动画的过程"><span class="nav-number">2.3.</span> <span class="nav-text">监控动画的过程</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用AnimatedBuilder进行重构"><span class="nav-number">2.4.</span> <span class="nav-text">使用AnimatedBuilder进行重构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#同步动画"><span class="nav-number">2.5.</span> <span class="nav-text">同步动画</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#下一步"><span class="nav-number">3.</span> <span class="nav-text">下一步</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

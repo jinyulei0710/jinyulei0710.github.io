@@ -1,0 +1,1462 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 由 Lasse Nielsen 撰写 2013年4月(2018年10月更新) dart:async 库包含两种对许多 Dart API 很重要的类型： Stream 和 Future 。如果Future表示单次计算的结果，则流是一系列结果。你在流上监听以获得结果（数据和错误）以及流关闭的通知。你也可以在监听时暂停或在流完成之前停止监听流。">
+<meta name="keywords" content="Async,Dart">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)在Dart中创建流">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/30/Flutter/Dart/Async/Creating Streams in Dart/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 由 Lasse Nielsen 撰写 2013年4月(2018年10月更新) dart:async 库包含两种对许多 Dart API 很重要的类型： Stream 和 Future 。如果Future表示单次计算的结果，则流是一系列结果。你在流上监听以获得结果（数据和错误）以及流关闭的通知。你也可以在监听时暂停或在流完成之前停止监听流。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-25T05:01:01.209Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)在Dart中创建流">
+<meta name="twitter:description" content="原文链接 由 Lasse Nielsen 撰写 2013年4月(2018年10月更新) dart:async 库包含两种对许多 Dart API 很重要的类型： Stream 和 Future 。如果Future表示单次计算的结果，则流是一系列结果。你在流上监听以获得结果（数据和错误）以及流关闭的通知。你也可以在监听时暂停或在流完成之前停止监听流。">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/30/Flutter/Dart/Async/Creating Streams in Dart/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译)在Dart中创建流 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/30/Flutter/Dart/Async/Creating Streams in Dart/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译)在Dart中创建流
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-30 16:45:17" itemprop="dateCreated datePublished" datetime="2019-04-30T16:45:17+08:00">2019-04-30</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:01:01" itemprop="dateModified" datetime="2019-06-25T13:01:01+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/30/Flutter/Dart/Async/Creating Streams in Dart/" class="leancloud_visitors" data-flag-title="(译)在Dart中创建流">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.dartlang.org/articles/libraries/creating-streams" target="_blank" rel="noopener">原文链接</a></p>
+<p>由 Lasse Nielsen 撰写</p>
+<p>2013年4月(2018年10月更新)</p>
+<p>dart:async 库包含两种对许多 Dart API 很重要的类型： <a href="https://api.dartlang.org/stable/dart-async/Stream-class.html" target="_blank" rel="noopener">Stream</a> 和 <a href="https://api.dartlang.org/stable/dart-async/Future-class.html" target="_blank" rel="noopener">Future</a> 。如果Future表示单次计算的结果，则流是一系列结果。你在流上监听以获得结果（数据和错误）以及流关闭的通知。你也可以在监听时暂停或在流完成之前停止监听流。</p>
+<a id="more"></a>
+
+
+<p>但是这篇文章不是关于使用流。这是关于创建自己的流。你可以通过以下几种方式创建流：</p>
+<ul>
+<li>转换现有流。</li>
+<li>使用 <code>async *</code> 函数从头开始创建流。</li>
+<li>使用 <code>StreamController</code> 创建流。</li>
+</ul>
+<p>本文介绍了每种方法的代码，并提供了帮助你正确实现流的提示。</p>
+<p>有关使用流的帮助，请参阅<a href="/dart/async/2019/04/28/AsynchronousProgrammingStreams/">异步编程:Streams</a>。</p>
+<h2 id="转换现有流"><a href="#转换现有流" class="headerlink" title="转换现有流"></a>转换现有流</h2><p>创建流的常见情况是你已经拥有流，并且你希望基于原始流的事件创建新流。例如，你可能有一个字节流，你希望通过 UTF-8 解码输入来转换为字符串流。最通用的方法是创建一个等待原始流上的事件然后输出新事件的新流。例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Splits a stream of consecutive strings into lines.</span></span><br><span class="line"><span class="comment">///</span></span><br><span class="line"><span class="comment">/// The input string is provided in smaller chunks through</span></span><br><span class="line"><span class="comment">/// the `source` stream.</span></span><br><span class="line">Stream&lt;<span class="built_in">String</span>&gt; lines(Stream&lt;<span class="built_in">String</span>&gt; source) <span class="keyword">async</span>* &#123;</span><br><span class="line">  <span class="comment">// Stores any partial line from the previous chunk.</span></span><br><span class="line">  <span class="keyword">var</span> partial = <span class="string">''</span>;</span><br><span class="line">  <span class="comment">// Wait until a new chunk is available, then process it.</span></span><br><span class="line">  <span class="keyword">await</span> <span class="keyword">for</span> (<span class="keyword">var</span> chunk <span class="keyword">in</span> source) &#123;</span><br><span class="line">    <span class="keyword">var</span> lines = chunk.split(<span class="string">'\n'</span>);</span><br><span class="line">    lines[<span class="number">0</span>] = partial + lines[<span class="number">0</span>]; <span class="comment">// Prepend partial line.</span></span><br><span class="line">    partial = lines.removeLast(); <span class="comment">// Remove new partial line.</span></span><br><span class="line">    <span class="keyword">for</span> (<span class="keyword">var</span> line <span class="keyword">in</span> lines) &#123;</span><br><span class="line">      <span class="keyword">yield</span> line; <span class="comment">// Add lines to output stream.</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">  <span class="comment">// Add final partial line to output stream, if any.</span></span><br><span class="line">  <span class="keyword">if</span> (partial.isNotEmpty) <span class="keyword">yield</span> partial;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>对于许多常见的转换，您可以使用 Stream 提供的转换方法，例如 map() ，where() ，expand() 和 take() 。</p>
+<p>例如，假设你有一个stream，counterStream 流，它每秒发出一个递增计数器。以下是它的实现方式：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> counterStream =</span><br><span class="line">    Stream&lt;<span class="built_in">int</span>&gt;.periodic(<span class="built_in">Duration</span>(seconds: <span class="number">1</span>), (x) =&gt; x).take(<span class="number">15</span>);</span><br></pre></td></tr></table></figure>
+
+<p>要快速查看事件，你可以使用以下代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">counterStream.forEach(<span class="built_in">print</span>); <span class="comment">// Print an integer every second, 15 times.</span></span><br></pre></td></tr></table></figure>
+
+<p>要转换流事件，可以在监听流之前调用流上的转换方法(如map()。该方法返回一个新流。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Double the integer in each event.</span></span><br><span class="line"><span class="keyword">var</span> doubleCounterStream = counterStream.map((<span class="built_in">int</span> x) =&gt; x * <span class="number">2</span>);</span><br><span class="line">doubleCounterStream.forEach(<span class="built_in">print</span>);</span><br></pre></td></tr></table></figure>
+
+<p>你可以使用任何其他转换方法，而不是map()，例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">.where((<span class="built_in">int</span> x) =&gt; x.isEven) <span class="comment">// Retain only even integer events.</span></span><br><span class="line">.expand((<span class="keyword">var</span> x) =&gt; [x, x]) <span class="comment">// Duplicate each event.</span></span><br><span class="line">.take(<span class="number">5</span>) <span class="comment">// Stop after the first five events.</span></span><br></pre></td></tr></table></figure>
+
+<p>通常，你只需要一种转换方法。但是，如果你需要更多地控制转换，可以使用 Stream 的transform() 方法指定 StreamTransformer 。平台库为许多常见任务提供流变换器。例如，以下代码使用 dart:convert 库提供的 utf8.decoder 和 LineSplitter 转换器。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;<span class="built_in">List</span>&lt;<span class="built_in">int</span>&gt;&gt; content = File(<span class="string">'someFile.txt'</span>).openRead();</span><br><span class="line"><span class="built_in">List</span>&lt;<span class="built_in">String</span>&gt; lines =</span><br><span class="line">    <span class="keyword">await</span> content.transform(utf8.decoder).transform(LineSplitter()).toList();</span><br></pre></td></tr></table></figure>
+
+<h2 id="从头创建流"><a href="#从头创建流" class="headerlink" title="从头创建流"></a>从头创建流</h2><p>创建新流的一种方法是使用异步生成器(async *）函数。调用函数时会创建流，并且在监听流时函数的主体开始运行。函数返回时，流关闭。在函数返回之前，它可以使用 yield 或 yield * 语句在流上发出事件。</p>
+<p>这是一个以固定间隔发出数字的原始示例：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;<span class="built_in">int</span>&gt; timedCounter(<span class="built_in">Duration</span> interval, [<span class="built_in">int</span> maxCount]) <span class="keyword">async</span>* &#123;</span><br><span class="line">  <span class="built_in">int</span> i = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">while</span> (<span class="keyword">true</span>) &#123;</span><br><span class="line">    <span class="keyword">await</span> Future.delayed(interval);</span><br><span class="line">    <span class="keyword">yield</span> i++;</span><br><span class="line">    <span class="keyword">if</span> (i == maxCount) <span class="keyword">break</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>[PENDING：显示使用它的代码，所以我们有一些提及 StreamSubscription 的上下文？]</p>
+<p>此函数返回一个 Stream 。当监听该流时，正文开始运行。它反复延迟请求的间隔，然后产生下一个数字。如果省略count参数，则循环上没有停止条件，因此流将永远输出越来越大的数字 - 或者直到监听器器取消其订阅。</p>
+<p>当监听器取消（通过对listen（）方法返回的 StreamSubscription 对象调用cancel()）时，下一次正文到达 yield 语句时，yield 将作为 return 语句。执行任何封闭的 finally 块，并退出该函数。如果函数在退出之前尝试生成一个值，那么它将失败并充当返回值。</p>
+<p>当函数最终退出时，cancel() 方法返回的 future 将完成。如果函数以错误退出，则将来会以该错误完成;否则,它以 null 结束。</p>
+<p>另一个更有用的示例是将 future 序列转换为流的函数：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;T&gt; streamFromFutures&lt;T&gt;(<span class="built_in">Iterable</span>&lt;Future&lt;T&gt;&gt; futures) <span class="keyword">async</span>* &#123;</span><br><span class="line">  <span class="keyword">for</span> (<span class="keyword">var</span> future <span class="keyword">in</span> futures) &#123;</span><br><span class="line">    <span class="keyword">var</span> result = <span class="keyword">await</span> future;</span><br><span class="line">    <span class="keyword">yield</span> result;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此函数要求future可迭代新的future，等待该future，发出结果值，然后循环。如果将来因错误而完成，则流将以该错误完成。</p>
+<p>很少有异步*函数从无到有构建流。它需要从某个地方获取数据，而且通常在某个地方是另一个流。在某些情况下，与上面的future序列一样，数据来自其他异步事件源。但是，在许多情况下，async*函数过于简单，无法轻松处理多个数据源。这就是 StreamController 类的用武之地。</p>
+<h2 id="使用StreamController"><a href="#使用StreamController" class="headerlink" title="使用StreamController"></a>使用StreamController</h2><p>如果你的流的事件来自程序的不同部分，而不仅仅是来自异步函数可以遍历的流或future，那么使用 StreamController 来创建和填充流。</p>
+<p>StreamController 为你提供了一个新的流，以及一种在任何地方和任何地方向流添加事件的方法。该流具有处理监听器和暂停所需的所有逻辑。您返回流并将控制器保留给自己。</p>
+<p>以下示例（来自 stream_controller_bad.dart ）展示了 StreamController 的一个基本但有缺陷的用法，用于实现前面示例中的 timedCounter() 函数。此代码创建一个要返回的流，然后根据计时器事件将数据提供给它，这些事件既不是 future 也不是流事件。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// <span class="doctag">NOTE:</span> This implementation is FLAWED!</span></span><br><span class="line"><span class="comment">// It starts before it has subscribers, and it doesn't implement pause.</span></span><br><span class="line">Stream&lt;<span class="built_in">int</span>&gt; timedCounter(<span class="built_in">Duration</span> interval, [<span class="built_in">int</span> maxCount]) &#123;</span><br><span class="line">  <span class="keyword">var</span> controller = StreamController&lt;<span class="built_in">int</span>&gt;();</span><br><span class="line">  <span class="built_in">int</span> counter = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">void</span> tick(Timer timer) &#123;</span><br><span class="line">    counter++;</span><br><span class="line">    controller.add(counter); <span class="comment">// Ask stream to send counter values as event.</span></span><br><span class="line">    <span class="keyword">if</span> (maxCount != <span class="keyword">null</span> &amp;&amp; counter &gt;= maxCount) &#123;</span><br><span class="line">      timer.cancel();</span><br><span class="line">      controller.close(); <span class="comment">// Ask stream to shut down and tell listeners.</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  Timer.periodic(interval, tick); <span class="comment">// BAD: Starts before it has subscribers.</span></span><br><span class="line">  <span class="keyword">return</span> controller.stream;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>和以前一样，你可以使用 timedCounter() 返回的流，如下所示：[PENDING：我们之前是否显示过这个？]</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> counterStream = timedCounter(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">1</span>), <span class="number">15</span>);</span><br><span class="line">counterStream.listen(<span class="built_in">print</span>); <span class="comment">// Print an integer every second, 15 times.</span></span><br></pre></td></tr></table></figure>
+
+<p>timedCounter() 的这个实现有几个问题：</p>
+<ul>
+<li>它在订阅者之前就开始制作活动。</li>
+<li>即使订阅者请求暂停，它也会不断产生事件。</li>
+</ul>
+<p>如下一节所示，您可以通过在创建StreamController时指定回调（如 onListen 和onPause ）来解决这两个问题。</p>
+<h3 id="等待订阅"><a href="#等待订阅" class="headerlink" title="等待订阅"></a>等待订阅</h3><p>通常，流应该在开始工作之前等待订阅者。 async * 函数会自动执行此操作，但在使用StreamController 时，您可以完全控制并且即使不应该也可以添加事件。当流没有订阅者时，其 StreamController 会缓冲事件，如果流永远不会获得订阅者，则会导致内存泄漏。</p>
+<p>尝试将使用该流的代码更改为以下内容：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> listenAfterDelay() <span class="keyword">async</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> counterStream = timedCounter(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">1</span>), <span class="number">15</span>);</span><br><span class="line">  <span class="keyword">await</span> Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">5</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">// After 5 seconds, add a listener.</span></span><br><span class="line">  <span class="keyword">await</span> <span class="keyword">for</span> (<span class="built_in">int</span> n <span class="keyword">in</span> counterStream) &#123;</span><br><span class="line">    <span class="built_in">print</span>(n); <span class="comment">// Print an integer every second, 15 times.</span></span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当此代码运行时，前5秒没有打印任何内容，尽管流正在运行。然后添加侦听器，并且一次打印前5个左右的事件，因为它们由 StreamController 缓冲。</p>
+<p>要获得订阅通知，请在创建 StreamController 时指定 onListen 参数。当流获得其第一个订阅者时，将调用 onListen 回调。如果指定 onCancel 回调，则在控制器丢失其最后一个订阅者时调用它。在前面的示例中，Timer.periodic() 应该移动到onListen处理程序，如下一节所示。</p>
+<h3 id="尊重暂停状态"><a href="#尊重暂停状态" class="headerlink" title="尊重暂停状态"></a>尊重暂停状态</h3><p>当监听器器请求暂停时，避免产生事件。当流订阅暂停时，async*函数会在yield语句中自动暂停。另一方面，StreamController 在暂停期间缓冲事件。如果提供事件的代码不遵循暂停，则缓冲区的大小可以无限增长。此外，如果监听器在暂停后立即停止监听，则浪费了创建缓冲区所花费的工作。</p>
+<p>要查看没有暂停支持会发生什么，请尝试将使用该流的代码更改为以下内容：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> listenWithPause() &#123;</span><br><span class="line">  <span class="keyword">var</span> counterStream = timedCounter(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">1</span>), <span class="number">15</span>);</span><br><span class="line">  StreamSubscription&lt;<span class="built_in">int</span>&gt; subscription;</span><br><span class="line"></span><br><span class="line">  subscription = counterStream.listen((<span class="built_in">int</span> counter) &#123;</span><br><span class="line">    <span class="built_in">print</span>(counter); <span class="comment">// Print an integer every second.</span></span><br><span class="line">    <span class="keyword">if</span> (counter == <span class="number">5</span>) &#123;</span><br><span class="line">      <span class="comment">// After 5 ticks, pause for five seconds, then resume.</span></span><br><span class="line">      subscription.pause(Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(seconds: <span class="number">5</span>)));</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>当五秒钟暂停时，在此期间触发的事件都会立即收到。发生这种情况是因为流的源不支持暂停并且不断向流添加事件。因此，流缓冲事件，然后在流取消暂停时清空其缓冲区。</p>
+<p>以下版本的 timedCounter()（来自stream_controller.dart）通过使用StreamController 上的 onListen，onPause ，onResume 和 onCancel 回调来实现暂停。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">Stream&lt;<span class="built_in">int</span>&gt; timedCounter(<span class="built_in">Duration</span> interval, [<span class="built_in">int</span> maxCount]) &#123;</span><br><span class="line">  StreamController&lt;<span class="built_in">int</span>&gt; controller;</span><br><span class="line">  Timer timer;</span><br><span class="line">  <span class="built_in">int</span> counter = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> tick(_) &#123;</span><br><span class="line">    counter++;</span><br><span class="line">    controller.add(counter); <span class="comment">// Ask stream to send counter values as event.</span></span><br><span class="line">    <span class="keyword">if</span> (counter == maxCount) &#123;</span><br><span class="line">      timer.cancel();</span><br><span class="line">      controller.close(); <span class="comment">// Ask stream to shut down and tell listeners.</span></span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> startTimer() &#123;</span><br><span class="line">    timer = Timer.periodic(interval, tick);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> stopTimer() &#123;</span><br><span class="line">    <span class="keyword">if</span> (timer != <span class="keyword">null</span>) &#123;</span><br><span class="line">      timer.cancel();</span><br><span class="line">      timer = <span class="keyword">null</span>;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  controller = StreamController&lt;<span class="built_in">int</span>&gt;(</span><br><span class="line">      onListen: startTimer,</span><br><span class="line">      onPause: stopTimer,</span><br><span class="line">      onResume: startTimer,</span><br><span class="line">      onCancel: stopTimer);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">return</span> controller.stream;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用上面的 listenWithPause() 函数运行此代码。你会看到它在暂停时停止计数，然后它恢复得很好。</p>
+<p>必须使用所有监听器- onListen，onCancel，onPause 和 onResume-来通知暂停状态的更改。原因是如果订阅和暂停状态同时发生变化，则仅调用 onListen 或 onCancel 回调。</p>
+<h2 id="最后的提示"><a href="#最后的提示" class="headerlink" title="最后的提示"></a>最后的提示</h2><p>在不使用async *函数的情况下创建流时，请记住以下提示：</p>
+<ul>
+<li><p>使用同步控制器时要小心 - 例如，使用 StreamController 创建的同步控制器（sync：true）。在未调用的同步控制器上发送事件时（例如，使用由 EventSink 定义的 add()，addError()或close()方法），事件将立即发送到流上的所有监听器。在添加监听器的代码完全返回之前，永远不能调用流监听器，并且在错误的时间使用同步控制器可能会破坏此承诺并导致良好的代码失败。避免使用同步控制器。</p>
+</li>
+<li><p>如果使用 StreamController ，则在 listen 调用返回 StreamSubscription 之前调用 onListen 回调。不要让 onListen 回调依赖于已存在的订阅。例如，在以下代码中，在订阅变量具有有效值之前触发 onListen 事件（并调用处理程序）。</p>
+</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">subscription = stream.listen（handler）;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><p>StreamController 定义的 onListen，onPause ，onResume 和 onCancel 回调在流的监听器状态更改时由流调用，但从不在事件触发期间或在调用另一个状态更改处理程序期间调用。在这些情况下，状态更改回调会延迟，直到上一次回调完成。</p>
+</li>
+<li><p>不要尝试自己实现 Stream 接口。很容易获得事件，回调之间的交互，以及添加和删除侦监听的巧妙错误。始终使用可能来自 StreamController 的现有流来实现新流的监听调用。</p>
+</li>
+<li><p>虽然可以通过扩展 Stream 类并在顶部实现 listen 方法和额外功能来创建扩展 Stream功能和更多功能的类，但通常不建议这样做，因为它引入了用户必须考虑的新类型。相反，你通常可以创建一个具有 Stream（和更多）的类 - 而不是一个Stream（以及更多）。</p>
+</li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Async/" rel="tag"># Async</a>
+          
+            <a href="/tags/Dart/" rel="tag"># Dart</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/" rel="next" title="(译)单订阅流 vs. 广播流">
+                <i class="fa fa-chevron-left"></i> (译)单订阅流 vs. 广播流
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/05/04/Flutter/Dart/Async/Asynchrony support/" rel="prev" title="(译)异步支持">
+                (译)异步支持 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#转换现有流"><span class="nav-number">1.</span> <span class="nav-text">转换现有流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#从头创建流"><span class="nav-number">2.</span> <span class="nav-text">从头创建流</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用StreamController"><span class="nav-number">3.</span> <span class="nav-text">使用StreamController</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#等待订阅"><span class="nav-number">3.1.</span> <span class="nav-text">等待订阅</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#尊重暂停状态"><span class="nav-number">3.2.</span> <span class="nav-text">尊重暂停状态</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#最后的提示"><span class="nav-number">4.</span> <span class="nav-text">最后的提示</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

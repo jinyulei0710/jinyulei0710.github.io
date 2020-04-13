@@ -1,0 +1,1449 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 很难想象，一个移动应用程序不需要与Web服务器通信，或者只是简单地在某一个位置存储结构化数据。制作与网络连接的应用程序的时候，迟早会需要使用一些美好的JSON。 本指南介绍了如何在Flutter中使用JSON。它涵盖了在不同场景中使用哪种JSON解决方案，以及原因。">
+<meta name="keywords" content="JSON序列化">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译) Flutter 中的 JSON 序列化">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 很难想象，一个移动应用程序不需要与Web服务器通信，或者只是简单地在某一个位置存储结构化数据。制作与网络连接的应用程序的时候，迟早会需要使用一些美好的JSON。 本指南介绍了如何在Flutter中使用JSON。它涵盖了在不同场景中使用哪种JSON解决方案，以及原因。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://flutter.dev/images/json/ide_warning.png">
+<meta property="og:updated_time" content="2019-06-25T05:03:16.693Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译) Flutter 中的 JSON 序列化">
+<meta name="twitter:description" content="原文链接 很难想象，一个移动应用程序不需要与Web服务器通信，或者只是简单地在某一个位置存储结构化数据。制作与网络连接的应用程序的时候，迟早会需要使用一些美好的JSON。 本指南介绍了如何在Flutter中使用JSON。它涵盖了在不同场景中使用哪种JSON解决方案，以及原因。">
+<meta name="twitter:image" content="https://flutter.dev/images/json/ide_warning.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译) Flutter 中的 JSON 序列化 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译) Flutter 中的 JSON 序列化
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-15 10:40:17" itemprop="dateCreated datePublished" datetime="2019-04-15T10:40:17+08:00">2019-04-15</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:03:16" itemprop="dateModified" datetime="2019-06-25T13:03:16+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/" class="leancloud_visitors" data-flag-title="(译) Flutter 中的 JSON 序列化">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://flutter.dev/docs/development/data-and-backend/json" target="_blank" rel="noopener">原文链接</a></p>
+<p>很难想象，一个移动应用程序不需要与Web服务器通信，或者只是简单地在某一个位置存储结构化数据。制作与网络连接的应用程序的时候，迟早会需要使用一些美好的JSON。</p>
+<p>本指南介绍了如何在Flutter中使用JSON。它涵盖了在不同场景中使用哪种JSON解决方案，以及原因。</p>
+<a id="more"></a>
+
+<blockquote>
+<p>术语：编码和序列化是一回事 - 将数据结构转换为字符串。解码和反序列化是相反的过程 - 将字符串转换为数据结构。但是，序列化通常也指将数据结构转换为更易于阅读的格式的整个过程。</p>
+</blockquote>
+<p>为避免混淆，本文档在引用整个过程时使用“序列化”，在专门引用这些过程时使用“编码”和“解码”。</p>
+<h2 id="哪种JSON序列化方法适合我？"><a href="#哪种JSON序列化方法适合我？" class="headerlink" title="哪种JSON序列化方法适合我？"></a>哪种JSON序列化方法适合我？</h2><p>本文介绍了使用JSON的两种常规策略：</p>
+<ul>
+<li>手动序列化</li>
+<li>使用代码生成进行自动序列化<br>不同的项目具有不同的复杂性和用例。对于较小的概念验证项目或快速原型，使用代码生成器可能有点杀鸡用牛刀。对于具有更多复杂性的多个JSON模型的应用程序，手动编码很快就会变得乏味，重复，并且会带来许多小错误。</li>
+</ul>
+<h2 id="对较小的项目使用手动序列化"><a href="#对较小的项目使用手动序列化" class="headerlink" title="对较小的项目使用手动序列化"></a>对较小的项目使用手动序列化</h2><p>手动JSON解码使用dart：convert中内置的JSON解码器。它涉及将原始JSON字符串传递给jsonDecode（）方法，然后在生成的Map &lt;String，dynamic&gt;中查找所需的值。它没有外部依赖或特别的设置过程，它有利于快速验证概念。</p>
+<p>当项目变大时，手动解码的效果就变得不佳。手动编写解码逻辑可能变得难以管理且容易出错。如果在访问不存在的JSON字段时出现拼写错误，则代码会在运行时抛出错误。</p>
+<p>如果您的项目中没有很多JSON模型，并且希望快速测试概念，那么手动序列化可能就是您想要的方式。有关手动编码的示例，请参阅使用dart：convert手动序列化JSON。</p>
+<h2 id="在大中型项目中使用代码生成"><a href="#在大中型项目中使用代码生成" class="headerlink" title="在大中型项目中使用代码生成"></a>在大中型项目中使用代码生成</h2><p>使用代码生成的JSON序列化意味着有一个外部库为您生成编码样板。进行一些初始设置后，您将运行一个文件观察者，它会依据您的模型类生成代码。例如，<a href="https://pub.dartlang.org/packages/json_serializable" target="_blank" rel="noopener">json_serializable</a>和<a href="https://pub.dartlang.org/packages/built_value" target="_blank" rel="noopener">built_value</a>就是这种类型的库。</p>
+<p>这种方法适用于较大的项目。不需要手写的样板文件，并且在编译时捕获访问JSON字段时的拼写错误。代码生成的缺点是它需要一些初始设置。此外，生成的源文件可能会在项目导航器中产生视觉混乱。</p>
+<p>当您拥有中型或大型项目时，您可能希望使用生成的代码进行JSON序列化。要查看基于JSON编码的代码生成示例，请参阅<a href="https://flutter.dev/docs/development/data-and-backend/json#code-generation" target="_blank" rel="noopener">使用代码生成库序列化JSON</a>。</p>
+<h2 id="Flutter中是否有GSON-Jackson-Moshi等价物？"><a href="#Flutter中是否有GSON-Jackson-Moshi等价物？" class="headerlink" title="Flutter中是否有GSON / Jackson / Moshi等价物？"></a>Flutter中是否有GSON / Jackson / Moshi等价物？</h2><p>答案很简单，就是没有。</p>
+<p>这样的库需要使用运行时反射，这在Flutter中被禁用。运行时反射会干扰<a href="https://en.wikipedia.org/wiki/Tree_shaking" target="_blank" rel="noopener">tree sharking</a>机制，Dart支持了这个机制已经很长时间。有了tree sharking](<a href="https://en.wikipedia.org/wiki/Tree_shaking)机制，您可以从发布版本中“摇掉”未使用的代码。这对应用大小的优化是显著的。" target="_blank" rel="noopener">https://en.wikipedia.org/wiki/Tree_shaking)机制，您可以从发布版本中“摇掉”未使用的代码。这对应用大小的优化是显著的。</a></p>
+<p>由于反射使得代码所有代码在默认情况下是隐式使用的，因此使<a href="https://en.wikipedia.org/wiki/Tree_shaking" target="_blank" rel="noopener">tree sharking</a>机制变得困难。这些工具无法知道运行时哪些部分未使用，因此冗余代码很难被删除。使用反射时，无法轻松优化应用程序大小。</p>
+<p>dartson怎么样？ dartson库使用运行时反射，这使它与Flutter不兼容。</p>
+<p>虽然您不能在Flutter中使用运行时反射，但是某些库基于代码为你提供了类似的易用API，<a href="https://flutter.dev/docs/development/data-and-backend/json#code-generation" target="_blank" rel="noopener">代码生成库部分</a>更详细地介绍了此方法。</p>
+<h2 id="使用dart：convert手动序列化JSON"><a href="#使用dart：convert手动序列化JSON" class="headerlink" title="使用dart：convert手动序列化JSON"></a>使用dart：convert手动序列化JSON</h2><p>Flutter中的基本JSON编码非常简单。 Flutter有一个内置的dart：转换库，包括一个简单的JSON编码器和解码器。</p>
+<p>以下是简单用户模型的示例JSON。</p>
+<figure class="highlight json"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  <span class="attr">"name"</span>: <span class="string">"John Smith"</span>,</span><br><span class="line">  <span class="attr">"email"</span>: <span class="string">"john@example.com"</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>使用dart：convert，您可以通过两种方式对此JSON模型进行编码。</p>
+<h3 id="以内联的方式序列化JSON"><a href="#以内联的方式序列化JSON" class="headerlink" title="以内联的方式序列化JSON"></a>以内联的方式序列化JSON</h3><p>通过查看dart：convert文档，您将看到可以通过调用jsonDecode()方法来解码JSON，并使用JSON字符串作为方法参数。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="keyword">dynamic</span>&gt; user = jsonDecode(jsonString);</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'Howdy, <span class="subst">$&#123;user[<span class="string">'name'</span>]&#125;</span>!'</span>);</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'We sent the verification link to <span class="subst">$&#123;user[<span class="string">'email'</span>]&#125;</span>.'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>不幸的是，jsonDecode（）返回一个Map &lt;String，dynamic&gt;，这意味着在运行时之前你不知道值的类型。使用这种方法，您将丧失大部分静态类型语言特性：类型安全，自动补全以及最重要的编译时异常。您的代码将立即变得更容易出错。</p>
+<p>例如，当年使用名称或电子邮件字段的时候，都可能会很快引入拼写错误。由于JSON存在于map结构中，编译器对于拼写错误是不知道。</p>
+<h3 id="在模型类中序列化JSON"><a href="#在模型类中序列化JSON" class="headerlink" title="在模型类中序列化JSON"></a>在模型类中序列化JSON</h3><p>为了解决以上提及到的问题，我们引入了一个普通的模型类，在本例中叫做User。在User类中，您将找到：</p>
+<ul>
+<li>User.fromJson（）构造函数，用于从map结构构造新的User实例。</li>
+<li>一个toJson（）方法，它将User实例转换为map。<br>使用这种方法，调用代码可以具有类型安全性，名称和电子邮件字段的自动补全以及编译时异常。如果您输入拼写错误或将字段视为int而不是字符串，则应用程序将无法编译，而不是在运行时崩溃。</li>
+</ul>
+<p>user.dart</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">String</span> name;</span><br><span class="line">  <span class="keyword">final</span> <span class="built_in">String</span> email;</span><br><span class="line"></span><br><span class="line">  User(<span class="keyword">this</span>.name, <span class="keyword">this</span>.email);</span><br><span class="line"></span><br><span class="line">  User.fromJson(<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="keyword">dynamic</span>&gt; json)</span><br><span class="line">      : name = json[<span class="string">'name'</span>],</span><br><span class="line">        email = json[<span class="string">'email'</span>];</span><br><span class="line"></span><br><span class="line">  <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="keyword">dynamic</span>&gt; toJson() =&gt;</span><br><span class="line">    &#123;</span><br><span class="line">      <span class="string">'name'</span>: name,</span><br><span class="line">      <span class="string">'email'</span>: email,</span><br><span class="line">    &#125;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解码逻辑的责任现在在模型本身内部移动。使用这种新方法，您可以轻松解码User。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Map</span> userMap = jsonDecode(jsonString);</span><br><span class="line"><span class="keyword">var</span> user = <span class="keyword">new</span> User.fromJson(userMap);</span><br><span class="line"></span><br><span class="line"><span class="built_in">print</span>(<span class="string">'Howdy, <span class="subst">$&#123;user.name&#125;</span>!'</span>);</span><br><span class="line"><span class="built_in">print</span>(<span class="string">'We sent the verification link to <span class="subst">$&#123;user.email&#125;</span>.'</span>);</span><br></pre></td></tr></table></figure>
+
+<p>要对用户进行编码，请将User对象传递给jsonEncode（）函数。你不需要调用toJson（）方法，因为jsonEncode（）已经为你做了。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">String</span> json = jsonEncode(user);</span><br></pre></td></tr></table></figure>
+
+<p>使用这种方法，调用代码根本不必担心JSON序列化。但是，模型类仍然是必须。在生产应用程序中，您需要确保序列化正常工作。实际上，User.fromJson()和User.toJson()方法都需要进行单元测试以验证其行为的正确性。</p>
+<p>但是，现实世界的场景通常不会那么简单。您不太可能使用如此小的JSON响应体。嵌套的JSON对象也是常有的。</p>
+<p>如果有一些东西可以为你处理JSON编码和解码，那就太好了。幸运的是，有！</p>
+<h2 id="使用代码生成库序列化JSON"><a href="#使用代码生成库序列化JSON" class="headerlink" title="使用代码生成库序列化JSON"></a>使用代码生成库序列化JSON</h2><p>json_serializable包，这是一个自动生成的源代码生成器，可为您生成JSON序列化样板。</p>
+<p>由于序列化代码不再是手动或手动维护的，因此可以最大限度地降低在运行时出现JSON序列化异常的风险。</p>
+<h2 id="在项目中设置json-serializable"><a href="#在项目中设置json-serializable" class="headerlink" title="在项目中设置json_serializable"></a>在项目中设置json_serializable</h2><p>要在项目中包含json_serializable，您需要一个常规依赖项和两个dev依赖项。简而言之，dev依赖项是我们的应用程序源代码中未包含的依赖项 - 它们仅在开发环境中使用。</p>
+<p>可以通过以下JSON可序列化示例中的pubspec文件来查看这些必需依赖项的最新版本。</p>
+<p>pubspec.yaml</p>
+<figure class="highlight yaml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">dependencies:</span></span><br><span class="line">  <span class="comment"># Your other regular dependencies here</span></span><br><span class="line"><span class="attr">  json_annotation:</span> <span class="string">^2.0.0</span></span><br><span class="line"></span><br><span class="line"><span class="attr">dev_dependencies:</span></span><br><span class="line">  <span class="comment"># Your other dev_dependencies here</span></span><br><span class="line"><span class="attr">  build_runner:</span> <span class="string">^1.0.0</span></span><br><span class="line"><span class="attr">  json_serializable:</span> <span class="string">^2.0.0</span></span><br></pre></td></tr></table></figure>
+
+<p>进入项目根文件夹运行flutter包，（或单击编辑器中的Packages Get）以在项目中使用这些新的依赖项。</p>
+<h2 id="以json-serializable方式创建模型类"><a href="#以json-serializable方式创建模型类" class="headerlink" title="以json_serializable方式创建模型类"></a>以json_serializable方式创建模型类</h2><p>下面显示了如何将User类转换为json_serializable类。为简单起见，此代码使用先前示例中的简化JSON模型。</p>
+<p>user.dart</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'package:json_annotation/json_annotation.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// This allows the `User` class to access private members in</span></span><br><span class="line"><span class="comment">/// the generated file. The value for this is *.g.dart, where</span></span><br><span class="line"><span class="comment">/// the star denotes the source file name.</span></span><br><span class="line"><span class="keyword">part</span> <span class="string">'user.g.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">/// An annotation for the code generator to know that this class needs the</span></span><br><span class="line"><span class="comment">/// JSON serialization logic to be generated.</span></span><br><span class="line"><span class="meta">@JsonSerializable</span>()</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">User</span> </span>&#123;</span><br><span class="line">  User(<span class="keyword">this</span>.name, <span class="keyword">this</span>.email);</span><br><span class="line"></span><br><span class="line">  <span class="built_in">String</span> name;</span><br><span class="line">  <span class="built_in">String</span> email;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/// A necessary factory constructor for creating a new User instance</span></span><br><span class="line">  <span class="comment">/// from a map. Pass the map to the generated `_$UserFromJson()` constructor.</span></span><br><span class="line">  <span class="comment">/// The constructor is named after the source class, in this case User.</span></span><br><span class="line">  <span class="keyword">factory</span> User.fromJson(<span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="keyword">dynamic</span>&gt; json) =&gt; _$UserFromJson(json);</span><br><span class="line"></span><br><span class="line">  <span class="comment">/// `toJson` is the convention for a class to declare support for serialization</span></span><br><span class="line">  <span class="comment">/// to JSON. The implementation simply calls the private, generated</span></span><br><span class="line">  <span class="comment">/// helper method `_$UserToJson`.</span></span><br><span class="line">  <span class="built_in">Map</span>&lt;<span class="built_in">String</span>, <span class="keyword">dynamic</span>&gt; toJson() =&gt; _$UserToJson(<span class="keyword">this</span>);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过此设置，源代码生成器生成用于编码和解码来自JSON的名称和电子邮件字段的代码。</p>
+<p>如果需要，还可以轻松自定义命名策略。例如，如果API返回带有snake_case的对象，并且您希望在模型中使用lowerCamelCase，则可以将@JsonKey批注与name参数一起使用：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/// Tell json_serializable that "registration_date_millis" should be</span></span><br><span class="line"><span class="comment">/// mapped to this property.</span></span><br><span class="line"><span class="meta">@JsonKey</span>(name: <span class="string">'registration_date_millis'</span>)</span><br><span class="line"><span class="keyword">final</span> <span class="built_in">int</span> registrationDateMillis;</span><br></pre></td></tr></table></figure>
+
+<h2 id="运行代码生成实用程序"><a href="#运行代码生成实用程序" class="headerlink" title="运行代码生成实用程序"></a>运行代码生成实用程序</h2><p>在第一次创建json_serializable类时，您将得到类似于下图所示的错误。</p>
+<p><img src="https://flutter.dev/images/json/ide_warning.png" alt="img"></p>
+<p>这些错误完全正常，仅仅是因为模型类的生成代码尚不存在。要解决此问题，请运行生成序列化样板的代码生成器。</p>
+<p>有两种运行代码生成器的方法。</p>
+<h3 id="一次性代码生成"><a href="#一次性代码生成" class="headerlink" title="一次性代码生成"></a>一次性代码生成</h3><p>通过运行flutter包，在项目根目录中运行build_runner build，可以在需要时为模型生成JSON序列化代码。这会触发一次性构建，该构建遍历源文件，选择相关文件，并为它们生成必要的序列化代码。</p>
+<p>尽管这是很方便的，每次当你对你的模型类做了修改的时候，你没必要每次都去手动运行一次。</p>
+<h3 id="持续性地生成代码"><a href="#持续性地生成代码" class="headerlink" title="持续性地生成代码"></a>持续性地生成代码</h3><p>观察者使我们的源代码生成过程更加方便。它会监听项目文件中的更改，并在需要时自动构建必要的文件。通过在项目根目录中运行flutter packages pub run build_runner watch来启动观察程序。</p>
+<p>启动观察器一次，然后把它扔在后台运行是安全的。</p>
+<h3 id="使用json-serializable模型"><a href="#使用json-serializable模型" class="headerlink" title="使用json_serializable模型"></a>使用json_serializable模型</h3><p>要以json_serializable方式解码JSON字符串，您实际上没有对我们以前的代码进行任何更改。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">Map</span> userMap = jsonDecode(jsonString);</span><br><span class="line"><span class="keyword">var</span> user = User.fromJson(userMap);</span><br></pre></td></tr></table></figure>
+
+<p>编码也是如此。调用的API与以前相同。</p>
+<p>使用json_serializable，您可以忘记User类中的任何手动JSON序列化。源代码生成器创建一个名为user.g.dart的文件，该文件具有所有必需的序列化逻辑。您不再需要编写自动化测试来确保序列化工作 - 现在确保序列化正常工作的职责落到了库上。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/JSON序列化/" rel="tag"># JSON序列化</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/" rel="next" title="(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例">
+                <i class="fa fa-chevron-left"></i> (译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/15/Flutter/development/data-and-backend/json serialization/built_collection for Immutable Collections/" rel="prev" title="(译)Dart中适用于不可修改集合的built_collection">
+                (译)Dart中适用于不可修改集合的built_collection <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#哪种JSON序列化方法适合我？"><span class="nav-number">1.</span> <span class="nav-text">哪种JSON序列化方法适合我？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#对较小的项目使用手动序列化"><span class="nav-number">2.</span> <span class="nav-text">对较小的项目使用手动序列化</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在大中型项目中使用代码生成"><span class="nav-number">3.</span> <span class="nav-text">在大中型项目中使用代码生成</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Flutter中是否有GSON-Jackson-Moshi等价物？"><span class="nav-number">4.</span> <span class="nav-text">Flutter中是否有GSON / Jackson / Moshi等价物？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用dart：convert手动序列化JSON"><span class="nav-number">5.</span> <span class="nav-text">使用dart：convert手动序列化JSON</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#以内联的方式序列化JSON"><span class="nav-number">5.1.</span> <span class="nav-text">以内联的方式序列化JSON</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在模型类中序列化JSON"><span class="nav-number">5.2.</span> <span class="nav-text">在模型类中序列化JSON</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用代码生成库序列化JSON"><span class="nav-number">6.</span> <span class="nav-text">使用代码生成库序列化JSON</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#在项目中设置json-serializable"><span class="nav-number">7.</span> <span class="nav-text">在项目中设置json_serializable</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#以json-serializable方式创建模型类"><span class="nav-number">8.</span> <span class="nav-text">以json_serializable方式创建模型类</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#运行代码生成实用程序"><span class="nav-number">9.</span> <span class="nav-text">运行代码生成实用程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#一次性代码生成"><span class="nav-number">9.1.</span> <span class="nav-text">一次性代码生成</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#持续性地生成代码"><span class="nav-number">9.2.</span> <span class="nav-text">持续性地生成代码</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用json-serializable模型"><span class="nav-number">9.3.</span> <span class="nav-text">使用json_serializable模型</span></a></li></ol></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

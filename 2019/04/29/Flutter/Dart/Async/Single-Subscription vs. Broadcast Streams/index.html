@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 由Florian Loitsch撰写 写于2014年一月 Dart具有两种不同风格的 Streams ：单订阅流和广播流。本文讨论了两者之间的差异，并提供了何时使用哪个的建议。 如果你还不熟悉Dart流，可以从教程异步编程：Streams中学习基础知识。">
+<meta name="keywords" content="Async,Dart">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)单订阅流 vs. 广播流">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 由Florian Loitsch撰写 写于2014年一月 Dart具有两种不同风格的 Streams ：单订阅流和广播流。本文讨论了两者之间的差异，并提供了何时使用哪个的建议。 如果你还不熟悉Dart流，可以从教程异步编程：Streams中学习基础知识。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription%20vs.%20Broadcast%20Streams/listen.png">
+<meta property="og:image" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription%20vs.%20Broadcast%20Streams/listen-with-controller.png">
+<meta property="og:image" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription%20vs.%20Broadcast%20Streams/broadcast-listen.png">
+<meta property="og:updated_time" content="2019-06-25T05:02:06.711Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)单订阅流 vs. 广播流">
+<meta name="twitter:description" content="原文链接 由Florian Loitsch撰写 写于2014年一月 Dart具有两种不同风格的 Streams ：单订阅流和广播流。本文讨论了两者之间的差异，并提供了何时使用哪个的建议。 如果你还不熟悉Dart流，可以从教程异步编程：Streams中学习基础知识。">
+<meta name="twitter:image" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription%20vs.%20Broadcast%20Streams/listen.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译)单订阅流 vs. 广播流 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译)单订阅流 vs. 广播流
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-29 16:45:17" itemprop="dateCreated datePublished" datetime="2019-04-29T16:45:17+08:00">2019-04-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:02:06" itemprop="dateModified" datetime="2019-06-25T13:02:06+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/" class="leancloud_visitors" data-flag-title="(译)单订阅流 vs. 广播流">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.dartlang.org/articles/libraries/broadcast-streams" target="_blank" rel="noopener">原文链接</a></p>
+<p>由Florian Loitsch撰写</p>
+<p>写于2014年一月</p>
+<p>Dart具有两种不同风格的 Streams ：单订阅流和广播流。本文讨论了两者之间的差异，并提供了何时使用哪个的建议。</p>
+<p>如果你还不熟悉Dart流，可以从教程<a href="/2019/04/28/Dart/Async/AsynchronousProgrammingStreams/">异步编程：Streams</a>中学习基础知识。</p>
+<a id="more"></a>
+
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>单订阅和广播流旨在用于不同的上下文并具有不同的要求。在许多方面，它们类似于TCP和UDP：单订阅流是稳定的，具有保证的属性（如TCP），而广播流可能丢失事件，而监听器与源没有紧密的连接（如UDP）。</p>
+<p>以下列表总结了两者之间的主要区别：</p>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>Single subscription</th>
+<th>Broadcast</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>监听者的数量</td>
+<td>1</td>
+<td>∞</td>
+</tr>
+<tr>
+<td>是否可以丢失事件</td>
+<td>否</td>
+<td>是</td>
+</tr>
+<tr>
+<td>良好定义的生命周期</td>
+<td>是</td>
+<td>否</td>
+</tr>
+<tr>
+<td>易用性</td>
+<td>难</td>
+<td>简单</td>
+</tr>
+</tbody></table>
+<p>让我们详细看看每个差异。</p>
+<p><strong>监听者数量</strong></p>
+<p>单订阅流只允许监听流一次。这包括内部监听调用（例如对isNotEmpty的调用)。广播流没有此限制。</p>
+<p><strong>可以丢失事件</strong></p>
+<p>单订阅流不会丢失事件。如有必要，他们会缓冲数据直到监听者出现。如果没有任何监听器，广播流可以自由地丢弃事件。</p>
+<p><strong>定义明确的生命周期</strong></p>
+<p>单订阅流具有明确定义的生命周期：它们在用户开始监听时启动，并在用户取消或流发送关闭事件时结束。广播流通常不会给监听者由监听者结束影响其生命周期的方法。</p>
+<p>正确获取流的生命周期非常重要：在 dart 中：io 流的生命周期决定了Dart程序对其用于传递数据的系统资源的持有时间。流类型的错误选择可能导致资源泄漏。</p>
+<p><strong>易用性</strong></p>
+<p>在内部，许多Stream成员（例如第一个）开始监听流。由于单订阅流只允许一个监听器，因此在它们上调用getter和方法可以自动使用该流。因此，单一订阅流不如广播流使用方便，广播流没有这种限制。</p>
+<p>然而，广播流有其自身的陷阱。例如，isEmpty仅在使用元素后返回false。然后，用户可以继续收听流，但第一个事件将丢失。</p>
+<p>在详细讨论流类型之前，让我们仔细看看订阅，这对于理解两种流的工作方式至关重要。</p>
+<h2 id="订阅-Subscriptions"><a href="#订阅-Subscriptions" class="headerlink" title="订阅(Subscriptions)"></a>订阅(Subscriptions)</h2><p>从流（单订阅和广播）接收事件的最简单方法是调用其listen方法：stream.listen（onDataCallback）。实际上，listen实际上是不同流的实现方式不同的唯一方法。它将流的侦听器连接到其事件源。所有其他方法都可以（通常是）在listen方法之上实现。</p>
+<p>listen方法创建新的流订阅，将其连接到流的事件源，并在订阅中安装回调（如果给定）。然后从listen调用返回该流订阅。回调的安装只是为了方便。订阅的处理程序可以在以后更改。通常只是为了接收流订阅而看到stream.listen（null）并不罕见。</p>
+<p>一旦流创建了流订阅，它就会将事件生成和传播移交给订阅。大多数Stream的实现甚至都没有跟踪他们的听众。一旦流创建订阅，流就不再需要知道有关侦听器的任何信息。</p>
+<p>下图解释了listen调用：</p>
+<p><img src="//jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/listen.png" alt></p>
+<p>请注意，一旦调用了listen方法，单个订阅流就不需要保留对事件源的引用。这就是为什么从Stream到事件源的箭头在“after”图片中被破坏的原因。另请注意，事件源永远不会看到（或需要查看）流。事件源仅需要对其订阅的引用。作为回报，流订阅需要指向其事件源的指针，以便它可以取消其订阅，从而关闭事件源。</p>
+<p>此设置的另一个结果是 Stream 实例不知道事件源的状态。特别是，他们不知道事件源是否暂停。 StreamSubscription 实例接管此任务。实际上，流订阅可确保遵循暂停请求。如果无法暂停实际事件源（无论出于何种原因），则流订阅必须缓冲事件。通常，如果创建的订阅能够暂停其事件源，则流应通知其用户。不知道的话很容易导致过多的内存使用。</p>
+<h2 id="单订阅流"><a href="#单订阅流" class="headerlink" title="单订阅流"></a>单订阅流</h2><p>单订阅流只允许一个订阅者。当消费者可以触发事件的生成（“生产”）并且丢失事件将是错误时，使用单订阅流。这种流的最佳示例是 File.openRead()：用户通过监听来启动流，并且用户通常不希望丢失事件。</p>
+<p>单一订阅流只能被听一次这一事实具有一些重要意义。首先，最重要的是，对于单一订阅流，当流应该生成事件时，以及何时应该停止这样做时，这是非常明显的。其次，更令人讨厌的是，许多 Stream getter 和方法对于单订阅流不太有用。例如，只需使用 isNotEmpty getter在内部监听流并在获取数据后取消其订阅。此时，单订阅流已完成：流已经有一个监听器（isNotEmpty getter），并且不允许其他监听。同样，第一个getter只能被调用一次。</p>
+<h3 id="创建单订阅流"><a href="#创建单订阅流" class="headerlink" title="创建单订阅流"></a>创建单订阅流</h3><p>创建流的最简单方法是使用 StreamController ，其中默认构造函数使用单订阅流实例化控制器。</p>
+<p>控制器使用add，addError 和 close 等方法实现 StreamSink 接口。事件源（例如本机I / O扩展）只在具有新数据时调用相应的函数。 StreamControllers为流的实现者提供了一个简单的抽象，但从根本上说，订阅部分中解释的概念仍然有效，如下图所示。</p>
+<p><img src="//jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/listen-with-controller.png" alt></p>
+<p>由于控制器在用户侦听其流之前存在，因此事件源可以在用户开始监听之前将数据添加到控制器。为避免数据丢失，控制器会缓冲数据，直到用户开始收听。</p>
+<p>此安全措施是流控制器中滥用最多的功能之一。在实例化控制器时，您可以注册onListen回调以在侦听器存在时得到通知。只有在调用此回调之后，才应将事件源添加到控制器。同样，您应该注册一个关闭流的onCancel回调。当用户取消订阅时，或者使用close（）关闭控制器时，将调用onCancel回调。</p>
+<p>请注意，仅在流具有侦听器时生成事件不是严格的规则，而是一个很好的准则。存在一些完全有效的用例，用于在任何订阅者收听之前向控制器添加数据。但请注意，StreamSubscription的缓冲方法仅针对少数事件进行了优化，并且不会滥用它。</p>
+<p>通常，避免数据生成的一种好方法是延迟计算直到监听器存在。例如，在侦听器存在之前，File.openRead（）不会触及文件系统。这个事实的一个奇怪的含义是File.openRead（）如果在不存在的文件上调用它就不会抛出。仅当用户开始侦听文件内容时，流才会打开硬盘驱动器上的文件。如果在侦听器订阅之前的时间（通过其他方式）创建文件，则流正常工作。直接的推论是调用File.openRead（）不会将文件锁定在硬盘驱动器上。</p>
+<p>作为一个很好的指导原则，假设从未收听过流。此规则的例外是小型本地代码片段，例如测试，其中保证订阅发生。如果必须侦听流（以避免内存泄漏），请在创建流的函数的注释中明确说明此事实。</p>
+<h2 id="广播流"><a href="#广播流" class="headerlink" title="广播流"></a>广播流</h2><p>作为单订阅流的对应物，Dart还带有广播流。它们的预期用途是用于独立于听众产生输出的事件源，并且缺少某些事件不是问题。通常，所有DOM事件源都是广播流。</p>
+<p>我们可以在多次监听呼叫后扩展我们的广播流订阅图：<br><img src="//jinyulei.cn/2019/04/29/Flutter/Dart/Async/Single-Subscription vs. Broadcast Streams/broadcast-listen.png" alt></p>
+<p>StreamSubscription实例再次负责确保暂停请求得到遵守。由于流订阅通常彼此不了解，因此最简单的解决方案是在订阅级别缓冲所有传入事件。如果订阅未恢复或取消，这可能导致内存泄漏。</p>
+<p>能够多次收听流有一些很好的含义。其中一个是第一个，isEmpty，等等不要使流无法使用。作为回报，确定流的生命周期更加困难。流应该关闭吗？如果是，它应该在它丢失所有订阅之后关闭（只有在拥有至少一个订阅者的情况下才使流多订阅），或者只有在特定的关键数据事件没有时才允许订阅者被排出？所有这些提议都是有效的，因此广播流应记录其结束行为。通常我们假设没有文档意味着流具有无限的生命周期。</p>
+<h3 id="创建广播流"><a href="#创建广播流" class="headerlink" title="创建广播流"></a>创建广播流</h3><p>StreamController 类附带了一个专为广播流设计的工厂构造函数StreamController.broadcast。与单订阅流相反，它不会缓冲事件。它或者直接向订阅者发送事件，或者如果没有，则丢弃事件。</p>
+<blockquote>
+<p>注意：没有缓冲，广播控制器似乎更简单，因此实现更快。但是，他们需要处理在上一个事件尚未分发时添加到控制器的事件。因此，当前的广播实现比单订阅流的实现更复杂。</p>
+</blockquote>
+<p>StreamController.broadcast构造函数还有两个回调：onListen和onCancel。只要控制器分别从未订阅切换到订阅，从订阅切换到取消订阅，都会调用它们（包括当流从事件源端关闭时）。</p>
+<p>创建流控制器的一种更危险的方法是通过 asBroadcastStream() 查看单订阅控制器。调用asBroadcastStream 基本上告诉用户想要接管流的生命周期管理的单订阅流。与cancelOnError 订阅者一起使用时，这很容易导致从未关闭的单流订阅，从而泄漏内存或资源。</p>
+<p>以下示例演示了这种情况：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:io'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'dart:async'</span>;</span><br><span class="line"></span><br><span class="line">main() &#123;</span><br><span class="line">  ServerSocket.bind(<span class="string">"localhost"</span>, <span class="number">4999</span>).then((socket) &#123;</span><br><span class="line">    socket.asBroadcastStream()  <span class="comment">// &lt;== asBroadcastStream.</span></span><br><span class="line">       .map((x) &#123; <span class="keyword">throw</span> <span class="string">"oops, my mistake"</span>; &#125;)</span><br><span class="line">       .listen(<span class="built_in">print</span>)</span><br><span class="line">       .asFuture()  <span class="comment">// Automatically cancels on error.</span></span><br><span class="line">       .catchError((_) &#123; <span class="built_in">print</span>(<span class="string">"caught error"</span>); &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在此示例中，单订阅流套接字被视为广播流。 asBroadcastStream在其唯一的侦听器取消后不会关闭，并且套接字保持打开状态。这是资源泄漏的典型情况。如果省略了asBroadcastStream()调用，则会通知单订阅流其订户已​​消失并将关闭套接字。</p>
+<p>请记住：asBroadcastStream 很危险。仅在极少数情况下使用它。我们已经看到asBroadcastStream 在监听器更改和 StreamIterators 是更好的选择的情况下使用。有关示例，请参阅下一节。</p>
+<p>或者，使用可以给 asBroadcastStream 的回调。它们允许管理订阅更改（类似于StreamController.broadcast构造函数），并提供取消订阅单订阅流的方法。</p>
+<h3 id="asBroadcastStream的替代品"><a href="#asBroadcastStream的替代品" class="headerlink" title="asBroadcastStream的替代品"></a>asBroadcastStream的替代品</h3><p>通常asBroadcastStream是（ab）使用的，因此可以多次调用 Stream getter 和方法，例如first和take。如上所示，这是一个危险的权衡。本节介绍一些更安全的替代方案。</p>
+<h4 id="监听者交换"><a href="#监听者交换" class="headerlink" title="监听者交换"></a>监听者交换</h4><p>流订阅允许交换他们的听众。您可以经常只在订阅上交换监听器回调，而不是在流上多次调用。例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> bstream = stream.asBroadcastStream();</span><br><span class="line">bstream.first.then((x) &#123;</span><br><span class="line">  handleFirstMessage();</span><br><span class="line">  <span class="keyword">return</span> bstream.first;</span><br><span class="line">&#125;).then((x) &#123;</span><br><span class="line">  handleSecondMessage();</span><br><span class="line">  bstream.listen(handleAllOtherMessages);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>可以写成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">StreamSubscription subscription = stream.listen(null);</span><br><span class="line">subscription.onData((x) &#123;</span><br><span class="line">  handleFirstMessage();</span><br><span class="line">  subscription.onData((x) &#123;</span><br><span class="line">    handleSecondMessage();</span><br><span class="line">    subscription.onData(handleAllOtherMessages);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;);</span><br></pre></td></tr></table></figure>
+
+<p>这引入了一些嵌套，但是一些抽象（或使用方法而不是匿名闭包）可以轻松地摆脱它们。一种流行的抽象是，例如，状态机。另一个是StreamIterator类。</p>
+<h4 id="StreamIterator"><a href="#StreamIterator" class="headerlink" title="StreamIterator"></a>StreamIterator</h4><p>通常，异步流的不同事件将发往系统的不同部分。在这种情况下，StreamIterator通常很方便。 StreamIterators的事件被逐一拉出，每个部分都可以单独拉出它需要的事件。但是，该操作仍然是异步的：与同步迭代器相反，移动到下一个事件可能需要一些时间，因此moveNext函数返回一个未来。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">Future moveNextAssert(iterator) &#123;</span><br><span class="line">  <span class="keyword">var</span> future = iterator.moveNext();</span><br><span class="line">  <span class="keyword">return</span> future.then((hasNext) &#123;</span><br><span class="line">    <span class="keyword">if</span> (!hasNext) <span class="keyword">throw</span> <span class="keyword">new</span> StateError(<span class="string">"missing element"</span>);</span><br><span class="line">    <span class="keyword">return</span> iterator.current;</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="keyword">var</span> lines = <span class="keyword">new</span> File(...).openRead()</span><br><span class="line">    .transform(utf8.decoder)</span><br><span class="line">    .transform(<span class="keyword">new</span> LineSplitter());</span><br><span class="line"><span class="keyword">var</span> iterator = <span class="keyword">new</span> StreamIterator(lines);</span><br><span class="line">moveNextAssert(iterator)</span><br><span class="line">  .then((line) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"First line: <span class="subst">$line</span>"</span>);</span><br><span class="line">    <span class="keyword">return</span> moveNextAssert(iterator);</span><br><span class="line">  &#125;)</span><br><span class="line">  .then((fileName) &#123;  <span class="comment">// Assume second line is a file.</span></span><br><span class="line">    <span class="keyword">return</span> handleFile(fileName)  <span class="comment">// Wait for it to finish.</span></span><br><span class="line">      .then((_) =&gt; moveNextAssert(iterator));</span><br><span class="line">  &#125;)</span><br><span class="line">  .then((line) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"Last line: <span class="subst">$line</span>"</span>);</span><br><span class="line">    <span class="keyword">return</span> iterator.moveNext();</span><br><span class="line">  &#125;)</span><br><span class="line">  .then((hasNext) &#123;</span><br><span class="line">    <span class="keyword">if</span> (hasNext) <span class="keyword">throw</span> <span class="string">"More lines than expected"</span>;</span><br><span class="line">  &#125;);</span><br></pre></td></tr></table></figure>
+
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>尽管它们有相似之处，但单一订阅和广播流有重要区别。您需要了解这些差异，这样可以避免资源泄漏和不必要的内存消耗。</p>
+<p>单订阅流是为不必丢失事件和/或流必须具有明确定义的生命周期的用例而设计的。广播流针对不一定由监听器控制的事件源以及某些事件可能丢失或被忽略的事件进行调整。</p>
+<p>在单订阅流上使用 asBroadcastStream 可能导致资源泄漏。考虑更安全的替代方案，例如监听器交换和 StreamIterators。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Async/" rel="tag"># Async</a>
+          
+            <a href="/tags/Dart/" rel="tag"># Dart</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/29/Flutter/Dart/Async/The Event Loop and Dart/" rel="next" title="(译) Event Loop 和 Dart">
+                <i class="fa fa-chevron-left"></i> (译) Event Loop 和 Dart
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/30/Flutter/Dart/Async/Creating Streams in Dart/" rel="prev" title="(译)在Dart中创建流">
+                (译)在Dart中创建流 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#订阅-Subscriptions"><span class="nav-number">2.</span> <span class="nav-text">订阅(Subscriptions)</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#单订阅流"><span class="nav-number">3.</span> <span class="nav-text">单订阅流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建单订阅流"><span class="nav-number">3.1.</span> <span class="nav-text">创建单订阅流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#广播流"><span class="nav-number">4.</span> <span class="nav-text">广播流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#创建广播流"><span class="nav-number">4.1.</span> <span class="nav-text">创建广播流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#asBroadcastStream的替代品"><span class="nav-number">4.2.</span> <span class="nav-text">asBroadcastStream的替代品</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#监听者交换"><span class="nav-number">4.2.1.</span> <span class="nav-text">监听者交换</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#StreamIterator"><span class="nav-number">4.2.2.</span> <span class="nav-text">StreamIterator</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

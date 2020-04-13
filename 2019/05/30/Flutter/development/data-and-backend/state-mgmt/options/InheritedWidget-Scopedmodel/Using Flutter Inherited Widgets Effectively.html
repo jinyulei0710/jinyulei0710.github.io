@@ -1,0 +1,378 @@
+<hr>
+<p>layout: post<br>title:  “(译)高效地使用Inherited widget”<br>date:   2019-04-18 13:55:17 +0800<br>categories: </p>
+<ul>
+<li>Flutter 开发<br>tags:<ul>
+<li>状态管理</li>
+<li>Inherited Widget</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><a href="https://ericwindmill.com/posts/inherited_widget/">原文链接</a></p>
+<p>如果你之前就使用过Flutter,你可能遇到过随处可见的不同类的<code>of</code>方法：</p>
+<!--more-->
+
+
+<pre><code class="dart">Theme.of(context).textTheme
+MediaQuery.of(context).size</code></pre>
+<p>这些widget(Theme,MediaQ)是<code>Inherited widget</code>。在你应用中几乎所有地方，你都可以访问你的主题，因为它们是继承而来的。</p>
+<p>在Flutter中，sdk的每个部分都是暴露给开发者的，所以你自己可以利用<code>Inherited widget</code>。 你可以把自定义的InheritedWidget作为内置的中央状态存储，与Redux仓库或Vue的Vuex仓库类似。</p>
+<p>当你建立了好像这样的仓库之后，你将能够做到像这样的事情：</p>
+<pre><code>class RedText extends StatelessWidget {
+  // ...
+  Widget build(BuildContext context) {
+    var state = StateContainer.of(context).state;
+    return new Text(
+      state.user.username,
+      style: const TextStyle(color: Colors.red),
+    );
+  // ...</code></pre><h2 id="把状态向上抬"><a href="#把状态向上抬" class="headerlink" title="把状态向上抬"></a>把状态向上抬</h2><p>当你使用一个<code>Inherited widget</code>作为你的状态管理工具，你可能要依赖于叫做<code>把状态向上抬</code>架构模式。</p>
+<p>考虑下当你新建一个项目时生成的入门Flutter应用。如果你想要把应用分成两个页面，一个展示数字，一个允许你对数字进行更改。突然之间，这个简单的应用就变得令人困惑了。每当变更路由的时候，你需要把这个状态片传过来传传去。</p>
+<p><code>Inherited widget</code>通过让整个widget树能访问相同的状态片来解决这个问题。</p>
+<p><img src="http://res.cloudinary.com/ericwindmill/image/upload/v1518974500/flutter_by_example/medium_tree.png" alt></p>
+<p>有关不同Flutter架构概念的超级精彩详细解释,请看<a href="https://www.youtube.com/watch?v=zKXz3pUkw9A&t=1467s">Brain Egan在 DartConf2018中的演讲</a>。只是不要看太多，不然你就会被被说服去使用flutter_redux，然后你就一点都不关心这篇文章了。</p>
+<p>把状态向上抬来这种模式相较于Redux之类的优势是，使用Inherited Widget的设置和使用非常简单。</p>
+<p>注意：毫无疑问，我是Redux、Vuex以及所有‘ux’之类的东西的粉丝。这只是你工具箱的另一件工具，毕竟杀鸡焉用牛刀。</p>
+<h2 id="何必呢"><a href="#何必呢" class="headerlink" title="何必呢?"></a>何必呢?</h2><p>此时，您可能会问为什么要使用InheritedWidget。为什么不仅仅应用程序根那里架<code>stateful widget</code>呢？</p>
+<p>对没错，这就是这里接下来要做的。<code>InheritedWidget</code>与<code>stateful widget</code>一起使用，并允许您将StatefulWidgets的状态传递给其所有祖先。它是一个实用的widget。因此，您不必在每个类中都写上代码才能把状态传递给其后代。</p>
+<h2 id="建立一个样板应用"><a href="#建立一个样板应用" class="headerlink" title="建立一个样板应用"></a>建立一个样板应用</h2><p>关于这个例子，让我创建一个简单的应用：<br><img src="http://res.cloudinary.com/ericwindmill/image/upload/v1523742041/blog_posts/inherited_test.gif" alt></p>
+<p>基本上这个应用程序的状态被抬到根Widget之上，当你提交表单时，它会在该<code>inherited widget</code>上调用<code>setState</code>，这个步骤会告诉主页面有新的信息要渲染。</p>
+<h2 id="1-Material-App-根目录"><a href="#1-Material-App-根目录" class="headerlink" title="1.Material App 根目录"></a>1.Material App 根目录</h2><p>这只是您标准的Flutter应用程序设置部分：</p>
+<pre><code>void main() {
+  runApp(new UserApp());
+}
+
+class UserApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return new MaterialApp(
+      home: new HomeScreen(),
+    );
+  }
+}
+</code></pre><h2 id="2-HomeScreen-Widget"><a href="#2-HomeScreen-Widget" class="headerlink" title="2 HomeScreen Widget"></a>2 HomeScreen Widget</h2><p>现在这也是非常基本的。这只是当好东西要来的时候你要遵从的样板</p>
+<pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">HomeScreen</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>{
+  <span class="meta">@override</span>
+  HomeScreenState createState() =&gt; <span class="keyword">new</span> HomeScreenState();
+}
+
+<span class="class"><span class="keyword">class</span> <span class="title">HomeScreenState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">HomeScreen</span>&gt; </span>{
+
+  Widget <span class="keyword">get</span> _logInPrompt {
+    <span class="keyword">return</span> <span class="keyword">new</span> Center(
+      child: <span class="keyword">new</span> Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: &lt;Widget&gt;[
+          <span class="keyword">new</span> Text(
+            <span class="string">'Please add user information'</span>,
+            style: <span class="keyword">const</span> TextStyle(fontSize: <span class="number">18.0</span>),
+          ),
+        ],
+      ),
+    );
+  }
+
+  <span class="comment">// All this method does is bring up the form page.</span>
+  <span class="keyword">void</span> _updateUser(BuildContext context) {
+    Navigator.push(
+      context,
+      <span class="keyword">new</span> MaterialPageRoute(
+        fullscreenDialog: <span class="keyword">true</span>,
+        builder: (context) {
+          <span class="keyword">return</span> <span class="keyword">new</span> UpdateUserScreen();
+        },
+      ),
+    );
+  }
+
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      appBar: <span class="keyword">new</span> AppBar(
+        title: <span class="keyword">new</span> Text(<span class="string">'Inherited Widget Test'</span>),
+      ),
+      body: _logInPrompt,
+      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+        onPressed: () =&gt; _updateUser(context),
+        child: <span class="keyword">new</span> Icon(Icons.edit),
+      ),
+    );
+  }
+}</code></pre>
+<h2 id="3-最后，目前没有做任何事情的表单页面"><a href="#3-最后，目前没有做任何事情的表单页面" class="headerlink" title="3.最后，目前没有做任何事情的表单页面"></a>3.最后，目前没有做任何事情的表单页面</h2><pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">UpdateUserScreen</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>{
+  <span class="keyword">static</span> <span class="keyword">final</span> GlobalKey&lt;FormState&gt; formKey = <span class="keyword">new</span> GlobalKey&lt;FormState&gt;();
+  <span class="keyword">static</span> <span class="keyword">final</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt; firstNameKey =
+  <span class="keyword">new</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt;();
+  <span class="keyword">static</span> <span class="keyword">final</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt; lastNameKey =
+  <span class="keyword">new</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt;();
+  <span class="keyword">static</span> <span class="keyword">final</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt; emailKey =
+  <span class="keyword">new</span> GlobalKey&lt;FormFieldState&lt;<span class="built_in">String</span>&gt;&gt;();
+
+  <span class="keyword">const</span> UpdateUserScreen({Key key}) : <span class="keyword">super</span>(key: key);
+
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      appBar: <span class="keyword">new</span> AppBar(
+        title: <span class="keyword">new</span> Text(<span class="string">'Edit User Info'</span>),
+      ),
+      body: <span class="keyword">new</span> Padding(
+        padding: <span class="keyword">new</span> EdgeInsets.all(<span class="number">16.0</span>),
+        child: <span class="keyword">new</span> Form(
+          key: formKey,
+          autovalidate: <span class="keyword">false</span>,
+          child: <span class="keyword">new</span> ListView(
+            children: [
+              <span class="keyword">new</span> TextFormField(
+                key: firstNameKey,
+                style: Theme.of(context).textTheme.headline,
+                decoration: <span class="keyword">new</span> InputDecoration(
+                  hintText: <span class="string">'First Name'</span>,
+                ),
+              ),
+              <span class="keyword">new</span> TextFormField(
+                key: lastNameKey,
+                style: Theme.of(context).textTheme.headline,
+                decoration: <span class="keyword">new</span> InputDecoration(
+                  hintText: <span class="string">'Last Name'</span>,
+                ),
+              ),
+              <span class="keyword">new</span> TextFormField(
+                key: emailKey,
+                style: Theme.of(context).textTheme.headline,
+                decoration: <span class="keyword">new</span> InputDecoration(
+                  hintText: <span class="string">'Email Address'</span>,
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+        child: <span class="keyword">new</span> Icon(Icons.add),
+        onPressed: () {
+          <span class="keyword">final</span> form = formKey.currentState;
+          <span class="keyword">if</span> (form.validate()) {
+            <span class="keyword">var</span> firstName = firstNameKey.currentState.value;
+            <span class="keyword">var</span> lastName = lastNameKey.currentState.value;
+            <span class="keyword">var</span> email = emailKey.currentState.value;
+
+            <span class="comment">// Later, do some stuff here</span>
+
+            Navigator.pop(context);
+          }
+        },
+      ),
+    );
+  }
+}</code></pre>
+<p><a href="https://gist.github.com/ericwindmill/32e73cc1fbf65114b5aa875500395f5a">boilder plate的Github Gist</a></p>
+<h2 id="pt2-添加Inherited-widget的功能"><a href="#pt2-添加Inherited-widget的功能" class="headerlink" title="pt2: 添加Inherited widget的功能"></a>pt2: 添加<code>Inherited widget</code>的功能</h2><h3 id="1-StateContainer以及InheritedStateContainer-Widgets"><a href="#1-StateContainer以及InheritedStateContainer-Widgets" class="headerlink" title="1.StateContainer以及InheritedStateContainer Widgets"></a>1.StateContainer以及InheritedStateContainer Widgets</h3><p>创建一个新的叫做state_container.dart文件。这是所有事情发生的地方。</p>
+<p>首先，在该文件中，创建一个名为User的简单类。在真实的应用程序中，这可能是一个更大的类AppState，您可以在其中保存要在整个应用程序中访问的所有属性。</p>
+<pre><code class="dart">lass User {
+  <span class="built_in">String</span> firstName;
+  <span class="built_in">String</span> lastName;
+  <span class="built_in">String</span> email;
+
+  User(<span class="keyword">this</span>.firstName, <span class="keyword">this</span>.lastName, <span class="keyword">this</span>.email);
+}</code></pre>
+<p>InheritedWidget通过连接到StatefulWidget作为存储。所以你的StateContainer实际上是三个类：</p>
+<pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">StateContainer</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span></span>
+<span class="class"><span class="title">class</span> <span class="title">StateContainerState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">StateContainer</span>&gt;</span>
+<span class="class"><span class="title">class</span> <span class="title">_InheritedStateContainer</span> <span class="keyword">extends</span> <span class="title">InheritedWidget</span></span></code></pre>
+<p><code>InheritedWidget</code>和<code>StateContainer</code>是最简单的设置，一旦设置它们就不会改变。逻辑主要存在于StateContainerState中。设置前两个:</p>
+<pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">_InheritedStateContainer</span> <span class="keyword">extends</span> <span class="title">InheritedWidget</span> </span>{
+   <span class="comment">// Data is your entire state. In our case just 'User' </span>
+  <span class="keyword">final</span> StateContainerState data;
+
+  <span class="comment">// You must pass through a child and your state.</span>
+  _InheritedStateContainer({
+    Key key,
+    <span class="meta">@required</span> <span class="keyword">this</span>.data,
+    <span class="meta">@required</span> Widget child,
+  }) : <span class="keyword">super</span>(key: key, child: child);
+
+  <span class="comment">// This is a built in method which you can use to check if</span>
+  <span class="comment">// any state has changed. If not, no reason to rebuild all the widgets</span>
+  <span class="comment">// that rely on your state.</span>
+  <span class="meta">@override</span>
+  <span class="built_in">bool</span> updateShouldNotify(_InheritedStateContainer old) =&gt; <span class="keyword">true</span>;
+}
+
+<span class="class"><span class="keyword">class</span> <span class="title">StateContainer</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>{
+   <span class="comment">// You must pass through a child. </span>
+  <span class="keyword">final</span> Widget child;
+  <span class="keyword">final</span> User user;
+
+  StateContainer({
+    <span class="meta">@required</span> <span class="keyword">this</span>.child,
+    <span class="keyword">this</span>.user,
+  });
+
+  <span class="comment">// This is the secret sauce. Write your own 'of' method that will behave</span>
+  <span class="comment">// Exactly like MediaQuery.of and Theme.of</span>
+  <span class="comment">// It basically says 'get the data from the widget of this type.</span>
+  <span class="keyword">static</span> StateContainerState of(BuildContext context) {
+    <span class="keyword">return</span> (context.inheritFromWidgetOfExactType(_InheritedStateContainer)
+            <span class="keyword">as</span> _InheritedStateContainer).data;
+  }
+
+  <span class="meta">@override</span>
+  StateContainerState createState() =&gt; <span class="keyword">new</span> StateContainerState();
+}</code></pre>
+<p>‘of’方法应该永远不会做任何其他事情。实际上，这两个类可以永远保持独立。</p>
+<h3 id="2-StateContainerState-widget"><a href="#2-StateContainerState-widget" class="headerlink" title="2. StateContainerState widget"></a>2. StateContainerState widget</h3><p>这个Widget是您所有状态和逻辑可以存在的地方。对于这个应用程序，你只需能够存储和操纵你的用户信息。</p>
+<pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">StateContainerState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">StateContainer</span>&gt; </span>{
+  <span class="comment">// Whichever properties you wanna pass around your app as state</span>
+  User user;
+
+  <span class="comment">// You can (and probably will) have methods on your StateContainer</span>
+  <span class="comment">// These methods are then used through our your app to </span>
+  <span class="comment">// change state.</span>
+  <span class="comment">// Using setState() here tells Flutter to repaint all the </span>
+  <span class="comment">// Widgets in the app that rely on the state you've changed.</span>
+  <span class="keyword">void</span> updateUserInfo({firstName, lastName, email}) {
+    <span class="keyword">if</span> (user == <span class="keyword">null</span>) {
+      user = <span class="keyword">new</span> User(firstName, lastName, email);
+      setState(() {
+        user = user;
+      });
+    } <span class="keyword">else</span> {
+      setState(() {
+        user.firstName = firstName ?? user.firstName;
+        user.lastName = lastName ?? user.lastName;
+        user.email = email ?? user.email;
+      });
+    }
+  }
+
+  <span class="comment">// Simple build method that just passes this state through</span>
+  <span class="comment">// your InheritedWidget</span>
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="keyword">return</span> <span class="keyword">new</span> _InheritedStateContainer(
+      data: <span class="keyword">this</span>,
+      child: widget.child,
+    );
+  }
+}</code></pre>
+<p>如果你以前使用过Redux，你可以看到这里涉及的样板少了多少，看起来是远远不够的，这当然会导致潜在的bug，但对于一个简单的应用程序，这是太棒了。这实际上是设置仓库所需的所有工作。然后，您只需根据需要向该类添加属性和方法。</p>
+<p>#3.重构主页面和表单页面</p>
+<p>首先，将你的应用包裹在StateContainer中：</p>
+<pre><code>void main() {
+  runApp(new StateContainer(child: new UserApp()));
+}
+</code></pre><p>就是这样：现在您可以在整个应用程序中访问你的仓库。像这样做：</p>
+<pre><code class="dart"><span class="class"><span class="keyword">class</span> <span class="title">HomeScreenState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">HomeScreen</span>&gt; </span>{
+  <span class="comment">// Make a class property for the data you want</span>
+  User user;
+
+  <span class="comment">// This Widget will display the users info:</span>
+
+  Widget <span class="keyword">get</span> _userInfo {
+    <span class="keyword">return</span> <span class="keyword">new</span> Center(
+      child: <span class="keyword">new</span> Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        crossAxisAlignment: CrossAxisAlignment.center,
+        children: &lt;Widget&gt;[
+          <span class="comment">// This refers to the user in your store</span>
+          <span class="keyword">new</span> Text(<span class="string">"<span class="subst">${user.firstName}</span> <span class="subst">${user.lastName}</span>"</span>,
+              style: <span class="keyword">new</span> TextStyle(fontSize: <span class="number">24.0</span>)),
+          <span class="keyword">new</span> Text(user.email, style: <span class="keyword">new</span> TextStyle(fontSize: <span class="number">24.0</span>)),
+        ],
+      ),
+    );
+  }
+
+  Widget <span class="keyword">get</span> _logInPrompt {
+    <span class="comment">// ...</span>
+  }
+
+  <span class="keyword">void</span> _updateUser(BuildContext context) {
+    <span class="comment">// ...</span>
+  }
+
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="comment">// This is how you access your store. This container</span>
+    <span class="comment">// is where your properties and methods live</span>
+    <span class="keyword">final</span> container = StateContainer.of(context);
+
+    <span class="comment">// set the class's user</span>
+    user = container.user;
+
+    <span class="keyword">var</span> body = user != <span class="keyword">null</span> ? _userInfo : _logInPrompt;
+
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      appBar: <span class="keyword">new</span> AppBar(
+        title: <span class="keyword">new</span> Text(<span class="string">'Inherited Widget Test'</span>),
+      ),
+      <span class="comment">// The body will rerender to show user info</span>
+      <span class="comment">// as its updated</span>
+      body: body,
+      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+        onPressed: () =&gt; _updateUser(context),
+        child: <span class="keyword">new</span> Icon(Icons.edit),
+      ),
+    );
+  }
+}</code></pre>
+<p>这里很简单的变化。表单页面没有太大区别：</p>
+<pre><code class="dart"><span class="comment">// form_page.dart</span>
+<span class="comment">// ...</span>
+<span class="class"><span class="keyword">class</span> <span class="title">UpdateUserScreen</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>{
+  <span class="comment">// ...</span>
+
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="comment">// get reference to your store</span>
+    <span class="keyword">final</span> container = StateContainer.of(context);
+
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      <span class="comment">// the form is the same until here:</span>
+      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+        child: <span class="keyword">new</span> Icon(Icons.add),
+        onPressed: () {
+          <span class="keyword">final</span> form = formKey.currentState;
+          <span class="keyword">if</span> (form.validate()) {
+            <span class="keyword">var</span> firstName = firstNameKey.currentState.value;
+            <span class="keyword">var</span> lastName = lastNameKey.currentState.value;
+            <span class="keyword">var</span> email = emailKey.currentState.value;
+
+            <span class="comment">// This is a hack that isn't important</span>
+            <span class="comment">// To this lesson. Basically, it prevents </span>
+            <span class="comment">// The store from overriding user info</span>
+            <span class="comment">// with an empty string if you only want</span>
+            <span class="comment">// to change a single attribute</span>
+            <span class="keyword">if</span> (firstName == <span class="string">''</span>) {
+              firstName = <span class="keyword">null</span>;
+            }
+            <span class="keyword">if</span> (lastName == <span class="string">''</span>) {
+              lastName = <span class="keyword">null</span>;
+            }
+            <span class="keyword">if</span> (email == <span class="string">''</span>) {
+              email = <span class="keyword">null</span>;
+            }
+
+            <span class="comment">// You can call the method from your store,</span>
+            <span class="comment">// which will call set state and rerender</span>
+            <span class="comment">// the widgets that rely on the user slice of state.</span>
+            <span class="comment">// In this case, thats the home page</span>
+            container.updateUserInfo(
+              firstName: firstName,
+              lastName: lastName,
+              email: email,
+            );
+
+            Navigator.pop(context);
+          }
+        },
+      ),
+    );
+  }
+}
+</code></pre>
+<p>仅此而已！InheritedWidget很简单，对于简单的应用程序，原型等来说，非常可行。</p>
+<p><a href="https://gist.github.com/ericwindmill/f790bd2456e6489b1ab97eba246fd4c6">完成时的Github Gist</a></p>

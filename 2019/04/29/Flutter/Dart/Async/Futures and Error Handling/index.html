@@ -1,0 +1,1459 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 本指南介绍了在编写异步代码时如何处理错误。你可以通过两种方式编写异步代码：  使用 async 函数和 await 表达式，其背后使用的是 Futures。 直接使用 Future API。">
+<meta name="keywords" content="Async,Dart">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译) Futures 和错误处理">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Futures and Error Handling/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 本指南介绍了在编写异步代码时如何处理错误。你可以通过两种方式编写异步代码：  使用 async 函数和 await 表达式，其背后使用的是 Futures。 直接使用 Future API。">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:updated_time" content="2019-06-25T05:01:54.955Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译) Futures 和错误处理">
+<meta name="twitter:description" content="原文链接 本指南介绍了在编写异步代码时如何处理错误。你可以通过两种方式编写异步代码：  使用 async 函数和 await 表达式，其背后使用的是 Futures。 直接使用 Future API。">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Futures and Error Handling/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译) Futures 和错误处理 | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/29/Flutter/Dart/Async/Futures and Error Handling/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译) Futures 和错误处理
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-29 09:45:17" itemprop="dateCreated datePublished" datetime="2019-04-29T09:45:17+08:00">2019-04-29</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:01:54" itemprop="dateModified" datetime="2019-06-25T13:01:54+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/29/Flutter/Dart/Async/Futures and Error Handling/" class="leancloud_visitors" data-flag-title="(译) Futures 和错误处理">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.dartlang.org/guides/libraries/futures-error-handling" target="_blank" rel="noopener">原文链接</a></p>
+<p>本指南介绍了在编写异步代码时如何处理错误。你可以通过两种方式编写异步代码：</p>
+<ul>
+<li>使用 <code>async</code> 函数和 <code>await</code> 表达式，其背后使用的是 Futures。</li>
+<li>直接使用 <a href="https://api.dartlang.org/stable/dart-async/dart-async-library.html" target="_blank" rel="noopener">Future API</a>。</li>
+</ul>
+<a id="more"></a>
+
+<p>注意：如果你不熟悉 Futures 背后的一般概念，请先阅读<a href="/2019/05/04/Dart/Async/Asynchrony%20support/">异步编程：Futures</a>。</p>
+<p>为什么要使用 Future API 而不是使用 <code>async</code> 和<code>await</code> ？当你需要比从 <code>async</code> 和 <code>await</code> 获得的还要有更多控制时。例如，假设你希望在 future 完成时发生某些事情，但你也希望立即继续你正在做的事情。如果使用 <code>await</code> ，则活动将暂停，直到 Future 完成。使用 Future API ，你可以注册回调并继续。</p>
+<h2 id="Async-await-和异常"><a href="#Async-await-和异常" class="headerlink" title="Async, await 和异常"></a>Async, await 和异常</h2><p>使用异常处理 -  try ，catch 和 finally - 来处理使用 async 函数和 await 表达式的代码中的错误。例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">Future main() <span class="keyword">async</span> &#123;</span><br><span class="line">  <span class="keyword">var</span> dir = <span class="keyword">new</span> Directory(<span class="string">'/tmp'</span>);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">try</span> &#123;</span><br><span class="line">    <span class="keyword">var</span> dirList = dir.list();</span><br><span class="line">    <span class="keyword">await</span> <span class="keyword">for</span> (FileSystemEntity f <span class="keyword">in</span> dirList) &#123;</span><br><span class="line">      <span class="keyword">if</span> (f <span class="keyword">is</span> File) &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">'Found file <span class="subst">$&#123;f.path&#125;</span>'</span>);</span><br><span class="line">      &#125; <span class="keyword">else</span> <span class="keyword">if</span> (f <span class="keyword">is</span> Directory) &#123;</span><br><span class="line">        <span class="built_in">print</span>(<span class="string">'Found dir <span class="subst">$&#123;f.path&#125;</span>'</span>);</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;</span><br><span class="line">  &#125; <span class="keyword">catch</span> (e) &#123;</span><br><span class="line">    <span class="built_in">print</span>(e.toString());</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>本指南的其余部分解决了使用 Future API 时的处理错误。</p>
+<h2 id="Future-API-以及-回调"><a href="#Future-API-以及-回调" class="headerlink" title="Future API 以及 回调"></a>Future API 以及 回调</h2><p>使用 Future API 的函数注册回调，用于处理完成 Future 的值(或错误)。例如：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">myFunc().then(processValue)</span><br><span class="line">        .catchError(handleError);</span><br></pre></td></tr></table></figure>
+
+<p>注册的回调基于以下规则触发：如果在以值结束的 Future 上调用 <code>then()</code> 的回调，则触发该回调;如果在一个以错误结束的 Future 上调用了 <code>catchError()</code> 的回调，则会触发它。</p>
+<p>在上面的例子中，如果 <code>myFunc()</code> 的Future以值结束，那么()的回调将触发。如果<code>then()</code> 中没有产生新错误，则不会触发 <code>catchError()</code> 的回调。另一方面，如果<code>myFunc()</code> 以错误结束，<code>then()</code> 的回调不会触发，而 <code>catchError()</code> 的回调就会触发。</p>
+<h2 id="将-then-和-catchError-一起使用的例子"><a href="#将-then-和-catchError-一起使用的例子" class="headerlink" title="将 then() 和 catchError() 一起使用的例子"></a>将 then() 和 catchError() 一起使用的例子</h2><p>链接 <code>then()</code> 和 <code>catchError()</code> 调用是处理 Futures 时的常见模式，可以被认为是 try-catch 块的粗略等价物。</p>
+<p>接下来的几节给出了这种模式的例子。</p>
+<h3 id="catchError-作为一个完整的错误处理器"><a href="#catchError-作为一个完整的错误处理器" class="headerlink" title="catchError() 作为一个完整的错误处理器"></a>catchError() 作为一个完整的错误处理器</h3><p>以下示例处理从 <code>then()</code> 的回调中抛出异常，并演示 <code>catchError()</code> 作为错误处理程序的多功能性：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">myFunc()</span><br><span class="line">  .then((value) &#123;</span><br><span class="line">    doSomethingWith(value);</span><br><span class="line">    ...</span><br><span class="line">    <span class="keyword">throw</span>(<span class="string">"some arbitrary error"</span>);</span><br><span class="line">  &#125;)</span><br><span class="line">  .catchError(handleError);</span><br></pre></td></tr></table></figure>
+
+<p>如果 <code>myFunc()</code> 的Future以值结束，<code>then()</code> 的回调会触发。如果then()的回调中的代码抛出（就像在上面的例子中那样），then()的Future以错误结束。该错误由 <code>catchError()</code> 处理。</p>
+<p>如果 <code>myFunc()</code> 的Future以错误结束，<code>then()</code> 的Future完成该错误。该错误也由 <code>catchError()</code> 处理。</p>
+<p>无论错误是在 <code>myFunc()</code> 内还是在<code>then()</code>内，<code>catchError()</code> 都会成功处理它。</p>
+<h3 id="than-中的错误处理"><a href="#than-中的错误处理" class="headerlink" title="than() 中的错误处理"></a>than() 中的错误处理</h3><p>对于更细粒度的错误处理，你可以在 <code>then()</code> 中注册第二个（<code>onError</code>）回调来处理已结束但有错误的 Futures。这是是 <code>then()</code> 的签名：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> Future then(onValue(T value), &#123;onError(AsyncError asyncError)&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>仅当你要区分转发到 then() 的错误和 then() 中生成的错误时，才注册可选的 onError 回调：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">funcThatThrows()</span><br><span class="line">  .then(successCallback, onError: (e) &#123;</span><br><span class="line">    handleError(e);          <span class="comment">// Original error.</span></span><br><span class="line">    anotherFuncThatThrows(); <span class="comment">// Oops, new error.</span></span><br><span class="line">  &#125;)</span><br><span class="line">  .catchError(handleError);  <span class="comment">// Error from within then() handled.</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的例子中，使用 <code>onError</code> 回调处理 <code>funcThatThrows()</code> 的Future错误; <code>anotherFuncThatThrows()</code> 导致then() 的Future以错误结尾;这个错误由​​<code>catchError()</code> 处理。</p>
+<p>通常，不建议实现两种不同的错误处理策略：仅当有令人信服的理由在 then() 中捕获错误时才注册第二个回调。</p>
+<h3 id="一个长链中间的错误"><a href="#一个长链中间的错误" class="headerlink" title="一个长链中间的错误"></a>一个长链中间的错误</h3><p>通常会有一系列then()调用，并使用catchError()捕获从链的任何部分生成的错误：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">Future&lt;<span class="built_in">String</span>&gt; one()   =&gt; <span class="keyword">new</span> Future.value(<span class="string">"from one"</span>);</span><br><span class="line">Future&lt;<span class="built_in">String</span>&gt; two()   =&gt; <span class="keyword">new</span> Future.error(<span class="string">"error from two"</span>);</span><br><span class="line">Future&lt;<span class="built_in">String</span>&gt; three() =&gt; <span class="keyword">new</span> Future.value(<span class="string">"from three"</span>);</span><br><span class="line">Future&lt;<span class="built_in">String</span>&gt; four()  =&gt; <span class="keyword">new</span> Future.value(<span class="string">"from four"</span>);</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  one()                                   <span class="comment">// Future completes with "from one".</span></span><br><span class="line">    .then((_) =&gt; two())                   <span class="comment">// Future completes with two()'s error.</span></span><br><span class="line">    .then((_) =&gt; three())                 <span class="comment">// Future completes with two()'s error.</span></span><br><span class="line">    .then((_) =&gt; four())                  <span class="comment">// Future completes with two()'s error.</span></span><br><span class="line">    .then((value) =&gt; processValue(value)) <span class="comment">// Future completes with two()'s error.</span></span><br><span class="line">    .catchError((e) &#123;</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">"Got error: <span class="subst">$&#123;e.error&#125;</span>"</span>);     <span class="comment">// Finally, callback fires.</span></span><br><span class="line">      <span class="keyword">return</span> <span class="number">42</span>;                          <span class="comment">// Future completes with 42.</span></span><br><span class="line">    &#125;)</span><br><span class="line">    .then((value) &#123;</span><br><span class="line">      <span class="built_in">print</span>(<span class="string">"The value is <span class="subst">$value</span>"</span>);</span><br><span class="line">    &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Output of this program:</span></span><br><span class="line"><span class="comment">//   Got error: error from two</span></span><br><span class="line"><span class="comment">//   The value is 42</span></span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，one() 的Future以值结束，但是 two() 的 Future 以错误结束。当在以错误结束的 Future 上调用 then() 时，则不会触发 then() 的回调。相反，then() 的Future 以它的接收器的错误结尾。在我们的示例中，这意味着在调用 two() 之后，每个后续then() 返回的 Future 都会以 two 的错误结束。该错误最终在 catchError() 中处理。</p>
+<h3 id="处理特有的错误"><a href="#处理特有的错误" class="headerlink" title="处理特有的错误"></a>处理特有的错误</h3><p>如果我们想捕获特定错误怎么办？或者捕获多个错误？</p>
+<p>catchError() 接受一个可选的命名参数test，它允许我们查询抛出的错误类型。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">abstract</span> Future catchError(onError(AsyncError asyncError), &#123;<span class="built_in">bool</span> test(<span class="built_in">Object</span> error)&#125;)</span><br></pre></td></tr></table></figure>
+
+<p>考虑 handleAuthResponse(params），这是一个根据提供的参数对用户进行身份验证的函数，并将用户重定向到适当的URL。鉴于复杂的工作流程，handleAuthResponse()可能会生成各种错误和异常，你应该以不同的方式处理它们。以下是如何使用test来执行此操作：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  handleAuthResponse(&#123;<span class="string">'username'</span>: <span class="string">'johncage'</span>, <span class="string">'age'</span>: <span class="number">92</span>&#125;)</span><br><span class="line">    .then((_) =&gt; ...)</span><br><span class="line">    .catchError(handleFormatException,</span><br><span class="line">                test: (e) =&gt; e <span class="keyword">is</span> FormatException)</span><br><span class="line">    .catchError(handleAuthorizationException,</span><br><span class="line">                test: (e) =&gt; e <span class="keyword">is</span> AuthorizationException);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="使用-whenComplete-的-Async-的-try-catch-finally"><a href="#使用-whenComplete-的-Async-的-try-catch-finally" class="headerlink" title="使用 whenComplete() 的 Async 的 try-catch-finally"></a>使用 whenComplete() 的 Async 的 try-catch-finally</h2><p>如果 then().catchError() 对应 try-catch ，whenComplete() 相当于 ‘finally’。在 whenComplete()中注册的回调，是在 whenComplete() 的接收器结束时被调用的，不管它是以值还是错误结尾：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">var</span> server = connectToServer();</span><br><span class="line">server.post(myUrl, fields: &#123;<span class="string">"name"</span>: <span class="string">"john"</span>, <span class="string">"profession"</span>: <span class="string">"juggler"</span>&#125;)</span><br><span class="line">      .then(handleResponse)</span><br><span class="line">      .catchError(handleError)</span><br><span class="line">      .whenComplete(server.close);</span><br></pre></td></tr></table></figure>
+
+<p>无论 server.post() 是否产生有效响应或错误，我们都想调用 server.close 。我们通过将它放在 whenComplete() 中来确保这一点。</p>
+<h3 id="结束由-whenComplete-返回的Future"><a href="#结束由-whenComplete-返回的Future" class="headerlink" title="结束由 whenComplete() 返回的Future"></a>结束由 whenComplete() 返回的Future</h3><p>如果没有错误从 <code>whenComplete()</code> 发出，则其 Future 将以与调用 <code>whenComplete()</code> 的Future相同的方式完成。通过示例最容易理解。</p>
+<p>在下面的代码中，then() 的Future以错误结束，所以 whenComplete() 的 Future 也以错误结束。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  funcThatThrows()</span><br><span class="line">    .then((_) =&gt; <span class="built_in">print</span>(<span class="string">"won't reach here"</span>))    <span class="comment">// Future completes with an error.</span></span><br><span class="line">    .whenComplete(() =&gt; <span class="built_in">print</span>(<span class="string">'reaches here'</span>)) <span class="comment">// Future completes with the same error.</span></span><br><span class="line">    .then((_) =&gt; <span class="built_in">print</span>(<span class="string">"won't reach here"</span>))    <span class="comment">// Future completes with the same error.</span></span><br><span class="line">    .catchError(handleError);                  <span class="comment">// Error is handled here.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在下面的代码中，then() 的 Future 完成了一个错误，现在由 catchError() 处理。因为catchError() 的Future以 someObject 结束，所以 whenComplete() 的Future 以同一个对象结束。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  funcThatThrows()</span><br><span class="line">    .then((_) =&gt; ...)         <span class="comment">// Future completes with an error.</span></span><br><span class="line">    .catchError((e) &#123;</span><br><span class="line">      handleError(e);</span><br><span class="line">      printErrorMessage();</span><br><span class="line">      <span class="keyword">return</span> someObject;</span><br><span class="line">    &#125;)                                   <span class="comment">// Future completes with someObject.</span></span><br><span class="line">    .whenComplete(() =&gt; <span class="built_in">print</span>(<span class="string">"Done!"</span>)); <span class="comment">// Future completes with someObject.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="来自-whenComplete-的错误"><a href="#来自-whenComplete-的错误" class="headerlink" title="来自 whenComplete() 的错误"></a>来自 whenComplete() 的错误</h3><p>如果 whenComplete() 的回调引发错误，那么 whenComplete() 的Future以该错误结束：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  funcThatThrows()</span><br><span class="line">    .catchError(handleError)               <span class="comment">// Future completes with a value.</span></span><br><span class="line">    .whenComplete(() =&gt; <span class="keyword">throw</span> <span class="string">"new error"</span>) <span class="comment">// Future completes with an error.</span></span><br><span class="line">    .catchError(handleError);              <span class="comment">// Error is handled.</span></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="潜在问题：未能及早注册错误处理程序"><a href="#潜在问题：未能及早注册错误处理程序" class="headerlink" title="潜在问题：未能及早注册错误处理程序"></a>潜在问题：未能及早注册错误处理程序</h2><p>在 Future 完成之前安装错误处理程序至关重要：这可以避免 Future 完成错误，错误处理程序尚未附加以及错误意外传播的情况。考虑以下代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  Future future = funcThatThrows();</span><br><span class="line"></span><br><span class="line">  <span class="comment">// BAD. Too late to handle funcThatThrows() exception.</span></span><br><span class="line">  <span class="keyword">new</span> Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(milliseconds: <span class="number">500</span>), () &#123;</span><br><span class="line">    future.then(...)</span><br><span class="line">          .catchError(...);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在上面的代码中，catchError() 在调用 funcThatThrows() 之后直到半秒才注册，并且错误未处理。</p>
+<p>如果在 Future.delayed() 回调中调用 funcThatThrows() ，问题就会消失：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  <span class="keyword">new</span> Future.delayed(<span class="keyword">const</span> <span class="built_in">Duration</span>(milliseconds: <span class="number">500</span>), () &#123;</span><br><span class="line">    funcThatThrows().then(processValue)</span><br><span class="line">                    .catchError(handleError)); <span class="comment">// We get here.</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="潜在问题：意外混合同步和异步错误"><a href="#潜在问题：意外混合同步和异步错误" class="headerlink" title="潜在问题：意外混合同步和异步错误"></a>潜在问题：意外混合同步和异步错误</h3><p>返回 future 的函数几乎总是会在将来发出错误。由于我们不希望这些函数的调用者必须实现多个错误处理方案，因此我们希望防止任何同步错误泄漏。考虑以下代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Future&lt;<span class="built_in">int</span>&gt; parseAndRead(data) &#123;</span><br><span class="line">  <span class="keyword">var</span> filename = obtainFileName(data);         <span class="comment">// Could throw.</span></span><br><span class="line">  File file = <span class="keyword">new</span> File(filename);</span><br><span class="line">  <span class="keyword">return</span> file.readAsString().then((contents) &#123;</span><br><span class="line">    <span class="keyword">return</span> parseFileData(contents);            <span class="comment">// Could throw.</span></span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>该代码中的两个函数可能同步抛出：<code>obtainFileName()</code> 和<code>parseFileData()</code> 因为<code>parseFileData()</code> 在<code>then()</code> 回调中执行，所以它的错误不会从函数中泄漏出来。相反，<code>then()</code>的<code>futureparseFileData()</code>的错误结束，错误最终结束了parseAndRead() 的future，并且 <code>catchError()</code> 可以成功处理错误。</p>
+<p>但是，在 then() 回调中不调用 obtainFileName() ;如果它抛出，则传播同步错误：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  parseAndRead(data).catchError((e) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"inside catchError"</span>);</span><br><span class="line">    <span class="built_in">print</span>(e.error);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Program Output:</span></span><br><span class="line"><span class="comment">//   Unhandled exception:</span></span><br><span class="line"><span class="comment">//   &lt;error from obtainFileName&gt;</span></span><br><span class="line"><span class="comment">//   ...</span></span><br></pre></td></tr></table></figure>
+
+<p>因为使用 catchError() 不捕获错误，所以 parseAndRead() 的客户端将为此错误实现单独的错误处理策略。</p>
+<h3 id="解决方案：使用Future-sync-来包装代码"><a href="#解决方案：使用Future-sync-来包装代码" class="headerlink" title="解决方案：使用Future.sync() 来包装代码"></a>解决方案：使用Future.sync() 来包装代码</h3><p>确保不会从函数中意外抛出同步错误的常见模式是将函数体包装在新的 Future.sync() 回调中：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">Future&lt;<span class="built_in">int</span>&gt; parseAndRead(data) &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Future.<span class="keyword">sync</span>(() &#123;</span><br><span class="line">    <span class="keyword">var</span> filename = obtainFileName(data);         <span class="comment">// Could throw.</span></span><br><span class="line">    File file = <span class="keyword">new</span> File(filename);</span><br><span class="line">    <span class="keyword">return</span> file.readAsString().then((contents) &#123;</span><br><span class="line">      <span class="keyword">return</span> parseFileData(contents);            <span class="comment">// Could throw.</span></span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果回调返回非 Future 值，则 Future.sync() 的 Future 以该值结束。如果回调抛出（就像在上面的例子中那样），则 Future 会以错误结束。如果回调本身返回 Future，则Future 的值或错误将以 Future.sync() 的 Future 结束。</p>
+<p>使用 Future.sync() 中包含的代码，catchError() 可以处理所有错误：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  parseAndRead(data).catchError((e) &#123;</span><br><span class="line">    <span class="built_in">print</span>(<span class="string">"inside catchError"</span>);</span><br><span class="line">    <span class="built_in">print</span>(e.error);</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Program Output:</span></span><br><span class="line"><span class="comment">//   inside catchError</span></span><br><span class="line"><span class="comment">//   &lt;error from obtainFileName&gt;</span></span><br></pre></td></tr></table></figure>
+
+<p>Future.sync() 使你的代码能够抵御未捕获的异常。如果你的函数中包含大量代码，那么你可能会在没有意识到的情况下做一些危险的事情：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Future fragileFunc() &#123;</span><br><span class="line">  <span class="keyword">return</span> <span class="keyword">new</span> Future.<span class="keyword">sync</span>(() &#123;</span><br><span class="line">    <span class="keyword">var</span> x = someFunc();     <span class="comment">// Unexpectedly throws in some rare cases.</span></span><br><span class="line">    <span class="keyword">var</span> y = <span class="number">10</span> / x;         <span class="comment">// x should not equal 0.</span></span><br><span class="line">    ...</span><br><span class="line">  &#125;);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>Future.sync() 不仅允许你处理你可能发生的错误，还可以防止错误意外泄漏你的功能。</p>
+<h2 id="更多信息"><a href="#更多信息" class="headerlink" title="更多信息"></a>更多信息</h2><p>以下文档提供了有关 Future 的更多信息：</p>
+<ul>
+<li><a href="/2019/04/29/Dart/Async/The%20Event%20Loop%20and%20Dart/">事件循环和Dart</a>，一篇描述如何使用Futures安排任务的文章</li>
+<li><a href="https://api.dartlang.org/stable/dart-async/Future-class.html" target="_blank" rel="noopener">Future的API参考</a></li>
+</ul>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Async/" rel="tag"># Async</a>
+          
+            <a href="/tags/Dart/" rel="tag"># Dart</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/28/Flutter/Dart/Async/AsynchronousProgrammingStreams/" rel="next" title="(译)异步编程: Streams ">
+                <i class="fa fa-chevron-left"></i> (译)异步编程: Streams 
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/29/Flutter/Dart/Async/The Event Loop and Dart/" rel="prev" title="(译) Event Loop 和 Dart">
+                (译) Event Loop 和 Dart <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#Async-await-和异常"><span class="nav-number">1.</span> <span class="nav-text">Async, await 和异常</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#Future-API-以及-回调"><span class="nav-number">2.</span> <span class="nav-text">Future API 以及 回调</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#将-then-和-catchError-一起使用的例子"><span class="nav-number">3.</span> <span class="nav-text">将 then() 和 catchError() 一起使用的例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#catchError-作为一个完整的错误处理器"><span class="nav-number">3.1.</span> <span class="nav-text">catchError() 作为一个完整的错误处理器</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#than-中的错误处理"><span class="nav-number">3.2.</span> <span class="nav-text">than() 中的错误处理</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#一个长链中间的错误"><span class="nav-number">3.3.</span> <span class="nav-text">一个长链中间的错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#处理特有的错误"><span class="nav-number">3.4.</span> <span class="nav-text">处理特有的错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#使用-whenComplete-的-Async-的-try-catch-finally"><span class="nav-number">4.</span> <span class="nav-text">使用 whenComplete() 的 Async 的 try-catch-finally</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#结束由-whenComplete-返回的Future"><span class="nav-number">4.1.</span> <span class="nav-text">结束由 whenComplete() 返回的Future</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#来自-whenComplete-的错误"><span class="nav-number">4.2.</span> <span class="nav-text">来自 whenComplete() 的错误</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#潜在问题：未能及早注册错误处理程序"><span class="nav-number">5.</span> <span class="nav-text">潜在问题：未能及早注册错误处理程序</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#潜在问题：意外混合同步和异步错误"><span class="nav-number">5.1.</span> <span class="nav-text">潜在问题：意外混合同步和异步错误</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#解决方案：使用Future-sync-来包装代码"><span class="nav-number">5.2.</span> <span class="nav-text">解决方案：使用Future.sync() 来包装代码</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#更多信息"><span class="nav-number">6.</span> <span class="nav-text">更多信息</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

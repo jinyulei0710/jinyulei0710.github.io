@@ -1,0 +1,1737 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 本文以理论结合实例的方式介绍了流(Streams)，业务逻辑组件(BloC)以及响应式编程(Reactive Programming)这些概念的介绍。 难度：中级">
+<meta name="keywords" content="BloC">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 本文以理论结合实例的方式介绍了流(Streams)，业务逻辑组件(BloC)以及响应式编程(Reactive Programming)这些概念的介绍。 难度：中级">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://www.didierboelens.com/images/streams_app_1.gif">
+<meta property="og:image" content="https://www.didierboelens.com/images/S.PublishSubject.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/S.BehaviorSubject.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/S.ReplaySubject.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/streams_bloc.png">
+<meta property="og:image" content="https://www.didierboelens.com/images/streams_flows.png">
+<meta property="og:updated_time" content="2019-06-25T05:05:51.694Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)">
+<meta name="twitter:description" content="原文链接 本文以理论结合实例的方式介绍了流(Streams)，业务逻辑组件(BloC)以及响应式编程(Reactive Programming)这些概念的介绍。 难度：中级">
+<meta name="twitter:image" content="https://www.didierboelens.com/images/streams_app_1.gif">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC) | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-13 11:51:17" itemprop="dateCreated datePublished" datetime="2019-04-13T11:51:17+08:00">2019-04-13</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:05:51" itemprop="dateModified" datetime="2019-06-25T13:05:51+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/" class="leancloud_visitors" data-flag-title="(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.didierboelens.com/2018/08/reactive-programming---streams---bloc/" target="_blank" rel="noopener">原文链接</a></p>
+<p>本文以理论结合实例的方式介绍了流(Streams)，业务逻辑组件(BloC)以及响应式编程(Reactive Programming)这些概念的介绍。</p>
+<p>难度：中级</p>
+<a id="more"></a>
+
+<h2 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h2><p>我花费很长时间才找到介绍响应式编程(Reactive Programming)，业务逻辑组件(BloC)和流(Streams)这些概念的方法。</p>
+<p>因为这些概念是能使得应用架构的方法产生巨大改变的，所以我想要用一个实例来展示这一点：</p>
+<ul>
+<li>不是一定要使用它们，但有时不使用的代价可能是代码编写难度更大和性能更低，</li>
+<li>使用它们的好处，以及</li>
+<li>使用它们造成的影响(正面的以及负面的)</li>
+</ul>
+<p>我写的这个实用性的例子是一个伪应用，简而言之，它允许用户从一个在线目录查看电影列表，对电影按类型和发布日期进行过滤，对电影进行收藏和取消收藏。当然，一切都是交互式的，用户动作可以在不同的页面中或在同一个页面内发生，并对界面进行实时刷新。</p>
+<p>这是一个显示此应用程序的动画。</p>
+<p><img src="https://www.didierboelens.com/images/streams_app_1.gif" alt></p>
+<p>既然你来看这篇文章，想要获取有关响应式编程(Reactive Programming)，业务逻辑组件(BloC)和流(Streams)的信息，我将先对它们进行一一介绍。随后，再向你展示如何在实践中实现和使用它们。</p>
+<p>本文的补充文章中给出一些实例，可以点击<a href="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/">此链接</a>找到。</p>
+<hr>
+<h2 id="什么是流"><a href="#什么是流" class="headerlink" title="什么是流"></a>什么是流</h2><h3 id="介绍-1"><a href="#介绍-1" class="headerlink" title="介绍"></a>介绍</h3><p>为了轻松可视化流(Stream)的概念，可以简单地把它当成两头都通的水管，只允许从一头插入一些东西。当你将一些东西插入水管中时，它会在水管内流动，并从另一头流出。</p>
+<p>在 Flutter 中，</p>
+<ul>
+<li>管道被称为 <a href="https://api.dartlang.org/stable/2.0.0/dart-async/Stream-class.html" target="_blank" rel="noopener">Stream</a></li>
+<li>为了控制 Stream，我们通常(*)使用 <a href="https://api.dartlang.org/stable/2.0.0/dart-async/StreamController-class.html" target="_blank" rel="noopener">StreamController</a></li>
+<li>为了插入一些东西到 Stream 中去，StreamController 暴露了一个叫做 StreamSink的入口，可以通过 <strong>sink</strong> 属性访问</li>
+<li>StreamController 通过 <strong>stream</strong> 属性暴露了从 Stream 中出来的方式</li>
+</ul>
+<p>（*）：我特意使用“通常”这个词，是因为很可能不使用任何 StreamController。但是，在本文中我将只使用 StreamController。</p>
+<h3 id="什么能被流运送？"><a href="#什么能被流运送？" class="headerlink" title="什么能被流运送？"></a>什么能被流运送？</h3><p>一切都能被运送。从值，事件，对象，集合，映射，错误或甚至另一个流，任何类型的数据都能被流运送。</p>
+<h3 id="我怎么知道东西是被流运送的？"><a href="#我怎么知道东西是被流运送的？" class="headerlink" title="我怎么知道东西是被流运送的？"></a>我怎么知道东西是被流运送的？</h3><p>当你需要在东西被运送的时候接收到通知，你只需要<strong>监听</strong> StreamController 的stream 属性。</p>
+<p>每当你定义一个监听器，你就会收到一个 <a href="https://api.dartlang.org/stable/2.0.0/dart-async/StreamSubscription-class.html" target="_blank" rel="noopener">StreamSubscription</a> 对象。正是通过 StreamSubscription 对象，你才会在 Stream 级别收到某些事情发生的通知。</p>
+<p>只要有一个监听器处于<strong>活跃</strong>状态，Stream 就会开始生成<strong>事件</strong>，以便在下列情况下每次都通知活跃的 StreamSubscription 对象们。</p>
+<ul>
+<li>一些数据从流中出来了</li>
+<li>当一些错误被发送到流时，</li>
+<li>当流关闭时。</li>
+</ul>
+<p>StreamSubscription 对象同样也允许你：</p>
+<ul>
+<li>停止监听</li>
+<li>暂停，</li>
+<li>恢复</li>
+</ul>
+<h3 id="流只是一条简单的水管吗？"><a href="#流只是一条简单的水管吗？" class="headerlink" title="流只是一条简单的水管吗？"></a>流只是一条简单的水管吗？</h3><p>不，Stream 还允许数据在流出之前，Stream 对其进行处理。</p>
+<p>为了控制 Stream 内部数据的处理，我们使用 <a href="https://api.dartlang.org/stable/2.0.0/dart-async/StreamTransformer-class.html" target="_blank" rel="noopener">StreamTransformer</a>，它只是</p>
+<ul>
+<li>一个“捕获” Stream 内部流动数据的方法</li>
+<li>对数据做了一些事情</li>
+<li>这种转换的结果也是一个 Stream</li>
+</ul>
+<p>你能直接从该声明中了解到，可以按顺序使用多个 StreamTransformer`。</p>
+<p><code>StreamTransformer</code>可被用于进行任何类型的处理，例如：</p>
+<ul>
+<li>过滤：根据任何类型的条件过滤数据，</li>
+<li>重新组合：重新组合数据，</li>
+<li>修改：对数据应用任何类型的修改，</li>
+<li>将数据注入其他流，</li>
+<li>缓冲，</li>
+<li>处理：基于数据进行任意类型的操作</li>
+<li>…</li>
+</ul>
+<h2 id="流的类型"><a href="#流的类型" class="headerlink" title="流的类型"></a>流的类型</h2><p>存在两种类型的流。</p>
+<h3 id="单订阅流"><a href="#单订阅流" class="headerlink" title="单订阅流"></a>单订阅流</h3><p>这种类型的流只允许在该流的整个生命周期内使用单个监听器。</p>
+<p>即使在第一个订阅被取消后，也无法在此类流上监听两次。</p>
+<h3 id="广播流"><a href="#广播流" class="headerlink" title="广播流"></a>广播流</h3><p>第二种类型的流允许任意数量的监听器。</p>
+<p>可以随时向广播流添加监听器。新的监听器将在它开始监听流时收到事件。</p>
+<h2 id="基础的例子"><a href="#基础的例子" class="headerlink" title="基础的例子"></a>基础的例子</h2><h3 id="任何类型的数据"><a href="#任何类型的数据" class="headerlink" title="任何类型的数据"></a>任何类型的数据</h3><p>第一个示例展示了“单订阅”流，它只是打印输入的数据。正如你所见的，数据的类型是无关紧要的。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:async'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Initialize a "Single-Subscription" Stream controller</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">final</span> StreamController ctrl = StreamController();</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Initialize a single listener which simply prints the data</span></span><br><span class="line">  <span class="comment">// as soon as it receives it</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">final</span> StreamSubscription subscription = ctrl.stream.listen((data) =&gt; <span class="built_in">print</span>(<span class="string">'<span class="subst">$data</span>'</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// We here add the data that will flow inside the stream</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  ctrl.sink.add(<span class="string">'my name'</span>);</span><br><span class="line">  ctrl.sink.add(<span class="number">1234</span>);</span><br><span class="line">  ctrl.sink.add(&#123;<span class="string">'a'</span>: <span class="string">'element A'</span>, <span class="string">'b'</span>: <span class="string">'element B'</span>&#125;);</span><br><span class="line">  ctrl.sink.add(<span class="number">123.45</span>);</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// We release the StreamController</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  ctrl.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="StreamTransformer"><a href="#StreamTransformer" class="headerlink" title="StreamTransformer"></a>StreamTransformer</h3><p>第二个示例显示“广播”流，它传达整数值并仅打印偶数。为此，我们应用StreamTransformer来过滤（第14行）值，只让偶数通过。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:async'</span>;</span><br><span class="line"></span><br><span class="line"><span class="keyword">void</span> main() &#123;</span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Initialize a "Broadcast" Stream controller of integers</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">final</span> StreamController&lt;<span class="built_in">int</span>&gt; ctrl = StreamController&lt;<span class="built_in">int</span>&gt;.broadcast();</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Initialize a single listener which filters out the odd numbers and</span></span><br><span class="line">  <span class="comment">// only prints the even numbers</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">final</span> StreamSubscription subscription = ctrl.stream</span><br><span class="line">					      .where((value) =&gt; (value % <span class="number">2</span> == <span class="number">0</span>))</span><br><span class="line">					      .listen((value) =&gt; <span class="built_in">print</span>(<span class="string">'<span class="subst">$value</span>'</span>));</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// We here add the data that will flow inside the stream</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="keyword">for</span>(<span class="built_in">int</span> i=<span class="number">1</span>; i&lt;<span class="number">11</span>; i++)&#123;</span><br><span class="line">  	ctrl.sink.add(i);</span><br><span class="line">  &#125;</span><br><span class="line">  </span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// We release the StreamController</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  ctrl.close();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="RxDart"><a href="#RxDart" class="headerlink" title="RxDart"></a>RxDart</h2><p>如今，如果我不提及 <a href="https://pub.dartlang.org/packages/rxdart" target="_blank" rel="noopener">RxDart包</a>，那么有关流的介绍就不会完整。</p>
+<p><strong>RxDart</strong> 包是 <a href="http://reactivex.io/" target="_blank" rel="noopener">ReactiveX</a> API的 Dart 实现，它扩展了原始的 Dart 流 API 以使其符合 ReactiveX 标准。</p>
+<p>由于它最初并未由 Google 定义，因此它使用不同的词汇。下表给出了 Dart 和 RxDart 之间的相关性。</p>
+<table>
+<thead>
+<tr>
+<th>Dart</th>
+<th>RxDart</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Stream</td>
+<td>Observable</td>
+</tr>
+<tr>
+<td>StreamController</td>
+<td>Subject</td>
+</tr>
+</tbody></table>
+<p>正如我刚才所说，RxDart 扩展了原始的 Dart Streams API 并提供了StreamController 的三个主要变体：</p>
+<h3 id="PublishSubject"><a href="#PublishSubject" class="headerlink" title="PublishSubject"></a>PublishSubject</h3><p><a href="https://pub.dartlang.org/documentation/rxdart/latest/rx/PublishSubject-class.html" target="_blank" rel="noopener">PublishSubject</a>是一个标准的 <strong>广播</strong> StreamController,只有一点除外，流返回的是一个 <a href="https://pub.dartlang.org/documentation/rxdart/latest/rx/Observable-class.html" target="_blank" rel="noopener">Observable</a> 而不是一个 Stream。</p>
+<p><img src="https://www.didierboelens.com/images/S.PublishSubject.png" alt></p>
+<p>正如你所看到的，<code>PublishSubject</code>只向监听器发送在订阅之后被添加到流中的事件。</p>
+<h3 id="BehaviorSubject"><a href="#BehaviorSubject" class="headerlink" title="BehaviorSubject"></a>BehaviorSubject</h3><p><a href="https://pub.dartlang.org/documentation/rxdart/latest/rx/BehaviorSubject-class.html" target="_blank" rel="noopener">BehaviorSubject</a> 也是一个<strong>广播</strong> <code>StreamController</code>，它返回一个 <strong>Observable</strong> 而不是一个 <strong>Stream</strong>。</p>
+<p><img src="https://www.didierboelens.com/images/S.BehaviorSubject.png" alt></p>
+<p>与 PublishSubject 的主要区别在于 BehaviorSubject 还将订阅前最后发送的事件发送给刚刚订阅的监听器。</p>
+<h3 id="ReplaySubject"><a href="#ReplaySubject" class="headerlink" title="ReplaySubject"></a>ReplaySubject</h3><p><a href="https://pub.dartlang.org/documentation/rxdart/latest/rx/ReplaySubject-class.html" target="_blank" rel="noopener">ReplaySubject</a> 也是一个 <strong>广播</strong> StreamController，它返回一个 <strong>Observable</strong> 而不是一个 <strong>Stream</strong>。</p>
+<p><img src="https://www.didierboelens.com/images/S.ReplaySubject.png" alt></p>
+<p><strong>默认情况下</strong>，ReplaySubject 将 Stream 已经发出的所有事件作为最先的事件发送到所有新订阅的监听器。</p>
+<hr>
+<h3 id="关于资源的重要说明"><a href="#关于资源的重要说明" class="headerlink" title="关于资源的重要说明"></a>关于资源的重要说明</h3><blockquote>
+<p>总是释放不再需要的资源是一种非常好的习惯。</p>
+</blockquote>
+<p>这句话适用于：</p>
+<ul>
+<li>StreamSubscription - 当你不再需要监听流的时候，取消订阅</li>
+<li>StreamController - 当你不再需要一个 StreamController 的时候，关闭它。</li>
+<li>同样也适用于 RxDart 这个主体，当你不再需要 BehaviourSubject，PublishSubject 的时候，关闭它。</li>
+</ul>
+<hr>
+<h3 id="如何基于从-Stream-出来的数据构建一个-Widget？"><a href="#如何基于从-Stream-出来的数据构建一个-Widget？" class="headerlink" title="如何基于从 Stream 出来的数据构建一个 Widget？"></a>如何基于从 Stream 出来的数据构建一个 Widget？</h3><p>Flutter 提供了一个十分方便的 StatefulWidget，被称为 <a href="https://docs.flutter.io/flutter/widgets/StreamBuilder-class.html" target="_blank" rel="noopener">StreamBuilder</a>。</p>
+<p>StreamBuilder 监听着一个 Stream ，每当一些数据流出 Stream 时，它会调用其builder 回调自动重建。</p>
+<p>这是如何使用 StreamBuilder 的方法：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">StreamBuilder&lt;T&gt;(</span><br><span class="line">    key: ...optional, the unique ID of <span class="keyword">this</span> Widget...</span><br><span class="line">    stream: ...the stream to listen to...</span><br><span class="line">    initialData: ...any initial data, <span class="keyword">in</span> <span class="keyword">case</span> the stream would initially be empty...</span><br><span class="line">    builder: (BuildContext context, AsyncSnapshot&lt;T&gt; snapshot)&#123;</span><br><span class="line">        <span class="keyword">if</span> (snapshot.hasData)&#123;</span><br><span class="line">            <span class="keyword">return</span> ...the Widget to be built based on snapshot.data</span><br><span class="line">        &#125;</span><br><span class="line">        <span class="keyword">return</span> ...the Widget to be built <span class="keyword">if</span> no data <span class="keyword">is</span> available</span><br><span class="line">    &#125;,</span><br><span class="line">)</span><br></pre></td></tr></table></figure>
+
+<p>以下示例模仿默认的“计数器”应用程序，但使用的是 Stream 而不再使用任何 setState 。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> <span class="string">'dart:async'</span>;</span><br><span class="line"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CounterPage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _CounterPageState createState() =&gt; _CounterPageState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_CounterPageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">CounterPage</span>&gt; </span>&#123;</span><br><span class="line">  <span class="built_in">int</span> _counter = <span class="number">0</span>;</span><br><span class="line">  <span class="keyword">final</span> StreamController&lt;<span class="built_in">int</span>&gt; _streamController = StreamController&lt;<span class="built_in">int</span>&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    _streamController.close();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> Scaffold(</span><br><span class="line">      appBar: AppBar(title: Text(<span class="string">'Stream version of the Counter App'</span>)),</span><br><span class="line">      body: Center(</span><br><span class="line">        child: StreamBuilder&lt;<span class="built_in">int</span>&gt;(</span><br><span class="line">          stream: _streamController.stream,</span><br><span class="line">          initialData: _counter,</span><br><span class="line">          builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">int</span>&gt; snapshot)&#123;</span><br><span class="line">            <span class="keyword">return</span> Text(<span class="string">'You hit me: <span class="subst">$&#123;snapshot.data&#125;</span> times'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">      floatingActionButton: FloatingActionButton(</span><br><span class="line">        child: <span class="keyword">const</span> Icon(Icons.add),</span><br><span class="line">        onPressed: ()&#123;</span><br><span class="line">          _streamController.sink.add(++_counter);</span><br><span class="line">        &#125;,</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>解释说明：</p>
+<ul>
+<li>第24-30行：我们正在监听流，每次有一个新值流出这个流时，我们用该值更新文本;</li>
+<li>第35行：当我们点击 FloatingActionButton 时，我们递增计数器并通过接收器将其发送到 Stream ;在流中注入值的事实导致侦听它的 StreamBuilder 重建并“刷新”计数器;</li>
+<li>我们不再需要状态的概念，所有东西都通过 Stream 接收;</li>
+<li>这是一个很大的改进，因为调用 setState() 方法会强制整个 Widget（和任何子widget）重建。在这里，只重建 StreamBuilder (当然还有子widget);</li>
+<li>我们仍然在为页面使用 StatefulWidget 的唯一原因，仅仅是因为我们需要通过 dispose 方法在第15行释放 StreamController;</li>
+</ul>
+<hr>
+<h2 id="什么是响应式编程"><a href="#什么是响应式编程" class="headerlink" title="什么是响应式编程"></a>什么是响应式编程</h2><p><strong>响应式编程是使用异步数据流进行编程</strong>。换句话说，所有东西都来源于一个事件(例如点击事件)，变量、消息的变化，要求构建的请求，所有这些经由数据流触发，可能改变或发生的事情都会被传送。</p>
+<p>很明显，所有这些意味着，通过响应式编程，应用程序：</p>
+<ul>
+<li>变得<strong>异步</strong>了</li>
+<li>围绕<strong>流</strong>和<strong>监听者</strong>的概念进行架构，</li>
+<li>当某事发生在某处(事件，变量的变化……)时，会向 Stream 发送通知，</li>
+<li>如果“某人”监听该流，无论其在应用程序中的位置如何，它将被通知并将采取适当的行动。</li>
+</ul>
+<blockquote>
+<p>组件之间不再存在紧密耦合</p>
+</blockquote>
+<p>简而言之，当 Widget 向 Stream 发送内容时，该 Widget <strong>不再需要知道</strong>：</p>
+<ul>
+<li>接下来会发生什么，</li>
+<li>谁可能使用这些信息（没有一个，一个或几个widget…）</li>
+<li>可能使用此信息的地方（没有地方，同一页面，另一个页面，几个页面…），</li>
+<li>当这些信息可能被使用时（几乎是直接，几秒钟之后，永远不会……）。</li>
+</ul>
+<blockquote>
+<p>…… Widget 只关心自己的业务，仅此而已。</p>
+</blockquote>
+<p>乍一看，这似乎会导致应用程序变得“无法控制”，但正如我们将看到的，情况正好相反。它给予你：</p>
+<ul>
+<li>构建仅负责特定活动的部分应用程序的机会，</li>
+<li>轻松模拟一些组件的行为，以允许更完整的测试覆盖，</li>
+<li>轻松重用组件（应用程序或其他应用程序中的其他位置），</li>
+<li>重新设计应用程序，并能够在不进行太多重构的情况下将组件从一个地方移动到另一个地方，<br>…</li>
+</ul>
+<p>我们将很快看到优势……但在之前，我需要介绍最后一个主题：BLoC 模式。</p>
+<hr>
+<h2 id="BLoC模式"><a href="#BLoC模式" class="headerlink" title="BLoC模式"></a>BLoC模式</h2><p>BLoC 模式由来自谷歌的 Paolo Soares 和 Cong Hui 设计，并在 2018 年 DartConf 期间（2018年1月23日至24日）首次提出。<a href="https://www.youtube.com/watch?v=PLHln7wHgPE" target="_blank" rel="noopener">观看YouTube上的视频</a>。</p>
+<p>简而言之，业务逻辑需要：</p>
+<ul>
+<li>需要迁移到一个或多个的BloC</li>
+<li>尽可能从表示层中删除业务逻辑。换句话说，UI 组件应该只关心 UI 的东西而不关心业务，</li>
+<li>依靠将输入(Sink)和输出(stream)作为唯一操作 Stream 的方式</li>
+<li>保持平台独立性</li>
+<li>保持环境独立性</li>
+</ul>
+<p>事实上，BLoC 模式最初构思是为了允许重用独立于平台（ Web 应用程序，移动应用程序，后端。<br>）的相同的代码。</p>
+<h3 id="它究竟意味着什么？"><a href="#它究竟意味着什么？" class="headerlink" title="它究竟意味着什么？"></a>它究竟意味着什么？</h3><p>BLoC 模式利用了我们刚才讨论过的概念：Streams。</p>
+<p><img src="https://www.didierboelens.com/images/streams_bloc.png" alt></p>
+<ul>
+<li>Widget通过 sinks 向 BloC 发送事件</li>
+<li>Widget通过 stream 被 BloC 通知的,</li>
+<li>由 BLoc 实现的业务逻辑，Widget 丝毫都不关心</li>
+</ul>
+<p>从这个声明中，我们可以直接看到一个巨大的好处。</p>
+<p>正是因为业务逻辑跟 UI 解耦了</p>
+<ul>
+<li>我们可以随时更改业务逻辑，并且其对应用程序的影响最小，</li>
+<li>我们可以更改 UI，同时不会对业务逻辑产生任何影响，</li>
+<li>现在，测试业务逻辑变得更加容易</li>
+</ul>
+<hr>
+<h2 id="如何把这个-Bloc-模式应用到计数器应用这个例子上？"><a href="#如何把这个-Bloc-模式应用到计数器应用这个例子上？" class="headerlink" title="如何把这个 Bloc 模式应用到计数器应用这个例子上？"></a>如何把这个 Bloc 模式应用到计数器应用这个例子上？</h2><p>将 BLoC 模式应用于此计数器应用程序似乎有点杀鸡用牛刀，但让我先展示给你看吧……</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() =&gt; runApp(<span class="keyword">new</span> MyApp());</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyApp</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MaterialApp(</span><br><span class="line">        title: <span class="string">'Streams Demo'</span>,</span><br><span class="line">        theme: <span class="keyword">new</span> ThemeData(</span><br><span class="line">          primarySwatch: Colors.blue,</span><br><span class="line">        ),</span><br><span class="line">        home: BlocProvider&lt;IncrementBloc&gt;(</span><br><span class="line">          bloc: IncrementBloc(),</span><br><span class="line">          child: CounterPage(),</span><br><span class="line">        ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CounterPage</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> IncrementBloc bloc = BlocProvider.of&lt;IncrementBloc&gt;(context);</span><br><span class="line"></span><br><span class="line">    <span class="keyword">return</span> Scaffold(</span><br><span class="line">      appBar: AppBar(title: Text(<span class="string">'Stream version of the Counter App'</span>)),</span><br><span class="line">      body: Center(</span><br><span class="line">        child: StreamBuilder&lt;<span class="built_in">int</span>&gt;(</span><br><span class="line">          stream: bloc.outCounter,</span><br><span class="line">          initialData: <span class="number">0</span>,</span><br><span class="line">          builder: (BuildContext context, AsyncSnapshot&lt;<span class="built_in">int</span>&gt; snapshot)&#123;</span><br><span class="line">            <span class="keyword">return</span> Text(<span class="string">'You hit me: <span class="subst">$&#123;snapshot.data&#125;</span> times'</span>);</span><br><span class="line">          &#125;</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">      floatingActionButton: FloatingActionButton(</span><br><span class="line">        child: <span class="keyword">const</span> Icon(Icons.add),</span><br><span class="line">        onPressed: ()&#123;</span><br><span class="line">          bloc.incrementCounter.add(<span class="keyword">null</span>);</span><br><span class="line">        &#125;,</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">IncrementBloc</span> <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="built_in">int</span> _counter;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Stream to handle the counter</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  StreamController&lt;<span class="built_in">int</span>&gt; _counterController = StreamController&lt;<span class="built_in">int</span>&gt;();</span><br><span class="line">  StreamSink&lt;<span class="built_in">int</span>&gt; <span class="keyword">get</span> _inAdd =&gt; _counterController.sink;</span><br><span class="line">  Stream&lt;<span class="built_in">int</span>&gt; <span class="keyword">get</span> outCounter =&gt; _counterController.stream;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Stream to handle the action on the counter</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  StreamController _actionController = StreamController();</span><br><span class="line">  StreamSink <span class="keyword">get</span> incrementCounter =&gt; _actionController.sink;</span><br><span class="line"></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  <span class="comment">// Constructor</span></span><br><span class="line">  <span class="comment">//</span></span><br><span class="line">  IncrementBloc()&#123;</span><br><span class="line">    _counter = <span class="number">0</span>;</span><br><span class="line">    _actionController.stream</span><br><span class="line">                     .listen(_handleLogic);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    _actionController.close();</span><br><span class="line">    _counterController.close();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> _handleLogic(data)&#123;</span><br><span class="line">    _counter = _counter + <span class="number">1</span>;</span><br><span class="line">    _inAdd.add(_counter);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>我已经听到你说，“为什么这么做，有必要吗”？</p>
+<h3 id="首先，职责分离"><a href="#首先，职责分离" class="headerlink" title="首先，职责分离"></a>首先，职责分离</h3><p>如果你检查 CounterPage（第21-45行），其中绝对没有任何业务逻辑。</p>
+<p>此页面现在仅负责：</p>
+<ul>
+<li>显示计数器，现在只在必要的时候刷新（甚至没有页面需要知道它）</li>
+<li>提供按钮，当按钮按下时，请求一个动作能在 couter 上执行。</li>
+</ul>
+<p>此外，整个业务逻辑集中在一个单个类 “IncrementBloc” 中。</p>
+<p>如果现在，你需要更改业务逻辑，你只需更新方法 _handleLogic（第77-80行）。 也许新的业务逻辑将要求做非常复杂的事情…… Counter 页面永远不会知道，这是非常好的！</p>
+<h3 id="第二，可测试性"><a href="#第二，可测试性" class="headerlink" title="第二，可测试性"></a>第二，可测试性</h3><p>现在，测试业务逻辑变得更加容易了。</p>
+<p>无需再通过用户界面测试业务逻辑。 只需要测试 IncrementBloc 类。</p>
+<h3 id="第三，自由组织布局"><a href="#第三，自由组织布局" class="headerlink" title="第三，自由组织布局"></a>第三，自由组织布局</h3><p>由于使用了 Streams，你现在可以独立于业务逻辑组织布局。</p>
+<p>可以从应用程序中的任何位置启动任何操作：只需调用.incrementCounter sink 即可。</p>
+<p>你可以在任何页面的任何位置显示计数器，只需监听 .outCounter stream 。</p>
+<h3 id="第四，减少-“build”-的数量"><a href="#第四，减少-“build”-的数量" class="headerlink" title="第四，减少 “build” 的数量"></a>第四，减少 “build” 的数量</h3><p>不使用 setState() 而是使用 StreamBuilder ，大大减少了需要使用 “build” 的数量。</p>
+<p>从性能角度来看，这是一个巨大的提升。</p>
+<hr>
+<h3 id="有一个约束…-BLoC-的访问性"><a href="#有一个约束…-BLoC-的访问性" class="headerlink" title="有一个约束… BLoC 的访问性"></a>有一个约束… BLoC 的访问性</h3><p>为了使所有这些能够工作，BLoC 需要能够被访问。</p>
+<p>有几种方法可以访问它：</p>
+<ul>
+<li>通过全局单例</li>
+</ul>
+<p>这种方式十分可行，但不是特别推荐。 此外，由于 Dart 中没有类析构函数，因此你永远无法正确释放资源。</p>
+<ul>
+<li>作为局部实例</li>
+</ul>
+<p>您可以实例化 BLoC 的局部实例。 在某些情况下，此解决方案完全满足某些需求。 在这种情况下，你应该始终考虑在 StatefulWidget 中初始化，以便你可以利用 dispose() 方法来释放它。</p>
+<ul>
+<li>由祖先提供</li>
+</ul>
+<p>使其可访问的最常见方式是通过<strong>祖先</strong> Widget，以 StatefulWidget 的方式实现。</p>
+<p>以下代码展示了泛型 BlocProvider 的示例。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// Generic Interface for all BLoCs</span></span><br><span class="line"><span class="keyword">abstract</span> <span class="class"><span class="keyword">class</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="keyword">void</span> dispose();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Generic BLoC provider</span></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">BlocProvider</span>&lt;<span class="title">T</span> <span class="keyword">extends</span> <span class="title">BlocBase</span>&gt; <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  BlocProvider(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.child,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.bloc,</span><br><span class="line">  &#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> T bloc;</span><br><span class="line">  <span class="keyword">final</span> Widget child;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _BlocProviderState&lt;T&gt; createState() =&gt; _BlocProviderState&lt;T&gt;();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> T of&lt;T <span class="keyword">extends</span> BlocBase&gt;(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">final</span> type = _typeOf&lt;BlocProvider&lt;T&gt;&gt;();</span><br><span class="line">    BlocProvider&lt;T&gt; provider = context.ancestorWidgetOfExactType(type);</span><br><span class="line">    <span class="keyword">return</span> provider.bloc;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> <span class="built_in">Type</span> _typeOf&lt;T&gt;() =&gt; T;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_BlocProviderState</span>&lt;<span class="title">T</span>&gt; <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">BlocProvider</span>&lt;<span class="title">BlocBase</span>&gt;&gt;</span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    widget.bloc.dispose();</span><br><span class="line">    <span class="keyword">super</span>.dispose();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> widget.child;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="关于这个泛型-BlocProvider-的一些解释"><a href="#关于这个泛型-BlocProvider-的一些解释" class="headerlink" title="关于这个泛型 BlocProvider 的一些解释"></a>关于这个泛型 BlocProvider 的一些解释</h3><p>首先，如何将其用作提供者？</p>
+<p>如果你查看示例代码“streams_4.dart”，您将看到以下代码行（第12-15行）</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">home: BlocProvider&lt;IncrementBloc&gt;(</span><br><span class="line">          bloc: IncrementBloc(),</span><br><span class="line">          child: CounterPage(),</span><br><span class="line">        ),</span><br></pre></td></tr></table></figure>
+
+<p>有了这几行代码，我们很简单地实例化一个新的 BlocProvider，它将处理一个IncrementBloc，并将 CounterPage 作为子项渲染出来。</p>
+<p>从那一刻开始，从 BlocProvider 开始的子树的任何小部件部分都将能够通过以下行访问IncrementBloc：</p>
+<h3 id="我们能有多个BLoc吗？"><a href="#我们能有多个BLoc吗？" class="headerlink" title="我们能有多个BLoc吗？"></a>我们能有多个BLoc吗？</h3><p>当然，这是非常可取的。 建议是：</p>
+<ul>
+<li>(如果有任何业务逻辑)每页顶部有一个BLoC，</li>
+<li>为什么不是 ApplicationBloc 来处理应用程序状态？</li>
+<li>每个“足够复杂的组件”都有相应的BLoC。</li>
+</ul>
+<p>以下示例代码在整个应用程序的顶部显示 ApplicationBloc ，然后在CounterPage顶部显示 IncrementBloc。</p>
+<p>该示例还展示了如何获取两个 BloC。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">void</span> main() =&gt; runApp(</span><br><span class="line">  BlocProvider&lt;ApplicationBloc&gt;(</span><br><span class="line">    bloc: ApplicationBloc(),</span><br><span class="line">    child: MyApp(),</span><br><span class="line">  )</span><br><span class="line">);</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyApp</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> MaterialApp(</span><br><span class="line">      title: <span class="string">'Streams Demo'</span>,</span><br><span class="line">      home: BlocProvider&lt;IncrementBloc&gt;(</span><br><span class="line">        bloc: IncrementBloc(),</span><br><span class="line">        child: CounterPage(),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">CounterPage</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">final</span> IncrementBloc counterBloc = BlocProvider.of&lt;IncrementBloc&gt;(context);</span><br><span class="line">    <span class="keyword">final</span> ApplicationBloc appBloc = BlocProvider.of&lt;ApplicationBloc&gt;(context);</span><br><span class="line">    </span><br><span class="line">    ...</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="为什么不使用-InhertitedWidget"><a href="#为什么不使用-InhertitedWidget" class="headerlink" title="为什么不使用 InhertitedWidget"></a>为什么不使用 InhertitedWidget</h3><p>在大多数与 BLoC 相关的文章中，你将看到 Provider 作为 InheritedWidget 的实现。</p>
+<p>当然，没有什么能阻止这种类型的实现。 然而，</p>
+<ul>
+<li>一个 InheritedWidget 没有提供任何 dispose 方法，记住，在不再需要资源时总是释放资源是一个很好的做法。</li>
+<li>当然，没有什么能阻止你将 InheritedWidget 包装在另一个StatefulWidget中，但是，使用 InheritedWidget 增加了什么呢？</li>
+<li>最后，如果不受控制，使用 InheritedWidget 经常会导致副作用（请参阅下面的InheritedWidget 上的提醒）。</li>
+</ul>
+<p>这三点解释了我为什么将泛型 BlocProvider 实现为 StatefulWidget 作为我的选择，这样我就可以在处理这个 widget 时释放资源。</p>
+<blockquote>
+<p><strong>Flutter 无法实例化泛型类型</strong></p>
+</blockquote>
+<blockquote>
+<p>不幸的是，Flutter 无法实例化泛型类型，我们必须将 BLoC 的实例传递给BlocProvider。为了在每个 BLoC 中强制执行 dispose() 方法，所有 BLoC 都必须实现BlocBase 接口。</p>
+</blockquote>
+<h4 id="关于-InhertitedWidget-的提醒"><a href="#关于-InhertitedWidget-的提醒" class="headerlink" title="关于 InhertitedWidget 的提醒"></a>关于 InhertitedWidget 的提醒</h4><p>在使用 InheritedWidget 并通过 context.inheritFromWidgetOfExactType(…)获取指定类型最近的 Widget 时，每当 InheritedWidget 的父级或者子布局发生变化时，这个方法会自动将当前“context”（= BuildContext）注册到要重建的widget当中。</p>
+<blockquote>
+<p>请注意，为了完全正确，我刚才解释的与 InheritedWidget 相关的问题只发生在我们将InheritedWidget 与 StatefulWidget 结合使用时。 当你只使用没有 State 的InheritedWidget 时，问题就不会发生。 但是……我将在下一篇文章中回到这句话。</p>
+</blockquote>
+<blockquote>
+<p>链接到 BuildContext 的 Widget 类型（Stateful或Stateless）是无关紧要的。</p>
+</blockquote>
+<h2 id="个人关于-BLoC-的看法"><a href="#个人关于-BLoC-的看法" class="headerlink" title="个人关于 BLoC 的看法"></a>个人关于 BLoC 的看法</h2><p>与 BLoC 相关的第三条规则是：“依靠输入(Sink)和输出(stream)作为唯一操作 Stream 的方式”。</p>
+<p>我的个人经历与这句话有点相左……让我解释一下。</p>
+<p>首先，BLoC 模式被设想成为跨平台共享相同的代码（AngularDart，…），并且从这个角度来看，该这句话非常有意义。</p>
+<p>但是，如果您只打算开发一个 Flutter 应用程序，基于我粗浅的经验，这有用力过猛了。</p>
+<p>如果我们坚持按这句话说的做，那么就没有 getter 或 setter方法了，只有 sinks 和streams。缺点就是，所有这些都是异步的。</p>
+<p>让我们来举两个例子来说明缺点：</p>
+<ul>
+<li>你需要从 BLoC 中获取一些数据，然后作为一个页面的输入，就应该直接在页面上展示这些参数（例如，想象一个参数页面），如果我们必须依赖 Streams，这会使页面的构建变成异步的，这是复杂的。通过Streams使其工作的示例代码可能如下所示……是不是很丑。</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FiltersPage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  FiltersPageState createState() =&gt; FiltersPageState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">FiltersPageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">FiltersPage</span>&gt; </span>&#123;</span><br><span class="line">  MovieCatalogBloc _movieBloc;</span><br><span class="line">  <span class="built_in">double</span> _minReleaseDate;</span><br><span class="line">  <span class="built_in">double</span> _maxReleaseDate;</span><br><span class="line">  MovieGenre _movieGenre;</span><br><span class="line">  <span class="built_in">bool</span> _isInit = <span class="keyword">false</span>;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="keyword">void</span> didChangeDependencies() &#123;</span><br><span class="line">    <span class="keyword">super</span>.didChangeDependencies();</span><br><span class="line"></span><br><span class="line">    <span class="comment">// As the context of not yet available at initState() level,</span></span><br><span class="line">    <span class="comment">// if not yet initialized, we get the list of the </span></span><br><span class="line">    <span class="comment">// filter parameters</span></span><br><span class="line">    <span class="keyword">if</span> (_isInit == <span class="keyword">false</span>)&#123;</span><br><span class="line">      _movieBloc = BlocProvider.of&lt;MovieCatalogBloc&gt;(context);</span><br><span class="line">      _getFilterParameters();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> _isInit == <span class="keyword">false</span></span><br><span class="line">      ? Container()</span><br><span class="line">      : Scaffold(</span><br><span class="line">    ...</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Very tricky.</span></span><br><span class="line">  <span class="comment">/// </span></span><br><span class="line">  <span class="comment">/// As we want to be 100% BLoC compliant, we need to retrieve</span></span><br><span class="line">  <span class="comment">/// everything from the BLoCs, using Streams...</span></span><br><span class="line">  <span class="comment">/// </span></span><br><span class="line">  <span class="comment">/// This is ugly but to be considered as a study case.</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="keyword">void</span> _getFilterParameters() &#123;</span><br><span class="line">    StreamSubscription subscriptionFilters;</span><br><span class="line"></span><br><span class="line">    subscriptionFilters = _movieBloc.outFilters.listen((MovieFilters filters) &#123;</span><br><span class="line">        _minReleaseDate = filters.minReleaseDate.toDouble();</span><br><span class="line">        _maxReleaseDate = filters.maxReleaseDate.toDouble();</span><br><span class="line"></span><br><span class="line">        <span class="comment">// Simply to make sure the subscriptions are released</span></span><br><span class="line">        subscriptionFilters.cancel();</span><br><span class="line">        </span><br><span class="line">        <span class="comment">// Now that we have all parameters, we may build the actual page</span></span><br><span class="line">        <span class="keyword">if</span> (mounted)&#123;</span><br><span class="line">          setState(()&#123;</span><br><span class="line">            _isInit = <span class="keyword">true</span>;</span><br><span class="line">          &#125;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;);</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>在 BLoC 级别，你还需要转换某些数据的“假”注入，以触发提供你希望通过流接收的数据。 使这项工作的示例代码可以是：</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">ApplicationBloc</span> <span class="keyword">implements</span> <span class="title">BlocBase</span> </span>&#123;</span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Synchronous Stream to handle the provision of the movie genres</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  StreamController&lt;<span class="built_in">List</span>&lt;MovieGenre&gt;&gt; _syncController = StreamController&lt;<span class="built_in">List</span>&lt;MovieGenre&gt;&gt;.broadcast();</span><br><span class="line">  Stream&lt;<span class="built_in">List</span>&lt;MovieGenre&gt;&gt; <span class="keyword">get</span> outMovieGenres =&gt; _syncController.stream;</span><br><span class="line"></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  <span class="comment">/// Stream to handle a fake command to trigger the provision of the list of MovieGenres via a Stream</span></span><br><span class="line">  <span class="comment">///</span></span><br><span class="line">  StreamController&lt;<span class="built_in">List</span>&lt;MovieGenre&gt;&gt; _cmdController = StreamController&lt;<span class="built_in">List</span>&lt;MovieGenre&gt;&gt;.broadcast();</span><br><span class="line">  StreamSink <span class="keyword">get</span> getMovieGenres =&gt; _cmdController.sink;</span><br><span class="line"></span><br><span class="line">  ApplicationBloc() &#123;</span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    <span class="comment">// If we receive any data via this sink, we simply provide the list of MovieGenre to the output stream</span></span><br><span class="line">    <span class="comment">//</span></span><br><span class="line">    _cmdController.stream.listen((_)&#123;</span><br><span class="line">      _syncController.sink.add(UnmodifiableListView&lt;MovieGenre&gt;(_genresList.genres));</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="keyword">void</span> dispose()&#123;</span><br><span class="line">    _syncController.close();</span><br><span class="line">    _cmdController.close();</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  MovieGenresList _genresList;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="comment">// Example of external call</span></span><br></pre></td></tr></table></figure>
+
+<p>我不知道你的看法是怎么样的，但就个人而言，如果我没有任何与代码移植/共享相关的限制，我发现这太重了以至于我宁愿在需要时使用常规的 getter/setter并使用 Streams/Sinks来保持分离责任并在需要的地方广播信息。</p>
+<h2 id="是时候在实战中来看所有这些了…"><a href="#是时候在实战中来看所有这些了…" class="headerlink" title="是时候在实战中来看所有这些了…"></a>是时候在实战中来看所有这些了…</h2><p>正如本文开头所提到的，我构建了一个伪应用程序来展示如何使用所有这些概念。 完整的源代码可以在 <a href="https://github.com/boeledi/Streams-Block-Reactive-Programming-in-Flutter" target="_blank" rel="noopener">Github</a> 上找到。</p>
+<p>请宽容，因为这段代码距离完美有很大的距离，它有进步的空间又或是采用更好的架构，但在这里的唯一目的是，向你展示所有这些事如何工作的。</p>
+<p>由于源代码注释已经很多，我只会解释主要原则。</p>
+<h3 id="电影目录的来源"><a href="#电影目录的来源" class="headerlink" title="电影目录的来源"></a>电影目录的来源</h3><p>我正在使用免费的 TMDB API 来获取所有电影的列表，以及海报，评分和描述。</p>
+<p>为了能够运行此示例应用程序，您需要注册并获取API密钥（完全免费），然后将您的API密钥放在文件“/api/tmdb_api.dart”第15行。</p>
+<h3 id="应该程序的架构"><a href="#应该程序的架构" class="headerlink" title="应该程序的架构"></a>应该程序的架构</h3><p>该应用程序使用：</p>
+<ul>
+<li><p>3个主要的BLoC：</p>
+<ul>
+<li>ApplicationBloc（在所有顶部），负责提供所有电影类型的列表;</li>
+<li>FavoriteBloc（就在ApplicationBloc下面），负责处理“收藏夹”的概念;</li>
+<li>MovieCatalogBloc（在2个主要页面之上），负责基于过滤器提供电影列表;</li>
+</ul>
+</li>
+<li><p>6个页面：</p>
+<ul>
+<li>主页面：登陆页面，允许导航到3个子页面;</li>
+<li>ListPage：将电影列为GridView的页面，允许过滤，收藏夹选择，访问收藏夹以及在后续页面中显示电影详细信息;</li>
+<li>ListOnePage：类似于ListPage，但电影列表显示为水平列表，下面是详细信息;</li>
+<li>收藏页面：列出收藏夹的页面，允许取消选择任何收藏夹;</li>
+<li>过滤器页面：允许定义过滤器的EndDrawer：流派和最小/最大发布日期。从ListPage或* ListOnePage调用此页面;</li>
+<li>详细信息页面：页面仅由ListPage调用以显示电影的详细信息，但也允许选择/取消选择电影作为收藏;</li>
+</ul>
+</li>
+<li><p>1个子BLoC：</p>
+<ul>
+<li>FavoriteMovieBloc，链接到MovieCardWidget或MovieDetailsWidget以处理作为收藏的电影的选择/取消选择</li>
+</ul>
+</li>
+<li><p>5个主要小部件：</p>
+<ul>
+<li>FavoriteButton：负责显示收藏夹的数量wiget，实时，并在按下时重定向到FavoritesPage;</li>
+<li>FavoriteWidget：负责显示一个喜欢的电影的细节的widget，并允许其取消选择;</li>
+<li>FiltersSummary：负责显示当前定义的过滤器的widget;</li>
+<li>MovieCardWidget: 负责将一部电影显示为卡片，电影海报，评级和名称，以及一个图标，表示选择该特定电影作为收藏的widget;</li>
+<li>MovieDetailsWidget：负责显示与特定电影相关的详细信息，并允许其选择/取消选择作为收藏的widget。</li>
+</ul>
+</li>
+</ul>
+<h3 id="不同BLoc-流的和谐结合"><a href="#不同BLoc-流的和谐结合" class="headerlink" title="不同BLoc/流的和谐结合"></a>不同BLoc/流的和谐结合</h3><p>下图显示了如何使用主要的3个 BLoC：</p>
+<ul>
+<li>在 BLoC 的左侧，哪些组件调用 Sink</li>
+<li>在右侧，哪些组件监听流</li>
+</ul>
+<p>例如，当 MovieDetailsWidget 调用 inAddFavorite Sink 时，会触发2个流：</p>
+<ul>
+<li>outTotalFavorites 流强制重建 FavoriteButton，和</li>
+<li>outFavorites 流<ul>
+<li>强制重建 MovieDetailsWidget（“最喜欢的”图标）</li>
+<li>强制重建 _buildMovieCard（“最喜欢的”图标）</li>
+<li>用于构建每个 MovieDetailsWidget<br><img src="https://www.didierboelens.com/images/streams_flows.png" alt> </li>
+</ul>
+</li>
+</ul>
+<h3 id="观察者"><a href="#观察者" class="headerlink" title="观察者"></a>观察者</h3><p>大多数小部件和页面都是 StatelessWidgets，这意味着：</p>
+<ul>
+<li>强制重建的 setState()几乎从未使用过。 例外情况是：<ul>
+<li>当 ListOnePage 用户点击 MovieCard 时，刷新 MovieDetailsWidget。 这也可能是由一个流驱动的……</li>
+<li>在 FiltersPage 中允许用户在接受过滤器之前通过 Sink 更改过滤器。<br>应用程序不使用任何 InheritedWidget</li>
+<li>应用程序几乎是 100％ BLoC/Stream 驱动，这意味着大多数小部件彼此独立，并且它们在应用程序中的位置</li>
+</ul>
+</li>
+</ul>
+<p>一个实际的例子是 FavoriteButton，它显示徽章中所选收藏夹的数量。 该应用程序计算此FavoriteButton 的3个实例，每个实例显示在3个不同的页面中。</p>
+<h3 id="显示电影列表（显示无限列表的技巧说明）"><a href="#显示电影列表（显示无限列表的技巧说明）" class="headerlink" title="显示电影列表（显示无限列表的技巧说明）"></a>显示电影列表（显示无限列表的技巧说明）</h3><p>要显示符合过滤条件的电影列表，我们使用 GridView.builder(ListPage)或ListView.builder(ListOnePage）作为无限滚动列表。</p>
+<p>使用 TMDB API 一次以20个电影的页面提取电影。</p>
+<p>提醒一下，GridView.builder 和 ListView.builder 都将 itemCount 作为输入，如果提供，则表示要显示的项目数。调用 itemBuilder，索引从 0 到 itemCount-1 不等。</p>
+<p>正如你将在代码中看到的那样，我随意为 GridView.builder 添加了30多个。理由是，在这个例子中，我们正在操纵假定的无限数量的项目（这不是完全正确但是谁在乎这个例子）。这将强制 GridView.builder 请求显示“最多30个”项目。</p>
+<p>此外，GridView.builder和ListView.builder只在认为必须在视口中呈现某个项目（索引）时才调用itemBuilder。</p>
+<p>这个MovieCatalogBloc.outMoviesList返回一个List <moviecard>，它被迭代以构建每个Movie Card。第一次，这个List <moviecard>是空的但是由于itemCount：… + 30，我们欺骗系统，它将要求通过 _buildMovieCard（…）呈现30个不存在的项目。</moviecard></moviecard></p>
+<p>正如你将在代码中看到的，此例程对 Sink 进行了一次奇怪的调用：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//通知MovieCatalogBloc我们正在渲染MovieCard [索引]</span></span><br><span class="line">movieBloc.inMovieIndex.add(index);</span><br></pre></td></tr></table></figure>
+
+<p>此调用告诉 MovieCatalogBloc 我们要渲染 MovieCard[index]。</p>
+<p>然后_buildMovieCard（…）继续验证与MovieCard [index]相关的数据是否存在。如果是，则渲染后者，否则显示CircularProgressIndicator。</p>
+<p>对StreamCatalogBloc.inMovieIndex.add（index）的调用由StreamSubscription监听，该索引将索引转换为某个pageIndex数字（一页最多可计数20个电影）。如果尚未从TMDB API获取相应页面，则会调用API。获取页面后，所有已获取电影的新列表将发送到_moviesController。当GridView.builder监听该流（= movieBloc.outMoviesList）时，后者请求重建相应的MovieCard。由于我们现在有数据，我们可能会渲染它。</p>
+<hr>
+<h2 id="致谢与附加链接"><a href="#致谢与附加链接" class="headerlink" title="致谢与附加链接"></a>致谢与附加链接</h2><p>描述PublishSubject，BehaviorSubject和ReplaySubject的图像由ReactiveX发布。</p>
+<p>其他一些值得阅读的有趣文章：</p>
+<ul>
+<li><a href="https://www.burkharts.net/apps/blog/" target="_blank" rel="noopener">Dart Streams的基础知识</a>[Thomas Burkhart]</li>
+<li><a href="https://pub.dartlang.org/packages/rx_command" target="_blank" rel="noopener">rx_command包</a>[Thomas Burkhart]</li>
+<li><a href="https://medium.com/flutter-io/build-reactive-mobile-apps-in-flutter-companion-article-13950959e381" target="_blank" rel="noopener">在Flutter中构建响应式移动应用程序 - 配套文章</a>[Filip Hracek]</li>
+<li><a href="https://skillsmatter.com/skillscasts/12254-flutter-with-streams-and-rxdart" target="_blank" rel="noopener">使用Streams和RxDart写Flutter</a>[Brian Egan]</li>
+</ul>
+<hr>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>很长的文章，但是还有很多要说的话。就对我而言，显而易见的，这是推动Flutter应用程序开发的方法，它提供了很大的灵活性。</p>
+<p>请继续关注新的文章。 快乐编程。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/状态管理/" rel="tag"># 状态管理</a>
+          
+            <a href="/tags/BLoC/" rel="tag"># BLoC</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2019/04/12/Flutter/development/data-and-backend/state-mgmt/options/InheritedWidget-Scopedmodel/Widget-State-BuildContext-InheritedWidget/" rel="next" title="(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget">
+                <i class="fa fa-chevron-left"></i> (译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC-PracticalUseCases/" rel="prev" title="(译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例">
+                (译)Flutter中的响应式编程(Reactive Programming)、流(Streams)、业务逻辑组件(BloC)以及实际使用案例 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#介绍"><span class="nav-number">1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是流"><span class="nav-number">2.</span> <span class="nav-text">什么是流</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#介绍-1"><span class="nav-number">2.1.</span> <span class="nav-text">介绍</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#什么能被流运送？"><span class="nav-number">2.2.</span> <span class="nav-text">什么能被流运送？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我怎么知道东西是被流运送的？"><span class="nav-number">2.3.</span> <span class="nav-text">我怎么知道东西是被流运送的？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流只是一条简单的水管吗？"><span class="nav-number">2.4.</span> <span class="nav-text">流只是一条简单的水管吗？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#流的类型"><span class="nav-number">3.</span> <span class="nav-text">流的类型</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#单订阅流"><span class="nav-number">3.1.</span> <span class="nav-text">单订阅流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#广播流"><span class="nav-number">3.2.</span> <span class="nav-text">广播流</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#基础的例子"><span class="nav-number">4.</span> <span class="nav-text">基础的例子</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#任何类型的数据"><span class="nav-number">4.1.</span> <span class="nav-text">任何类型的数据</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#StreamTransformer"><span class="nav-number">4.2.</span> <span class="nav-text">StreamTransformer</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#RxDart"><span class="nav-number">5.</span> <span class="nav-text">RxDart</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#PublishSubject"><span class="nav-number">5.1.</span> <span class="nav-text">PublishSubject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BehaviorSubject"><span class="nav-number">5.2.</span> <span class="nav-text">BehaviorSubject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#ReplaySubject"><span class="nav-number">5.3.</span> <span class="nav-text">ReplaySubject</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于资源的重要说明"><span class="nav-number">5.4.</span> <span class="nav-text">关于资源的重要说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#如何基于从-Stream-出来的数据构建一个-Widget？"><span class="nav-number">5.5.</span> <span class="nav-text">如何基于从 Stream 出来的数据构建一个 Widget？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#什么是响应式编程"><span class="nav-number">6.</span> <span class="nav-text">什么是响应式编程</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#BLoC模式"><span class="nav-number">7.</span> <span class="nav-text">BLoC模式</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#它究竟意味着什么？"><span class="nav-number">7.1.</span> <span class="nav-text">它究竟意味着什么？</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何把这个-Bloc-模式应用到计数器应用这个例子上？"><span class="nav-number">8.</span> <span class="nav-text">如何把这个 Bloc 模式应用到计数器应用这个例子上？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#首先，职责分离"><span class="nav-number">8.1.</span> <span class="nav-text">首先，职责分离</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第二，可测试性"><span class="nav-number">8.2.</span> <span class="nav-text">第二，可测试性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第三，自由组织布局"><span class="nav-number">8.3.</span> <span class="nav-text">第三，自由组织布局</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#第四，减少-“build”-的数量"><span class="nav-number">8.4.</span> <span class="nav-text">第四，减少 “build” 的数量</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有一个约束…-BLoC-的访问性"><span class="nav-number">8.5.</span> <span class="nav-text">有一个约束… BLoC 的访问性</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#关于这个泛型-BlocProvider-的一些解释"><span class="nav-number">8.6.</span> <span class="nav-text">关于这个泛型 BlocProvider 的一些解释</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#我们能有多个BLoc吗？"><span class="nav-number">8.7.</span> <span class="nav-text">我们能有多个BLoc吗？</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#为什么不使用-InhertitedWidget"><span class="nav-number">8.8.</span> <span class="nav-text">为什么不使用 InhertitedWidget</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#关于-InhertitedWidget-的提醒"><span class="nav-number">8.8.1.</span> <span class="nav-text">关于 InhertitedWidget 的提醒</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#个人关于-BLoC-的看法"><span class="nav-number">9.</span> <span class="nav-text">个人关于 BLoC 的看法</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#是时候在实战中来看所有这些了…"><span class="nav-number">10.</span> <span class="nav-text">是时候在实战中来看所有这些了…</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#电影目录的来源"><span class="nav-number">10.1.</span> <span class="nav-text">电影目录的来源</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#应该程序的架构"><span class="nav-number">10.2.</span> <span class="nav-text">应该程序的架构</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#不同BLoc-流的和谐结合"><span class="nav-number">10.3.</span> <span class="nav-text">不同BLoc/流的和谐结合</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#观察者"><span class="nav-number">10.4.</span> <span class="nav-text">观察者</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#显示电影列表（显示无限列表的技巧说明）"><span class="nav-number">10.5.</span> <span class="nav-text">显示电影列表（显示无限列表的技巧说明）</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#致谢与附加链接"><span class="nav-number">11.</span> <span class="nav-text">致谢与附加链接</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">12.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="zh-Hans">
+<head><meta name="generator" content="Hexo 3.8.0">
+  <meta charset="UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=2">
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2">
+
+<link rel="stylesheet" href="/css/main.css?v=7.1.1">
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=7.1.1">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=7.1.1">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=7.1.1" color="#222">
+
+
+
+
+
+
+
+<script id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '7.1.1',
+    sidebar: {"position":"left","display":"post","offset":12,"onmobile":false,"dimmer":false},
+    back2top: true,
+    back2top_sidebar: false,
+    fancybox: false,
+    fastclick: false,
+    lazyload: false,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+  
+
+
+
+
+  <meta name="description" content="原文链接 这篇文档涵盖了Flutter应用中的重要概念Widget,状态（state）,BuildContext以及InheritedWidget。特别要引起注意的是InheritedWidget,它是最重要的一个，也是文档较少的widget。 难度：初级">
+<meta name="keywords" content="Inherited Widget,State,Widget,BuildContext">
+<meta property="og:type" content="article">
+<meta property="og:title" content="(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget">
+<meta property="og:url" content="https://jinyulei.cn/2019/04/12/Flutter/development/data-and-backend/state-mgmt/options/InheritedWidget-Scopedmodel/Widget-State-BuildContext-InheritedWidget/index.html">
+<meta property="og:site_name" content="捕线程者">
+<meta property="og:description" content="原文链接 这篇文档涵盖了Flutter应用中的重要概念Widget,状态（state）,BuildContext以及InheritedWidget。特别要引起注意的是InheritedWidget,它是最重要的一个，也是文档较少的widget。 难度：初级">
+<meta property="og:locale" content="zh-Hans">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/800/1*z_A9htJmE6THrxZeloVRiw.png">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/800/1*Tc0kB9YXL4Bj6tonRJlH0w.png">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/800/1*a4Vdp6kZAUqXh2ye_JAEwQ.png">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/800/1*aE03QEqgcxdGe3NZXJ3wsA.png">
+<meta property="og:image" content="https://cdn-images-1.medium.com/max/800/1*g3yJbjYt6jaVuV7DHpKKSA.png">
+<meta property="og:updated_time" content="2019-06-25T05:06:34.313Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget">
+<meta name="twitter:description" content="原文链接 这篇文档涵盖了Flutter应用中的重要概念Widget,状态（state）,BuildContext以及InheritedWidget。特别要引起注意的是InheritedWidget,它是最重要的一个，也是文档较少的widget。 难度：初级">
+<meta name="twitter:image" content="https://cdn-images-1.medium.com/max/800/1*z_A9htJmE6THrxZeloVRiw.png">
+
+
+
+
+
+  
+  
+  <link rel="canonical" href="https://jinyulei.cn/2019/04/12/Flutter/development/data-and-backend/state-mgmt/options/InheritedWidget-Scopedmodel/Widget-State-BuildContext-InheritedWidget/">
+
+
+
+<script id="page.configurations">
+  CONFIG.page = {
+    sidebar: "",
+  };
+</script>
+
+  <title>(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget | 捕线程者</title>
+  
+
+
+
+
+  <script async src="//www.googletagmanager.com/gtag/js?id=UA-138654110-1"></script>
+  <script>
+    var host = window.location.hostname;
+    if (host !== "localhost" || !false) {
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'UA-138654110-1');
+    }
+  </script>
+
+
+
+  <script>
+    var _hmt = _hmt || [];
+    (function() {
+      var hm = document.createElement("script");
+      hm.src = "https://hm.baidu.com/hm.js?bcc193740f027583bde09c22a8c7a191";
+      var s = document.getElementsByTagName("script")[0];
+      s.parentNode.insertBefore(hm, s);
+    })();
+  </script>
+
+
+
+
+
+
+
+  <noscript>
+  <style>
+  .use-motion .motion-element,
+  .use-motion .brand,
+  .use-motion .menu-item,
+  .sidebar-inner,
+  .use-motion .post-block,
+  .use-motion .pagination,
+  .use-motion .comments,
+  .use-motion .post-header,
+  .use-motion .post-body,
+  .use-motion .collection-title { opacity: initial; }
+
+  .use-motion .logo,
+  .use-motion .site-title,
+  .use-motion .site-subtitle {
+    opacity: initial;
+    top: initial;
+  }
+
+  .use-motion .logo-line-before i { left: initial; }
+  .use-motion .logo-line-after i { right: initial; }
+  </style>
+</noscript>
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="zh-Hans">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/" class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">捕线程者</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+    
+      
+        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+      
+    
+    
+  </div>
+
+  <div class="site-nav-toggle">
+    <button aria-label="切换导航栏">
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+
+
+<nav class="site-nav">
+  
+    <ul id="menu" class="menu">
+      
+        
+        
+        
+          
+          <li class="menu-item menu-item-home">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/" rel="section"><i class="menu-item-icon fa fa-fw fa-home"></i> <br>首页</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-about">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/about/" rel="section"><i class="menu-item-icon fa fa-fw fa-user"></i> <br>关于</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-tags">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/tags/" rel="section"><i class="menu-item-icon fa fa-fw fa-tags"></i> <br>标签</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-categories">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/categories/" rel="section"><i class="menu-item-icon fa fa-fw fa-th"></i> <br>分类</a>
+
+  </li>
+        
+        
+        
+          
+          <li class="menu-item menu-item-archives">
+
+    
+    
+    
+      
+    
+
+    
+
+    <a href="/archives/" rel="section"><i class="menu-item-icon fa fa-fw fa-archive"></i> <br>归档</a>
+
+  </li>
+
+      
+      
+        <li class="menu-item menu-item-search">
+          
+            <a href="javascript:;" class="popup-trigger">
+          
+            
+              <i class="menu-item-icon fa fa-search fa-fw"></i> <br>搜索</a>
+        </li>
+      
+    </ul>
+  
+
+  
+    
+
+  
+
+  
+    <div class="site-search">
+      
+  <div class="popup search-popup local-search-popup">
+  <div class="local-search-header clearfix">
+    <span class="search-icon">
+      <i class="fa fa-search"></i>
+    </span>
+    <span class="popup-btn-close">
+      <i class="fa fa-times-circle"></i>
+    </span>
+    <div class="local-search-input-wrapper">
+      <input autocomplete="off" placeholder="搜索..." spellcheck="false" type="text" id="local-search-input">
+    </div>
+  </div>
+  <div id="local-search-result"></div>
+</div>
+
+
+
+    </div>
+  
+</nav>
+
+
+
+  
+
+
+
+</div>
+    </header>
+
+    
+
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/12/Flutter/development/data-and-backend/state-mgmt/options/InheritedWidget-Scopedmodel/Widget-State-BuildContext-InheritedWidget/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="捕线程者">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget
+
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-12 13:51:17" itemprop="dateCreated datePublished" datetime="2019-04-12T13:51:17+08:00">2019-04-12</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:06:34" itemprop="dateModified" datetime="2019-06-25T13:06:34+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/12/Flutter/development/data-and-backend/state-mgmt/options/InheritedWidget-Scopedmodel/Widget-State-BuildContext-InheritedWidget/" class="leancloud_visitors" data-flag-title="(译)Flutter中的widget、状态（state）、BuildContext、以及Inherited Widget">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <p><a href="https://www.didierboelens.com/2018/06/widget---state---context---inheritedwidget/" target="_blank" rel="noopener">原文链接</a></p>
+<p>这篇文档涵盖了Flutter应用中的重要概念Widget,状态（state）,BuildContext以及InheritedWidget。特别要引起注意的是InheritedWidget,它是最重要的一个，也是文档较少的widget。</p>
+<p>难度：初级</p>
+<a id="more"></a>
+
+
+<h2 id="前言"><a href="#前言" class="headerlink" title="前言"></a>前言</h2><p><a href="https://docs.flutter.io/flutter/widgets/Widget-class.html" target="_blank" rel="noopener">Widget</a>，<a href="https://docs.flutter.io/flutter/widgets/State-class.html" target="_blank" rel="noopener">State</a>和<a href="https://docs.flutter.io/flutter/widgets/BuildContext-class.html" target="_blank" rel="noopener">BuildContext</a>的概念是Flutter中每个Flutter开发人员需要完全理解的最重要概念。</p>
+<p>尽管文档量巨大，但是并不总能清楚地解释这些概念。</p>
+<p>我会用自己的话语来解释这些概念，知道这可能会让一些纯粹主义者感到震惊，但本文的真正目的是弄清楚以下话题：</p>
+<ul>
+<li><a href="https://docs.flutter.io/flutter/widgets/StatefulWidget-class.html" target="_blank" rel="noopener">有状态</a>和<a href="https://docs.flutter.io/flutter/widgets/StatelessWidget-class.html" target="_blank" rel="noopener">无状态</a>widget之间的区别</li>
+<li>什么是<a href="https://docs.flutter.io/flutter/widgets/BuildContext-class.html" target="_blank" rel="noopener">BuildContext</a></li>
+<li>什么是<a href="https://docs.flutter.io/flutter/widgets/State-class.html" target="_blank" rel="noopener">状态</a>以及如何使用它</li>
+<li>BuildContext与其State对象之间的关系</li>
+<li><a href="https://docs.flutter.io/flutter/widgets/InheritedWidget-class.html" target="_blank" rel="noopener">InheritedWidget</a>以及在Widgets树中传播信息的方式</li>
+<li>重建的概念</li>
+</ul>
+<h2 id="第一部分：概念"><a href="#第一部分：概念" class="headerlink" title="第一部分：概念"></a>第一部分：概念</h2><h3 id="Widget-的概念"><a href="#Widget-的概念" class="headerlink" title="Widget 的概念"></a>Widget 的概念</h3><p>在Flutter中，几乎所有的东西都是widget。</p>
+<p>将Widget视为可视组件（或与应用程序的可视方面交互的组件）</p>
+<p>当您需要构建与布局直接或间接相关的任何内容时，您就正在使用widget。</p>
+<h3 id="Widget树的概念"><a href="#Widget树的概念" class="headerlink" title="Widget树的概念"></a>Widget树的概念</h3><p>包含其他widget的widget被称为父widget（或widget容器）。</p>
+<p>包含在父widget中的widget称为子widget。</p>
+<p>让我们用Flutter自动生成的基本应用程序来说明这一点。</p>
+<p>这是简化的代码，仅限于<code>build</code>方法：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="meta">@override</span></span><br><span class="line">Widget build(BuildContext)&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(</span><br><span class="line">      appBar: <span class="keyword">new</span> AppBar(</span><br><span class="line">        title: <span class="keyword">new</span> Text(widget.title),</span><br><span class="line">      ),</span><br><span class="line">      body: <span class="keyword">new</span> Center(</span><br><span class="line">        child: <span class="keyword">new</span> Column(</span><br><span class="line">          mainAxisAlignment: MainAxisAlignment.center,</span><br><span class="line">          children: &lt;Widget&gt;[</span><br><span class="line">            <span class="keyword">new</span> Text(</span><br><span class="line">              <span class="string">'You have pushed the button this many times:'</span>,</span><br><span class="line">            ),</span><br><span class="line">            <span class="keyword">new</span> Text(</span><br><span class="line">              <span class="string">'<span class="subst">$_counter</span>'</span>,</span><br><span class="line">              style: Theme.of(context).textTheme.display1,</span><br><span class="line">            ),</span><br><span class="line">          ],</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(</span><br><span class="line">        onPressed: _incrementCounter,</span><br><span class="line">        tooltip: <span class="string">'Increment'</span>,</span><br><span class="line">        child: <span class="keyword">new</span> Icon(Icons.add),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>如果我们现在思考这个基础例子，我们将获得以下Widgets树结构（限于代码中存在的Widgets列表）：</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*z_A9htJmE6THrxZeloVRiw.png" alt></p>
+<h3 id="BuildContext"><a href="#BuildContext" class="headerlink" title="BuildContext"></a>BuildContext</h3><p>另一个重要的概念是BuildContext。</p>
+<p>BuildContext只不过是对构建的所有widget的树结构中widget的位置的引用。</p>
+<p>简而言之，将BuildContext视为Widgets树的一部分，BuildContext是Widget连接到此树的位置。</p>
+<p>BuildContext仅属于一个wdiget。</p>
+<p>如果widget“A”具有子widget，则widget“A”的BuildContext将成为直接子widget BuildContexts的父BuildContext。</p>
+<p>读到此处，很明显BuildContexts被链接在一起的，并且组成了BuildContexts树（父子关系）。</p>
+<p>如果我们现在尝试在上图中说明BuildContext的概念，我们获得（仍然是一个非常简化的视图），其中每种颜色代表一个BuildContext，MyApp除外，它是不同的：<br><img src="https://cdn-images-1.medium.com/max/800/1*Tc0kB9YXL4Bj6tonRJlH0w.png" alt></p>
+<p>BuildContext可见性（简化的声明）：</p>
+<p>它是仅在其自己的BuildContext或其父BuildContext的BuildContext中可见的东西。</p>
+<p>按这句话说的，我们可以从子BuildContext获取BuildContext，并且很容易找到一个父Widget。</p>
+<p>有个例子是，思考下 支架 &gt; 中心 &gt; 列 &gt; 文本 ：<br>context.ancestorWidgetOfExactType（Scaffold）=&gt; 通过从Text上下文转到树结构来返回第一个Scaffold。</p>
+<p>从父BuildContext，也可以找到一个后代（=子）Widget，但不建议这样做（我们稍后会讨论）。</p>
+<h3 id="两种类型的widget"><a href="#两种类型的widget" class="headerlink" title="两种类型的widget"></a>两种类型的widget</h3><p>Widget有两种类型：</p>
+<h3 id="无状态widget"><a href="#无状态widget" class="headerlink" title="无状态widget"></a>无状态widget</h3><p>一些可视组件中除了它们自己的配置信息之外不依赖于任何其他信息，该信息在其直接父级构建时提供。</p>
+<p>换句话说，这些小部件一旦创建就不必关心任何变化。</p>
+<p>这些widget称为无状态widget。</p>
+<p>这种widget的典型是Text，Row，Column，Container等，在构建时，我们只是将一些参数传递给它们。</p>
+<p>参数可以是装饰，尺寸甚至其它widget的任何内容。不要紧。唯一重要的是这个配置一旦应用，在下一个构建过程之前都不会改变</p>
+<p>无状态widget只能在加载/构建widget时绘制一次，这意味着无法根据任何事件或用户操作重绘widget。</p>
+<h3 id="无状态widget生命周期"><a href="#无状态widget生命周期" class="headerlink" title="无状态widget生命周期"></a>无状态widget生命周期</h3><p>这是与无状态小组件相关的代码的典型结构。</p>
+<p>如您所见，我们可以将一些额外的参数传递给它的构造函数。但是，请记住，这些参数不会在以后阶段发生变化（变异），只能按原样使用。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyStatelessWidget</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">	MyStatelessWidget(&#123;</span><br><span class="line">		Key key,</span><br><span class="line">		<span class="keyword">this</span>.parameter,</span><br><span class="line">	&#125;): <span class="keyword">super</span>(key:key);</span><br><span class="line"></span><br><span class="line">	<span class="keyword">final</span> parameter;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	Widget build(BuildContext context)&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> ...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>即使有另一种方法可以被覆盖（createElement），后者几乎从不被重写。</p>
+<p>唯一需要被重写的是构建。</p>
+<p>这种无状态widget的生命周期是简单直接的：</p>
+<ul>
+<li>初始化</li>
+<li>通过build()渲染</li>
+</ul>
+<h3 id="有状态的widget"><a href="#有状态的widget" class="headerlink" title="有状态的widget"></a>有状态的widget</h3><p>其他一些widget将处理一些在Widget生命周期内会发生变化的内部数据。因此，该数据变得动态。</p>
+<p>由此Widget持有的，在此Widget的生命周期中可能会有所不同的数据集，被称为State。</p>
+<p>这些widget称为有状态widget。</p>
+<p>此类Widget的示例可以是用户可以选择的复选框列表，也可以是根据条件禁用的Button。</p>
+<h2 id="状态的概念"><a href="#状态的概念" class="headerlink" title="状态的概念"></a>状态的概念</h2><p>State定义StatefulWidget实例的“行为”部分。</p>
+<p>它持有了就行为和布局布局而言有着相互作用/妨碍的信息。</p>
+<p>所有应用于State变更都会强制Widget重建。</p>
+<h2 id="State和BuildContext之间的关系"><a href="#State和BuildContext之间的关系" class="headerlink" title="State和BuildContext之间的关系"></a>State和BuildContext之间的关系</h2><p>对于有状态widget，状态与BuildContext相关联的。</p>
+<p>此关联是永久性的，State对象永远不会更改其BuildContext。</p>
+<p>即使可以在树结构周围移动Widget BuildContext，State仍将与该BuildContext保持关联。</p>
+<p>当State与BuildContext关联时，State被视为已挂载。</p>
+<p>超重要的：</p>
+<p>由于State对象与BuildContext相关联，这意味着State对象不能（直接）通过另一个BuildContext访问！（我们将在稍后讨论这个问题）。</p>
+<h2 id="有状态widget的生命周期"><a href="#有状态widget的生命周期" class="headerlink" title="有状态widget的生命周期"></a>有状态widget的生命周期</h2><p>在介绍了基本概念之后，是时候进一步深入了</p>
+<p>这是与Stateful Widget相关的典型代码结构。</p>
+<p>由于本文的主要目的是用“变量”数据来解释State的概念，我将故意跳过与某些Stateful Widget overridable方法相关的任何解释，这些方法与此没有特别的关系。</p>
+<p>这些可覆盖的方法是didUpdateWidget，deactivate，reassemble。这些将在另一篇文章中讨论。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyStatefulWidget</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">	MyStatefulWidget(&#123;</span><br><span class="line">		Key key,</span><br><span class="line">		<span class="keyword">this</span>.parameter,</span><br><span class="line">	&#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">final</span> parameter;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	_MyStatefulWidgetState createState() =&gt; <span class="keyword">new</span> _MyStatefulWidgetState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyStatefulWidgetState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyStatefulWidget</span>&gt; </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	<span class="keyword">void</span> initState()&#123;</span><br><span class="line">		<span class="keyword">super</span>.initState();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// Additional initialization of the State</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	<span class="keyword">void</span> didChangeDependencies()&#123;</span><br><span class="line">		<span class="keyword">super</span>.didChangeDependencies();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">// Additional code</span></span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	<span class="keyword">void</span> dispose()&#123;</span><br><span class="line">		<span class="comment">// Additional disposal code</span></span><br><span class="line">		</span><br><span class="line">		<span class="keyword">super</span>.dispose();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	Widget build(BuildContext context)&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="keyword">new</span> ...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>下图显示了与创建有状态widget相关的操作/调用序列（简化版本）。</p>
+<p>在图的右侧，您将注意到流程中的State对象的内部状态。</p>
+<p>您还将看到上下文与状态相关联的时刻，从而变为可用（已挂载）。</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*a4Vdp6kZAUqXh2ye_JAEwQ.png" alt></p>
+<p>那么让我们用一些细节来说明：</p>
+<h3 id="initState"><a href="#initState" class="headerlink" title="initState()"></a>initState()</h3><p>initState()方法是在创建State对象后要调用的第一个方法（在构造函数之后）。</p>
+<p>当需要执行额外初始化时，将覆盖此方法。典型的初始化是与动画，控制器有关的。</p>
+<p>如果重写此方法，则需要在第一个位置调用super.initState()方法。</p>
+<p>在这个方法中，上下文可用但你还不能真正使用它，因为框架还没有完全将状态与它相关联。</p>
+<p>一旦initState（）方法完成，State对象就初始化完成了，并且上下文是可用的。</p>
+<p>在此State对象的生命周期内不再调用此方法。</p>
+<p>didChangeDependencies（）</p>
+<p>didChangeDependencies（）方法是要调用的第二个方法。</p>
+<p>在此阶段，由于上下文已经可用了，你就可以使用它了。</p>
+<p>如果您的Widget链接到InheritedWidget和/或您需要基于BuildContext初始化一些监听器（），则通常会覆盖此方法。</p>
+<p>请注意，如果您的widget链接到了InheritedWidget，则每次重建此widget时都会调用此方法。</p>
+<p>如果重写此方法，则应首先调用super.didChangeDependencies()。</p>
+<h3 id="build"><a href="#build" class="headerlink" title="build()"></a>build()</h3><p>build（BuildContext context）方法在didChangeDependencies()和didUpdateWidget(）之后调用。</p>
+<p>这是您构建widget(以及可能的所有子树)的地方。</p>
+<p>每次State对象更改时（或者当InheritedWidget需要通知“已注册”的widget时）都会调用此方法！</p>
+<p>为了强制重建，您可以调用setState（（）{…}）方法。</p>
+<h3 id="dispose"><a href="#dispose" class="headerlink" title="dispose()"></a>dispose()</h3><p>丢弃widget时调用dispose()方法。</p>
+<p>如果需要执行一些清理（例如监听器，控制器……），则重写此方法，然后立即调用super.dispose()。</p>
+<h2 id="无状态widget还是有状态widget"><a href="#无状态widget还是有状态widget" class="headerlink" title="无状态widget还是有状态widget"></a>无状态widget还是有状态widget</h2><p>这是一个许多开发人员需要问自己的问题：“我需要我的Widget是无状态还是有状态的？”</p>
+<p>为了回答这个问题，请问问自己：</p>
+<p>在我的widget的生命周期中，我是否需要考虑一个会更改的变量，并且更改的时候是否会强制widget重建？</p>
+<p>如果问题的答案是肯定的，那么您需要一个有状态widget，否则，您需要一个无状态widget。</p>
+<p>举几个例子：</p>
+<ul>
+<li>一个要展示复选框列表的widget。为了展示复选框，您需要考虑使用一个条目的数组。每个条目都是一个带着标题和状态的对象。如果单击复选框，则会切换相应的条目的状态;</li>
+</ul>
+<p>在这种情况下，您需要使用有状态widget来保存条目的状态，以便能够重绘复选框。</p>
+<ul>
+<li>表单页面。该页面允许用户填写表单widget，并将表单发送到服务器。</li>
+</ul>
+<p>在这种情况下，除非在提交表单之前验证表单或执行任何其他操作，无状态widget可能就足够了。</p>
+<h2 id="有状态的widget有两部分组成的"><a href="#有状态的widget有两部分组成的" class="headerlink" title="有状态的widget有两部分组成的"></a>有状态的widget有两部分组成的</h2><p>还记得Stateful小部件的结构吗？有两个部分：</p>
+<h3 id="Widget的主要部分的定义"><a href="#Widget的主要部分的定义" class="headerlink" title="Widget的主要部分的定义"></a>Widget的主要部分的定义</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyStatefulWidget</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">    MyStatefulWidget(&#123;</span><br><span class="line">		Key key,</span><br><span class="line">		<span class="keyword">this</span>.color,</span><br><span class="line">	&#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line">	</span><br><span class="line">	<span class="keyword">final</span> Color color;</span><br><span class="line"></span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	_MyStatefulWidgetState createState() =&gt; <span class="keyword">new</span> _MyStatefulWidgetState();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第一部分“MyStatefulWidget”通常是Widget的公有部分。当您要将其添加到widget树时，可以实例化这部分。此部分在Widget的生命周期内不会发生变化，但可能接受可能由其相应的State实例使用的参数。</p>
+<p>请注意，在Widget的第一部分级别定义的任何变量，通常在其生命周期内不会更改。</p>
+<h3 id="widget状态定义"><a href="#widget状态定义" class="headerlink" title="widget状态定义"></a>widget状态定义</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyStatefulWidgetState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyStatefulWidget</span>&gt; </span>&#123;</span><br><span class="line">    ...</span><br><span class="line">	<span class="meta">@override</span></span><br><span class="line">	Widget build(BuildContext context)&#123;</span><br><span class="line">	    ...</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>第二部分“_MyStatefulWidgetState”，是在Widget的生命周期中变化的部分，并强制在发生改变的时候重建Widget的特定实例。</p>
+<p>名称开头的“_”字符使该类对.dart文件是私有的。如果需要在.dart文件之外引用此类，请不要使用“_”前缀。</p>
+<p>_MyStatefulWidgetState类可以使用widget.{变量的名称}访问存储在MyStatefulWidget中的任何变量。在此示例中：widget.color。</p>
+<h2 id="widget唯一标识-Key"><a href="#widget唯一标识-Key" class="headerlink" title="widget唯一标识-Key"></a>widget唯一标识-Key</h2><p>在Flutter中，每个Widget都是唯一标识的。这个唯一标识由构建/渲染时的框架定义。</p>
+<p>此唯一标识对应于可选的Key参数。如果省略，Flutter将为您生成一个。</p>
+<p>在某些情况下，您可能需要强制使用此密钥，以便可以通过key访问widget。</p>
+<p>为此，您可以使用以下辅助类：GlobalKey <t>，LocalKey，UniqueKey或ObjectKey。</t></p>
+<p>GlobalKey确保key在整个应用程序中是唯一的。</p>
+<p>强制使用Widget的唯一标识：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">GlobalKey myKey = <span class="keyword">new</span> GlobalKey();</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@override</span></span><br><span class="line">    Widget build(BuildContext context)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyWidget(</span><br><span class="line">            key: myKey</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="第二部分：如何访问状态"><a href="#第二部分：如何访问状态" class="headerlink" title="第二部分：如何访问状态"></a>第二部分：如何访问状态</h2><p>如上所述，State被链接到一个Context，并且Context被链接到Widget的一个实例。</p>
+<h3 id="1-Widget本身"><a href="#1-Widget本身" class="headerlink" title="1. Widget本身"></a>1. Widget本身</h3><p>从理论上讲，唯一能够访问状态的是Widget状态本身。</p>
+<p>在这种情况下，没有困难。 Widget的<code>State</code>类访问其任何变量。</p>
+<h3 id="2-一个直连的子widget"><a href="#2-一个直连的子widget" class="headerlink" title="2.一个直连的子widget"></a>2.一个直连的子widget</h3><p>有时，父widget可能需要访问直连的子widget的状态才能执行特定任务。</p>
+<p>在这种情况下，要访问直连的子widget，你需要了解它们。</p>
+<p>给某人打电话的最简单方法是通过名字。在Flutter中，每个Widget都有一个唯一的标识，由框架在构建/渲染时确定。</p>
+<p>如上所示，您可以使用key参数强制使用Widget的标识。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">...</span><br><span class="line">    GlobalKey&lt;MyStatefulWidgetState&gt; myWidgetStateKey = <span class="keyword">new</span> GlobalKey&lt;MyStatefulWidgetState&gt;();</span><br><span class="line">    ...</span><br><span class="line">    <span class="meta">@override</span></span><br><span class="line">    Widget build(BuildContext context)&#123;</span><br><span class="line">        <span class="keyword">return</span> <span class="keyword">new</span> MyStatefulWidget(</span><br><span class="line">            key: myWidgetStateKey,</span><br><span class="line">            color: Colors.blue,</span><br><span class="line">        );</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<p>一旦确定，父Widget可以通过以下方式访问子widget的状态：</p>
+<p>myWidgetStateKey.currentState</p>
+<p>让我们考虑一个基础的例子，在用户点击按钮时显示SnackBar。</p>
+<p>由于SnackBar是Scaffold的子Widget，它不能直接访问Scaffold body 部分的任何其他孩子（请记住上下文的概念及其层次结构/树结构？）。因此，访问它的唯一方法是通过ScaffoldState，它暴露一个公共方法来显示SnackBar。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyScreenState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyScreen</span>&gt; </span>&#123;</span><br><span class="line">        <span class="comment">/// the unique identity of the Scaffold</span></span><br><span class="line">        <span class="keyword">final</span> GlobalKey&lt;ScaffoldState&gt; _scaffoldKey = <span class="keyword">new</span> GlobalKey&lt;ScaffoldState&gt;();</span><br><span class="line"></span><br><span class="line">        <span class="meta">@override</span></span><br><span class="line">        Widget build(BuildContext context)&#123;</span><br><span class="line">            <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(</span><br><span class="line">                key: _scaffoldKey,</span><br><span class="line">                appBar: <span class="keyword">new</span> AppBar(</span><br><span class="line">                    title: <span class="keyword">new</span> Text(<span class="string">'My Screen'</span>),</span><br><span class="line">                ),</span><br><span class="line">                body: <span class="keyword">new</span> Center(</span><br><span class="line">                    <span class="keyword">new</span> RaiseButton(</span><br><span class="line">                        child: <span class="keyword">new</span> Text(<span class="string">'Hit me'</span>),</span><br><span class="line">                        onPressed: ()&#123;</span><br><span class="line">                            _scaffoldKey.currentState.showSnackBar(</span><br><span class="line">                                <span class="keyword">new</span> SnackBar(</span><br><span class="line">                                    content: <span class="keyword">new</span> Text(<span class="string">'This is the Snackbar...'</span>),</span><br><span class="line">                                )</span><br><span class="line">                            );</span><br><span class="line">                        &#125;</span><br><span class="line">                    ),</span><br><span class="line">                ),</span><br><span class="line">            );</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-始祖widget"><a href="#3-始祖widget" class="headerlink" title="3.始祖widget"></a>3.始祖widget</h3><p>假设您有一个属于另一个Widget的子树的Widget，如下图所示。</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*aE03QEqgcxdGe3NZXJ3wsA.png" alt></p>
+<p>为了实现这一目标，需要满足3个条件：</p>
+<h3 id="1-“带状态的widget”（红色）需要暴露其状态"><a href="#1-“带状态的widget”（红色）需要暴露其状态" class="headerlink" title="1.“带状态的widget”（红色）需要暴露其状态"></a>1.“带状态的widget”（红色）需要暴露其状态</h3><p>为了公开它的状态，Widget需要在创建时记录它，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyExposingWidget</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">   MyExposingWidgetState myState;</span><br><span class="line">	</span><br><span class="line">   <span class="meta">@override</span></span><br><span class="line">   MyExposingWidgetState createState()&#123;</span><br><span class="line">      myState = <span class="keyword">new</span> MyExposingWidgetState();</span><br><span class="line">      <span class="keyword">return</span> myState;</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-widget-state需要暴露一些getter-setter"><a href="#2-widget-state需要暴露一些getter-setter" class="headerlink" title="2.widget state需要暴露一些getter / setter"></a>2.<code>widget state</code>需要暴露一些getter / setter</h3><p>为了让局外人能设置/获取State的属性，Widget State需要通过以下方式授权访问：</p>
+<ul>
+<li>公有属性（不推荐）</li>
+<li>getter / setter</li>
+</ul>
+<p>举个例子：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyExposingWidgetState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyExposingWidget</span>&gt;</span>&#123;</span><br><span class="line">   Color _color;</span><br><span class="line">	</span><br><span class="line">   Color <span class="keyword">get</span> color =&gt; _color;</span><br><span class="line">   ...</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="3-“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用"><a href="#3-“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用" class="headerlink" title="3.“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用"></a>3.“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用</h3><figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyChildWidget</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">   <span class="meta">@override</span></span><br><span class="line">   Widget build(BuildContext context)&#123;</span><br><span class="line">      <span class="keyword">final</span> MyExposingWidget widget = context.ancestorWidgetOfExactType(MyExposingWidget);</span><br><span class="line">      <span class="keyword">final</span> MyExposingWidgetState state = widget?.myState;</span><br><span class="line">		</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> Container(</span><br><span class="line">         color: state == <span class="keyword">null</span> ? Colors.blue : state.color,</span><br><span class="line">      );</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>这个解决方案很容易实现，但widget如何知道它何时需要重建？</p>
+<p>对于这个解决方案，它是不知道什么时候重建的。它必须等待重建发生，才能刷新其内容，这不是很方便。</p>
+<p>下一节将讨论<code>Inherited Widget</code>的概念，它可以解决这个问题。</p>
+<h2 id="InheritedWidget"><a href="#InheritedWidget" class="headerlink" title="InheritedWidget"></a>InheritedWidget</h2><p>简而言之，InheritedWidget使在widget树中有效地传播（和共享）信息成为可能。</p>
+<p>InheritedWidget是一个特殊的Widget，您可以将其作为另一个子树的父级放在Widgets树中。该子树的所有widget都必须能够与该InheritedWidget公有数据进行交互。</p>
+<p>基本</p>
+<p>为了解释它，让我们思考以下代码：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyInheritedWidget</span> <span class="keyword">extends</span> <span class="title">InheritedWidget</span> </span>&#123;</span><br><span class="line">   MyInheritedWidget(&#123;</span><br><span class="line">      Key key,</span><br><span class="line">      <span class="meta">@required</span> Widget child,</span><br><span class="line">      <span class="keyword">this</span>.data,</span><br><span class="line">   &#125;): <span class="keyword">super</span>(key: key, child: child);</span><br><span class="line">	</span><br><span class="line">   <span class="keyword">final</span> data;</span><br><span class="line">	</span><br><span class="line">   <span class="keyword">static</span> MyInheritedWidget of(BuildContext context) &#123;</span><br><span class="line">      <span class="keyword">return</span> context.inheritFromWidgetOfExactType(MyInheritedWidget);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   <span class="meta">@override</span></span><br><span class="line">   <span class="built_in">bool</span> updateShouldNotify(MyInheritedWidget oldWidget) =&gt; data != oldWidget.data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>此代码定义了一个名为“MyInheritedWidget”的Widget，它作为子树的一部分，目的是在所有widget中的共享一些数据。</p>
+<p>如上所述，为了能够传播/共享某些数据，需要将InheritedWidget摆放在widget树的顶部，这解释了所需的子widget是如何传递给InheritedWidget的基础构造器的。</p>
+<p>“静态方法MyInheritedWidget(BuildContext context）”允许所有子widget获取最接近上下文的MyInheritedWidget的实例(具体看后面)。</p>
+<p>最后，如果数据发生更改，“updateShouldNotify”重写方法，用于告诉InheritedWidget是否必须将通知传递给所有子widget（那些已注册/已订阅的）。</p>
+<p>因此，我们需要将它放在如下的树节点层级</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyParentWidget</span>... </span>&#123;</span><br><span class="line">   ...</span><br><span class="line">   <span class="meta">@override</span></span><br><span class="line">   Widget build(BuildContext context)&#123;</span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> MyInheritedWidget(</span><br><span class="line">         data: counter,</span><br><span class="line">         child: <span class="keyword">new</span> Row(</span><br><span class="line">            children: &lt;Widget&gt;[</span><br><span class="line">               ...</span><br><span class="line">            ],</span><br><span class="line">         ),</span><br><span class="line">      );</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="子widget是如何访问InheritedWidget的数据？"><a href="#子widget是如何访问InheritedWidget的数据？" class="headerlink" title="子widget是如何访问InheritedWidget的数据？"></a>子widget是如何访问InheritedWidget的数据？</h2><p>在子widget的构建过程中，后者将获得对InheritedWidget的引用，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyChildWidget</span>... </span>&#123;</span><br><span class="line">   ...</span><br><span class="line">	</span><br><span class="line">   <span class="meta">@override</span></span><br><span class="line">   Widget build(BuildContext context)&#123;</span><br><span class="line">      <span class="keyword">final</span> MyInheritedWidget inheritedWidget = MyInheritedWidget.of(context);</span><br><span class="line">		</span><br><span class="line">      <span class="comment">///</span></span><br><span class="line">      <span class="comment">/// 从这个时候起，widget就能通过调用inheritedWidget.data，使用 yInheritedWidget暴露的数据</span></span><br><span class="line">      <span class="comment">///</span></span><br><span class="line">      <span class="keyword">return</span> <span class="keyword">new</span> Container(</span><br><span class="line">         color: inheritedWidget.data.color,</span><br><span class="line">      );</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h2 id="如何在widget之间进行交互？"><a href="#如何在widget之间进行交互？" class="headerlink" title="如何在widget之间进行交互？"></a>如何在widget之间进行交互？</h2><p>请思考以下展示widget树结构的图表。</p>
+<p><img src="https://cdn-images-1.medium.com/max/800/1*g3yJbjYt6jaVuV7DHpKKSA.png" alt></p>
+<p>为了说明一种交互方式，我们作出以下假定：</p>
+<ul>
+<li>“widget A”是一个将项目添加到购物车的按钮;</li>
+<li>“widget B”是一个显示购物车中商品数量的文本;</li>
+<li>“widget C”位于widgetB旁边，是一个内置任何文本的文本widget;</li>
+<li>我们希望“Widget B”在按下“Widget A”时自动在购物车中显示正确数量的项目，但我们不希望重建“Widget C”</li>
+</ul>
+<p>InheritedWidget就是用于这种情况的正确的widget。</p>
+<p>示例代码：</p>
+<p>先让我写下代码，随后会对其进行解释</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">Item</span> </span>&#123;</span><br><span class="line">   <span class="built_in">String</span> reference;</span><br><span class="line"></span><br><span class="line">   Item(<span class="keyword">this</span>.reference);</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyInherited</span> <span class="keyword">extends</span> <span class="title">InheritedWidget</span> </span>&#123;</span><br><span class="line">  _MyInherited(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="meta">@required</span> Widget child,</span><br><span class="line">    <span class="meta">@required</span> <span class="keyword">this</span>.data,</span><br><span class="line">  &#125;) : <span class="keyword">super</span>(key: key, child: child);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> MyInheritedWidgetState data;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  <span class="built_in">bool</span> updateShouldNotify(_MyInherited oldWidget) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">true</span>;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyInheritedWidget</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  MyInheritedWidget(&#123;</span><br><span class="line">    Key key,</span><br><span class="line">    <span class="keyword">this</span>.child,</span><br><span class="line">  &#125;): <span class="keyword">super</span>(key: key);</span><br><span class="line"></span><br><span class="line">  <span class="keyword">final</span> Widget child;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  MyInheritedWidgetState createState() =&gt; <span class="keyword">new</span> MyInheritedWidgetState();</span><br><span class="line"></span><br><span class="line">  <span class="keyword">static</span> MyInheritedWidgetState of(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> (context.inheritFromWidgetOfExactType(_MyInherited) <span class="keyword">as</span> _MyInherited).data;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyInheritedWidgetState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyInheritedWidget</span>&gt;</span>&#123;</span><br><span class="line">  <span class="comment">/// List of Items</span></span><br><span class="line">  <span class="built_in">List</span>&lt;Item&gt; _items = &lt;Item&gt;[];</span><br><span class="line"></span><br><span class="line">  <span class="comment">/// Getter (number of items)</span></span><br><span class="line">  <span class="built_in">int</span> <span class="keyword">get</span> itemsCount =&gt; _items.length;</span><br><span class="line"></span><br><span class="line">  <span class="comment">/// Helper method to add an Item</span></span><br><span class="line">  <span class="keyword">void</span> addItem(<span class="built_in">String</span> reference)&#123;</span><br><span class="line">    setState(()&#123;</span><br><span class="line">      _items.add(<span class="keyword">new</span> Item(reference));</span><br><span class="line">    &#125;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context)&#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> _MyInherited(</span><br><span class="line">      data: <span class="keyword">this</span>,</span><br><span class="line">      child: widget.child,</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">MyTree</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  _MyTreeState createState() =&gt; <span class="keyword">new</span> _MyTreeState();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">_MyTreeState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyTree</span>&gt; </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> MyInheritedWidget(</span><br><span class="line">      child: <span class="keyword">new</span> Scaffold(</span><br><span class="line">        appBar: <span class="keyword">new</span> AppBar(</span><br><span class="line">          title: <span class="keyword">new</span> Text(<span class="string">'Title'</span>),</span><br><span class="line">        ),</span><br><span class="line">        body: <span class="keyword">new</span> Column(</span><br><span class="line">          children: &lt;Widget&gt;[</span><br><span class="line">            <span class="keyword">new</span> WidgetA(),</span><br><span class="line">            <span class="keyword">new</span> Container(</span><br><span class="line">              child: <span class="keyword">new</span> Row(</span><br><span class="line">                children: &lt;Widget&gt;[</span><br><span class="line">                  <span class="keyword">new</span> Icon(Icons.shopping_cart),</span><br><span class="line">                  <span class="keyword">new</span> WidgetB(),</span><br><span class="line">                  <span class="keyword">new</span> WidgetC(),</span><br><span class="line">                ],</span><br><span class="line">              ),</span><br><span class="line">            ),</span><br><span class="line">          ],</span><br><span class="line">        ),</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetA</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> MyInheritedWidgetState state = MyInheritedWidget.of(context);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Container(</span><br><span class="line">      child: <span class="keyword">new</span> RaisedButton(</span><br><span class="line">        child: <span class="keyword">new</span> Text(<span class="string">'Add Item'</span>),</span><br><span class="line">        onPressed: () &#123;</span><br><span class="line">          state.addItem(<span class="string">'new item'</span>);</span><br><span class="line">        &#125;,</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetB</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> MyInheritedWidgetState state = MyInheritedWidget.of(context);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Text(<span class="string">'<span class="subst">$&#123;state.itemsCount&#125;</span>'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetC</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Text(<span class="string">'I am Widget C'</span>);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="解释说明"><a href="#解释说明" class="headerlink" title="解释说明"></a>解释说明</h3><p>在这个非常基础的例子中，</p>
+<ul>
+<li>_MyInherited是一个InheritedWidget，每次我们通过点击“Widget A”按钮添加一个Item时都会重建</li>
+<li>MyInheritedWidget是一个Widget，其状态包含Items列表。可以通过“（BuildContext context）的静态MyInheritedWidgetState”访问此状态。</li>
+<li>MyInheritedWidgetState公开一个getter（itemsCount）和一个方法（addItem），以便它们可以被widget使用，这是子wiget树的一部分</li>
+<li>每次我们将一个Item添加到State时，MyInheritedWidgetState都会重建</li>
+<li>MyTree类只是构建一个widget树，将MyInheritedWidget作为树的父级</li>
+<li>WidgetA是一个简单的RaisedButton，当按下它时，从最近的MyInheritedWidget调用addItem方法</li>
+<li>WidgetB是一个简单的文本，显示最接近的MyInheritedWidget级别的项目数</li>
+</ul>
+<p>这一切是如何运作？</p>
+<p>注册Widget以供以后通知</p>
+<p>当子Widget调用MyInheritedWidget.of（context）时，它会调用MyInheritedWidget的以下方法，并传递自己的BuildContext。</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> MyInheritedWidgetState of(BuildContext context) &#123;</span><br><span class="line">  <span class="keyword">return</span> (context.inheritFromWidgetOfExactType(_MyInherited) <span class="keyword">as</span> _MyInherited).data;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>在内部，除了简单地返回MyInheritedWidgetState的实例之外，它还将消费者widget订阅了以便更改通知。</p>
+<p>在这个景象背后，对这个静态方法的简单调用实际上做了两件事：</p>
+<ul>
+<li>当对InheritedWidget应用修改时，消费者widget会自动添加到将重建的订户者列表中（此处为_MyInherited）</li>
+<li>_MyInherited小部件（又名MyInheritedWidgetState）中引用的数据将返回给“消费者”。</li>
+</ul>
+<h3 id="流"><a href="#流" class="headerlink" title="流"></a>流</h3><p>由于’Widget A’和’Widget B’都已订阅了InheritedWidget，因此如果对_MyInherited应用了修改，则当单击Widget A的RaisedButton时，操作流程如下（简化版本）：</p>
+<ul>
+<li>调用MyInheritedWidgetState的addItem方法</li>
+<li>MyInheritedWidgetState.addItem方法将新项添加到List <item></item></li>
+<li>调用setState（）以重建MyInheritedWidget</li>
+<li>使用List <item>的新内容创建_MyInherited的新实例</item></li>
+<li>_MyInherited记录在参数（数据）中传递的新State</li>
+<li>作为InheritedWidget，它检查是否需要“通知”“使用者”（答案为是）</li>
+<li>它遍历整个消费者列表（这里是Widget A和Widget B）并请求他们重建</li>
+<li>由于Wiget C不是消费者，因此不会重建。</li>
+</ul>
+<p>但是，Widget A和Widget B都重建了，而重建Wiget A是没有必要的，因为它没有任何改变。</p>
+<p>如何防止这种情况发生？</p>
+<h3 id="在仍然访问“继承的”小组件时阻止某些小组件重建"><a href="#在仍然访问“继承的”小组件时阻止某些小组件重建" class="headerlink" title="在仍然访问“继承的”小组件时阻止某些小组件重建"></a>在仍然访问“继承的”小组件时阻止某些小组件重建</h3><p>Widget A也被重建的原因来自它访问MyInheritedWidgetState的方式。</p>
+<p>正如我们之前看到的，调用“context.inheritFromWidgetOfExactType（）”方法的事实自动将Widget订阅到“使用者”列表。</p>
+<p>防止此自动订阅同时仍允许Widget A访问MyInheritedWidgetState的解决方案是更改MyInheritedWidget的静态方法，如下所示：</p>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">static</span> MyInheritedWidgetState of([BuildContext context, <span class="built_in">bool</span> rebuild = <span class="keyword">true</span>])&#123;</span><br><span class="line">    <span class="keyword">return</span> (rebuild ? context.inheritFromWidgetOfExactType(_MyInherited) <span class="keyword">as</span> _MyInherited</span><br><span class="line">                    : context.ancestorWidgetOfExactType(_MyInherited) <span class="keyword">as</span> _MyInherited).data;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+
+<p>通过添加布尔额外参数…</p>
+<ul>
+<li>如果“rebuild”参数为true（默认情况下），我们使用常规方法（并且Widget将添加到订阅者列表中）</li>
+<li>如果“rebuild”参数为false，我们仍然可以访问数据，但不使用InheritedWidget的内部实现<br>因此，要完成解决方案，我们还需要稍微更新Widget A的代码，如下所示（我们添加false额外参数）：</li>
+</ul>
+<figure class="highlight dart"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line"><span class="class"><span class="keyword">class</span> <span class="title">WidgetA</span> <span class="keyword">extends</span> <span class="title">StatelessWidget</span> </span>&#123;</span><br><span class="line">  <span class="meta">@override</span></span><br><span class="line">  Widget build(BuildContext context) &#123;</span><br><span class="line">    <span class="keyword">final</span> MyInheritedWidgetState state = MyInheritedWidget.of(context, <span class="keyword">false</span>);</span><br><span class="line">    <span class="keyword">return</span> <span class="keyword">new</span> Container(</span><br><span class="line">      child: <span class="keyword">new</span> RaisedButton(</span><br><span class="line">        child: <span class="keyword">new</span> Text(<span class="string">'Add Item'</span>),</span><br><span class="line">        onPressed: () &#123;</span><br><span class="line">          state.addItem(<span class="string">'new item'</span>);</span><br><span class="line">        &#125;,</span><br><span class="line">      ),</span><br><span class="line">    );</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p>就这样，按下它时就不再重建Widget A.</p>
+<h2 id="针对路由，对话框的特别说明"><a href="#针对路由，对话框的特别说明" class="headerlink" title="针对路由，对话框的特别说明"></a>针对路由，对话框的特别说明</h2><p>路由，对话框的上下文是与应用程序绑定的。<br>这意味着即使在页面A内部您要求显示另一个页面B（例如，在当前的屏幕上），两个屏幕中的任何一个都没有“简单的方法”来关联它们自己的上下文。<br>页面B了解页面A上下文的唯一方法是从页面A把它作为Navigator.of（context）.push（…。）的参数获取。</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>关于这些主题还有很多话要说……特别是在InheritedWidget上。</p>
+<p>在下一篇文章中，我将介绍通知器/监听器的概念，这在使用状态和传送数据的方式中也非常有趣。</p>
+<p>感谢您阅读这篇相当长的文章，请继续关注，做一个快乐编码的人。</p>
+
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+        <div class="post-tags">
+          
+            <a href="/tags/Inherited-Widget/" rel="tag"># Inherited Widget</a>
+          
+            <a href="/tags/State/" rel="tag"># State</a>
+          
+            <a href="/tags/Widget/" rel="tag"># Widget</a>
+          
+            <a href="/tags/BuildContext/" rel="tag"># BuildContext</a>
+          
+        </div>
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2019/04/13/Flutter/development/data-and-backend/state-mgmt/options/BloC/ReactiveProgramming-Streams-BLoC/" rel="prev" title="(译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC)">
+                (译) Flutter中的响应式编程(Reactive Programming)、流(Streams)以及业务逻辑组件(BloC) <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+  </div>
+
+
+          </div>
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            文章目录
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            站点概览
+          </li>
+        </ul>
+      
+
+      <div class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">顽石</p>
+              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+          </div>
+
+          
+            <nav class="site-state motion-element">
+              
+                <div class="site-state-item site-state-posts">
+                
+                  <a href="/archives/">
+                
+                    <span class="site-state-item-count">56</span>
+                    <span class="site-state-item-name">日志</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-categories">
+                  
+                    
+                      <a href="/categories/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">3</span>
+                    <span class="site-state-item-name">分类</span>
+                  </a>
+                </div>
+              
+
+              
+                
+                
+                <div class="site-state-item site-state-tags">
+                  
+                    
+                      <a href="/tags/">
+                    
+                  
+                    
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                      
+                    
+                    <span class="site-state-item-count">24</span>
+                    <span class="site-state-item-name">标签</span>
+                  </a>
+                </div>
+              
+            </nav>
+          
+
+          
+
+          
+
+          
+            <div class="links-of-author motion-element">
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="mailto:jinyulei@outlook.com" title="E-Mail &rarr; mailto:jinyulei@outlook.com" rel="noopener" target="_blank"><i class="fa fa-fw fa-envelope"></i>E-Mail</a>
+                </span>
+              
+                <span class="links-of-author-item">
+                  
+                  
+                    
+                  
+                  
+                    
+                  
+                  <a href="https://weibo.com/jinyulei0710" title="Weibo &rarr; https://weibo.com/jinyulei0710" rel="noopener" target="_blank"><i class="fa fa-fw fa-weibo"></i>Weibo</a>
+                </span>
+              
+            </div>
+          
+
+          
+
+          
+          
+
+          
+            
+          
+          
+
+        </div>
+      </div>
+
+      
+      <!--noindex-->
+        <div class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+            
+            
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#前言"><span class="nav-number">1.</span> <span class="nav-text">前言</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第一部分：概念"><span class="nav-number">2.</span> <span class="nav-text">第一部分：概念</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Widget-的概念"><span class="nav-number">2.1.</span> <span class="nav-text">Widget 的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#Widget树的概念"><span class="nav-number">2.2.</span> <span class="nav-text">Widget树的概念</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#BuildContext"><span class="nav-number">2.3.</span> <span class="nav-text">BuildContext</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#两种类型的widget"><span class="nav-number">2.4.</span> <span class="nav-text">两种类型的widget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无状态widget"><span class="nav-number">2.5.</span> <span class="nav-text">无状态widget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#无状态widget生命周期"><span class="nav-number">2.6.</span> <span class="nav-text">无状态widget生命周期</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#有状态的widget"><span class="nav-number">2.7.</span> <span class="nav-text">有状态的widget</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#状态的概念"><span class="nav-number">3.</span> <span class="nav-text">状态的概念</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#State和BuildContext之间的关系"><span class="nav-number">4.</span> <span class="nav-text">State和BuildContext之间的关系</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有状态widget的生命周期"><span class="nav-number">5.</span> <span class="nav-text">有状态widget的生命周期</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#initState"><span class="nav-number">5.1.</span> <span class="nav-text">initState()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#build"><span class="nav-number">5.2.</span> <span class="nav-text">build()</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#dispose"><span class="nav-number">5.3.</span> <span class="nav-text">dispose()</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#无状态widget还是有状态widget"><span class="nav-number">6.</span> <span class="nav-text">无状态widget还是有状态widget</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#有状态的widget有两部分组成的"><span class="nav-number">7.</span> <span class="nav-text">有状态的widget有两部分组成的</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#Widget的主要部分的定义"><span class="nav-number">7.1.</span> <span class="nav-text">Widget的主要部分的定义</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#widget状态定义"><span class="nav-number">7.2.</span> <span class="nav-text">widget状态定义</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#widget唯一标识-Key"><span class="nav-number">8.</span> <span class="nav-text">widget唯一标识-Key</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#第二部分：如何访问状态"><span class="nav-number">9.</span> <span class="nav-text">第二部分：如何访问状态</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#1-Widget本身"><span class="nav-number">9.1.</span> <span class="nav-text">1. Widget本身</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-一个直连的子widget"><span class="nav-number">9.2.</span> <span class="nav-text">2.一个直连的子widget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-始祖widget"><span class="nav-number">9.3.</span> <span class="nav-text">3.始祖widget</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#1-“带状态的widget”（红色）需要暴露其状态"><span class="nav-number">9.4.</span> <span class="nav-text">1.“带状态的widget”（红色）需要暴露其状态</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#2-widget-state需要暴露一些getter-setter"><span class="nav-number">9.5.</span> <span class="nav-text">2.widget state需要暴露一些getter / setter</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#3-“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用"><span class="nav-number">9.6.</span> <span class="nav-text">3.“对获得状态感兴趣的widget”（蓝色）需要获得对状态的引用</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#InheritedWidget"><span class="nav-number">10.</span> <span class="nav-text">InheritedWidget</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#子widget是如何访问InheritedWidget的数据？"><span class="nav-number">11.</span> <span class="nav-text">子widget是如何访问InheritedWidget的数据？</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#如何在widget之间进行交互？"><span class="nav-number">12.</span> <span class="nav-text">如何在widget之间进行交互？</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#解释说明"><span class="nav-number">12.1.</span> <span class="nav-text">解释说明</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#流"><span class="nav-number">12.2.</span> <span class="nav-text">流</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#在仍然访问“继承的”小组件时阻止某些小组件重建"><span class="nav-number">12.3.</span> <span class="nav-text">在仍然访问“继承的”小组件时阻止某些小组件重建</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#针对路由，对话框的特别说明"><span class="nav-number">13.</span> <span class="nav-text">针对路由，对话框的特别说明</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">14.</span> <span class="nav-text">结论</span></a></li></ol></div>
+            
+
+          </div>
+        </div>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+  
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2020</span>
+  <span class="with-love" id="animate">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">顽石</span>
+
+  
+
+  
+</div>
+
+
+  <div class="powered-by">由 <a href="https://hexo.io" class="theme-link" rel="noopener" target="_blank">Hexo</a> 强力驱动 v3.8.0</div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">主题 – <a href="https://theme-next.org" class="theme-link" rel="noopener" target="_blank">NexT.Mist</a> v7.1.1</div>
+
+
+
+
+        
+
+
+
+
+
+<script type="text/javascript">document.write(unescape("%3Cspan id='cnzz_stat_icon_1278706234'%3E%3C/span%3E%3Cscript src='https://s4.cnzz.com/z_stat.php%3Fid%3D1278706234%26show%3Dpic2' type='text/javascript'%3E%3C/script%3E"));</script>
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+    
+
+    
+  </div>
+
+  
+
+<script>
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  <script src="/lib/jquery/index.js?v=2.1.3"></script>
+
+  
+  <script src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+
+  
+  <script src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+
+
+  
+
+
+  <script src="/js/utils.js?v=7.1.1"></script>
+
+  <script src="/js/motion.js?v=7.1.1"></script>
+
+
+
+  
+  
+
+
+  <script src="/js/schemes/muse.js?v=7.1.1"></script>
+
+
+
+
+  
+  <script src="/js/scrollspy.js?v=7.1.1"></script>
+<script src="/js/post-details.js?v=7.1.1"></script>
+
+
+
+  
+
+
+  <script src="/js/next-boot.js?v=7.1.1"></script>
+
+
+  
+
+  
+
+  
+
+  
+
+
+  
+
+
+  
+  <script>
+    // Popup Window;
+    var isfetched = false;
+    var isXml = true;
+    // Search DB path;
+    var search_path = "search.xml";
+    if (search_path.length === 0) {
+      search_path = "search.xml";
+    } else if (/json$/i.test(search_path)) {
+      isXml = false;
+    }
+    var path = "/" + search_path;
+    // monitor main search box;
+
+    var onPopupClose = function (e) {
+      $('.popup').hide();
+      $('#local-search-input').val('');
+      $('.search-result-list').remove();
+      $('#no-result').remove();
+      $(".local-search-pop-overlay").remove();
+      $('body').css('overflow', '');
+    }
+
+    function proceedsearch() {
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay"></div>')
+        .css('overflow', 'hidden');
+      $('.search-popup-overlay').click(onPopupClose);
+      $('.popup').toggle();
+      var $localSearchInput = $('#local-search-input');
+      $localSearchInput.attr("autocapitalize", "none");
+      $localSearchInput.attr("autocorrect", "off");
+      $localSearchInput.focus();
+    }
+
+    // search function;
+    var searchFunc = function(path, search_id, content_id) {
+      'use strict';
+
+      // start loading animation
+      $("body")
+        .append('<div class="search-popup-overlay local-search-pop-overlay">' +
+          '<div id="search-loading-icon">' +
+          '<i class="fa fa-spinner fa-pulse fa-5x fa-fw"></i>' +
+          '</div>' +
+          '</div>')
+        .css('overflow', 'hidden');
+      $("#search-loading-icon").css('margin', '20% auto 0 auto').css('text-align', 'center');
+
+      
+
+      $.ajax({
+        url: path,
+        dataType: isXml ? "xml" : "json",
+        async: true,
+        success: function(res) {
+          // get the contents from search data
+          isfetched = true;
+          $('.popup').detach().appendTo('.header-inner');
+          var datas = isXml ? $("entry", res).map(function() {
+            return {
+              title: $("title", this).text(),
+              content: $("content",this).text(),
+              url: $("url" , this).text()
+            };
+          }).get() : res;
+          var input = document.getElementById(search_id);
+          var resultContent = document.getElementById(content_id);
+          var inputEventFunction = function() {
+            var searchText = input.value.trim().toLowerCase();
+            var keywords = searchText.split(/[\s\-]+/);
+            if (keywords.length > 1) {
+              keywords.push(searchText);
+            }
+            var resultItems = [];
+            if (searchText.length > 0) {
+              // perform local searching
+              datas.forEach(function(data) {
+                var isMatch = false;
+                var hitCount = 0;
+                var searchTextCount = 0;
+                var title = data.title.trim();
+                var titleInLowerCase = title.toLowerCase();
+                var content = data.content.trim().replace(/<[^>]+>/g,"");
+                
+                var contentInLowerCase = content.toLowerCase();
+                var articleUrl = decodeURIComponent(data.url).replace(/\/{2,}/g, '/');
+                var indexOfTitle = [];
+                var indexOfContent = [];
+                // only match articles with not empty titles
+                if(title != '') {
+                  keywords.forEach(function(keyword) {
+                    function getIndexByWord(word, text, caseSensitive) {
+                      var wordLen = word.length;
+                      if (wordLen === 0) {
+                        return [];
+                      }
+                      var startPosition = 0, position = [], index = [];
+                      if (!caseSensitive) {
+                        text = text.toLowerCase();
+                        word = word.toLowerCase();
+                      }
+                      while ((position = text.indexOf(word, startPosition)) > -1) {
+                        index.push({position: position, word: word});
+                        startPosition = position + wordLen;
+                      }
+                      return index;
+                    }
+
+                    indexOfTitle = indexOfTitle.concat(getIndexByWord(keyword, titleInLowerCase, false));
+                    indexOfContent = indexOfContent.concat(getIndexByWord(keyword, contentInLowerCase, false));
+                  });
+                  if (indexOfTitle.length > 0 || indexOfContent.length > 0) {
+                    isMatch = true;
+                    hitCount = indexOfTitle.length + indexOfContent.length;
+                  }
+                }
+
+                // show search results
+
+                if (isMatch) {
+                  // sort index by position of keyword
+
+                  [indexOfTitle, indexOfContent].forEach(function (index) {
+                    index.sort(function (itemLeft, itemRight) {
+                      if (itemRight.position !== itemLeft.position) {
+                        return itemRight.position - itemLeft.position;
+                      } else {
+                        return itemLeft.word.length - itemRight.word.length;
+                      }
+                    });
+                  });
+
+                  // merge hits into slices
+
+                  function mergeIntoSlice(text, start, end, index) {
+                    var item = index[index.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    var hits = [];
+                    var searchTextCountInSlice = 0;
+                    while (position + word.length <= end && index.length != 0) {
+                      if (word === searchText) {
+                        searchTextCountInSlice++;
+                      }
+                      hits.push({position: position, length: word.length});
+                      var wordEnd = position + word.length;
+
+                      // move to next position of hit
+
+                      index.pop();
+                      while (index.length != 0) {
+                        item = index[index.length - 1];
+                        position = item.position;
+                        word = item.word;
+                        if (wordEnd > position) {
+                          index.pop();
+                        } else {
+                          break;
+                        }
+                      }
+                    }
+                    searchTextCount += searchTextCountInSlice;
+                    return {
+                      hits: hits,
+                      start: start,
+                      end: end,
+                      searchTextCount: searchTextCountInSlice
+                    };
+                  }
+
+                  var slicesOfTitle = [];
+                  if (indexOfTitle.length != 0) {
+                    slicesOfTitle.push(mergeIntoSlice(title, 0, title.length, indexOfTitle));
+                  }
+
+                  var slicesOfContent = [];
+                  while (indexOfContent.length != 0) {
+                    var item = indexOfContent[indexOfContent.length - 1];
+                    var position = item.position;
+                    var word = item.word;
+                    // cut out 100 characters
+                    var start = position - 20;
+                    var end = position + 80;
+                    if(start < 0){
+                      start = 0;
+                    }
+                    if (end < position + word.length) {
+                      end = position + word.length;
+                    }
+                    if(end > content.length){
+                      end = content.length;
+                    }
+                    slicesOfContent.push(mergeIntoSlice(content, start, end, indexOfContent));
+                  }
+
+                  // sort slices in content by search text's count and hits' count
+
+                  slicesOfContent.sort(function (sliceLeft, sliceRight) {
+                    if (sliceLeft.searchTextCount !== sliceRight.searchTextCount) {
+                      return sliceRight.searchTextCount - sliceLeft.searchTextCount;
+                    } else if (sliceLeft.hits.length !== sliceRight.hits.length) {
+                      return sliceRight.hits.length - sliceLeft.hits.length;
+                    } else {
+                      return sliceLeft.start - sliceRight.start;
+                    }
+                  });
+
+                  // select top N slices in content
+
+                  var upperBound = parseInt('1');
+                  if (upperBound >= 0) {
+                    slicesOfContent = slicesOfContent.slice(0, upperBound);
+                  }
+
+                  // highlight title and content
+
+                  function highlightKeyword(text, slice) {
+                    var result = '';
+                    var prevEnd = slice.start;
+                    slice.hits.forEach(function (hit) {
+                      result += text.substring(prevEnd, hit.position);
+                      var end = hit.position + hit.length;
+                      result += '<b class="search-keyword">' + text.substring(hit.position, end) + '</b>';
+                      prevEnd = end;
+                    });
+                    result += text.substring(prevEnd, slice.end);
+                    return result;
+                  }
+
+                  var resultItem = '';
+
+                  if (slicesOfTitle.length != 0) {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + highlightKeyword(title, slicesOfTitle[0]) + "</a>";
+                  } else {
+                    resultItem += "<li><a href='" + articleUrl + "' class='search-result-title'>" + title + "</a>";
+                  }
+
+                  slicesOfContent.forEach(function (slice) {
+                    resultItem += "<a href='" + articleUrl + "'>" +
+                      "<p class=\"search-result\">" + highlightKeyword(content, slice) +
+                      "...</p>" + "</a>";
+                  });
+
+                  resultItem += "</li>";
+                  resultItems.push({
+                    item: resultItem,
+                    searchTextCount: searchTextCount,
+                    hitCount: hitCount,
+                    id: resultItems.length
+                  });
+                }
+              })
+            };
+            if (keywords.length === 1 && keywords[0] === "") {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-search fa-5x"></i></div>'
+            } else if (resultItems.length === 0) {
+              resultContent.innerHTML = '<div id="no-result"><i class="fa fa-frown-o fa-5x"></i></div>'
+            } else {
+              resultItems.sort(function (resultLeft, resultRight) {
+                if (resultLeft.searchTextCount !== resultRight.searchTextCount) {
+                  return resultRight.searchTextCount - resultLeft.searchTextCount;
+                } else if (resultLeft.hitCount !== resultRight.hitCount) {
+                  return resultRight.hitCount - resultLeft.hitCount;
+                } else {
+                  return resultRight.id - resultLeft.id;
+                }
+              });
+              var searchResultList = '<ul class=\"search-result-list\">';
+              resultItems.forEach(function (result) {
+                searchResultList += result.item;
+              })
+              searchResultList += "</ul>";
+              resultContent.innerHTML = searchResultList;
+            }
+          }
+
+          if ('auto' === 'auto') {
+            input.addEventListener('input', inputEventFunction);
+          } else {
+            $('.search-icon').click(inputEventFunction);
+            input.addEventListener('keypress', function (event) {
+              if (event.keyCode === 13) {
+                inputEventFunction();
+              }
+            });
+          }
+
+          // remove loading animation
+          $(".local-search-pop-overlay").remove();
+          $('body').css('overflow', '');
+
+          proceedsearch();
+        }
+      });
+    }
+
+    // handle and trigger popup window;
+    $('.popup-trigger').click(function(e) {
+      e.stopPropagation();
+      if (isfetched === false) {
+        searchFunc(path, 'local-search-input', 'local-search-result');
+      } else {
+        proceedsearch();
+      };
+    });
+
+    $('.popup-btn-close').click(onPopupClose);
+    $('.popup').click(function(e){
+      e.stopPropagation();
+    });
+    $(document).on('keyup', function (event) {
+      var shouldDismissSearchPopup = event.which === 27 &&
+        $('.search-popup').is(':visible');
+      if (shouldDismissSearchPopup) {
+        onPopupClose();
+      }
+    });
+  </script>
+
+
+
+
+
+  
+  
+  <script>
+    
+    function addCount(Counter) {
+      var $visitors = $('.leancloud_visitors');
+      var url = $visitors.attr('id').trim();
+      var title = $visitors.attr('data-flag-title').trim();
+
+      Counter('get', '/classes/Counter', { where: JSON.stringify({ url }) })
+        .done(function({ results }) {
+          if (results.length > 0) {
+            var counter = results[0];
+            
+            Counter('put', '/classes/Counter/' + counter.objectId, JSON.stringify({ time: { '__op': 'Increment', 'amount': 1 } }))
+            
+              .done(function() {
+                var $element = $(document.getElementById(url));
+                $element.find('.leancloud-visitors-count').text(counter.time + 1);
+              })
+            
+              .fail(function ({ responseJSON }) {
+                console.log('Failed to save Visitor num, with error message: ' + responseJSON.error);
+              })
+          } else {
+            
+              Counter('post', '/classes/Counter', JSON.stringify({ title: title, url: url, time: 1 }))
+                .done(function() {
+                  var $element = $(document.getElementById(url));
+                  $element.find('.leancloud-visitors-count').text(1);
+                })
+                .fail(function() {
+                  console.log('Failed to create');
+                });
+            
+          }
+        })
+        .fail(function ({ responseJSON }) {
+          console.log('LeanCloud Counter Error: ' + responseJSON.code + ' ' + responseJSON.error);
+        });
+    }
+    
+
+    $(function() {
+      $.get('https://app-router.leancloud.cn/2/route?appId=' + 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz')
+        .done(function({ api_server }) {
+          var Counter = function(method, url, data) {
+            return $.ajax({
+              method: method,
+              url: 'https://' + api_server + '/1.1' + url,
+              headers: {
+                'X-LC-Id': 'eHGr88WsRNLEoMuwdgIlCtkE-gzGzoHsz',
+                'X-LC-Key': 'TYodVy5avzk1wnyVhGU1RCT0',
+                'Content-Type': 'application/json',
+              },
+              data: data
+            });
+          };
+          
+            addCount(Counter);
+          
+        });
+    });
+  </script>
+
+
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>

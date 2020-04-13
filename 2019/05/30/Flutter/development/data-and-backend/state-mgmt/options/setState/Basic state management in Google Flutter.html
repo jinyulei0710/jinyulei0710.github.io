@@ -1,0 +1,196 @@
+<hr>
+<p>layout: post<br>title:  “(译) Google Flutter 中的简单状态管理”<br>date:   2019-04-18 09:55:17 +0800<br>categories: </p>
+<ul>
+<li>Flutter 开发<br>tags:<ul>
+<li>状态管理</li>
+<li>setState</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><a href="https://medium.com/@agungsurya/basic-state-management-in-google-flutter-6ee73608f96d">原文链接</a></p>
+<h2 id="我是如何遇见-Google-Flutter的"><a href="#我是如何遇见-Google-Flutter的" class="headerlink" title="我是如何遇见 Google Flutter的"></a>我是如何遇见 Google Flutter的</h2><p>这对我来这是像往常一样的码代码的一天。我的一个朋友在我们的开发者群组中发了这么一个问题，是否有人尝试过Google Flutter。它想要知道React Native 和 Google Flutter之间的比较。这个问题让我种草了Google Flutter。我之前从没有听过Google Flutter。它是否值得与React Native进行比较，就像AngularJS相较于ReactJS?</p>
+<p>我必须承认。我是一个React的迷弟。我已经使用ReactJS差不多两年了。我也写React Natice。但是不要对我有所误解。我之前也曾为AngularJS疯狂。有大约一年的时间我是一个AngularJS的开发者。然后我换了一家使用ReactJS的新公司。后来的事你们都知道了。</p>
+<!--more-->
+
+<p>##长话短说 我渴望尝试使用Flutter</p>
+<p>Google Flutter是一个新的平台，在这个平台之上你可以用一份Dart代码同时开发Android和iOS应用。迁移到新的开发栈之后，我知道做一个简单的应用，至少要优先处理的是状态管理。它把我引向了三个问题：</p>
+<p>1.如何在widget树种向下传递一个应用的状态</p>
+<p>2.如何在更新应用的状态之后对widget进行重建</p>
+<p>3.如何在在页面之间跳转的同时保持状态同步。</p>
+<h2 id="执行"><a href="#执行" class="headerlink" title="执行"></a>执行</h2><p>默认情况下，flutter会创建main.dart。这是程序运行的地方。由于我要创建两个页面直接的跳转，我额外创建了两个文件：MyHomePage.dart以及MySecondPage.dart。</p>
+<p>这个应用程序的目的是让用户做以下几件事：</p>
+<ul>
+<li>使MyHomePage中的计数器自增</li>
+<li>跳转到MySecondPage</li>
+<li>使MySecondPage中的计数器递减</li>
+</ul>
+<p>这虽然看起来很简单，但是我要找到一种方式保持MyHomePage和MySecondPage之间计数器的同步。</p>
+<p>计数器的初始值是0。如果在MyHomePage中用户自增了两次，当用户跳转到MySecondPage之后，计数器必须展示位2。</p>
+<p>与此同时，如果在MySecondPage中用户自减了两次，当用户跳转到MyHomePage，计数器必须展示为0。</p>
+<p>这叫做状态管理。</p>
+<p>我得知Google Flutter有着setState()的机制，而这个机制React也有。这使我能更快地找出解决方案。</p>
+<p>在我的main.dart文件中：</p>
+<pre><code class="dart"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:flutter_redux_example/screens/MyHomePage.dart'</span>;
+<span class="keyword">void</span> main() =&gt; runApp(<span class="keyword">new</span> MyApp());
+<span class="class"><span class="keyword">class</span> <span class="title">MyApp</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>{
+
+  <span class="meta">@override</span>
+  _MyAppState createState() =&gt; <span class="keyword">new</span> _MyAppState();
+}
+<span class="class"><span class="keyword">class</span> <span class="title">_MyAppState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyApp</span>&gt; </span>{
+  <span class="built_in">int</span> counter;
+  <span class="meta">@override</span>
+  <span class="keyword">void</span> initState() {
+    <span class="keyword">super</span>.initState();
+    counter = counter ?? <span class="number">0</span>;
+  }
+  <span class="keyword">void</span> _decrementCounter(_) {
+    setState(() {
+      counter--;
+      <span class="built_in">print</span>(<span class="string">'decrement: <span class="subst">$counter</span>'</span>);
+    });
+  }
+
+  <span class="keyword">void</span> _incrementCounter(_) {
+    setState(() {
+      counter++;
+      <span class="built_in">print</span>(<span class="string">'increment: <span class="subst">$counter</span>'</span>);
+    });
+  }
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="keyword">return</span> <span class="keyword">new</span> MaterialApp(
+      title: <span class="string">'Flutter Demo'</span>,
+      theme: <span class="keyword">new</span> ThemeData(
+        primarySwatch: Colors.blue,
+      ),
+      home: <span class="keyword">new</span> MyHomePage(
+        title: <span class="string">'My Home Page'</span>,
+        counter: counter,
+        decrementCounter: _decrementCounter,
+        incrementCounter: _incrementCounter,
+      ),
+    );
+  }
+}
+</code></pre>
+<p>从以上的代码，你可以看到_decrementCounter()和_incrementCounter()。它们是负责操作counter的值的，然后我把它们传递给了MyHomePage的构造器。</p>
+<p>在我的MyHomePage.dart文件中：</p>
+<pre><code class="dart">
+<span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+<span class="keyword">import</span> <span class="string">'package:flutter_redux_example/screens/MySecondPage.dart'</span>;
+<span class="class"><span class="keyword">class</span> <span class="title">MyHomePage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>{
+  MyHomePage({
+    Key key,
+    <span class="keyword">this</span>.title,
+    <span class="keyword">this</span>.counter,
+    <span class="keyword">this</span>.decrementCounter,
+    <span class="keyword">this</span>.incrementCounter
+  }) : <span class="keyword">super</span>(key: key);
+  <span class="keyword">final</span> <span class="built_in">String</span> title;
+  <span class="keyword">final</span> <span class="built_in">int</span> counter;
+  <span class="keyword">final</span> ValueChanged&lt;<span class="keyword">void</span>&gt; decrementCounter;
+  <span class="keyword">final</span> ValueChanged&lt;<span class="keyword">void</span>&gt; incrementCounter;
+  <span class="meta">@override</span>
+  _MyHomePageState createState() =&gt; <span class="keyword">new</span> _MyHomePageState();
+}
+<span class="class"><span class="keyword">class</span> <span class="title">_MyHomePageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MyHomePage</span>&gt; </span>{
+  <span class="keyword">void</span> _onPressed() {
+    widget.incrementCounter(<span class="keyword">null</span>);
+  }
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      appBar: <span class="keyword">new</span> AppBar(
+        title: <span class="keyword">new</span> Text(widget.title),
+      ),
+      body: <span class="keyword">new</span> Center(
+        child: <span class="keyword">new</span> Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: &lt;Widget&gt;[
+            <span class="keyword">new</span> Text(<span class="string">'You have pushed the button this many times:'</span>),
+            <span class="keyword">new</span> Text(
+              widget.counter.toString(),
+              style: Theme.of(context).textTheme.display1,
+            ),
+            <span class="keyword">new</span> RaisedButton(
+              child: <span class="keyword">new</span> Text(<span class="string">'Next Screen'</span>),
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  <span class="keyword">new</span> MaterialPageRoute(
+                    builder: (context) =&gt; <span class="keyword">new</span> MySecondPage(
+                      widget.decrementCounter,
+                      title: <span class="string">'My Second Page'</span>,
+                      counter: widget.counter,
+                    ),
+                  ),
+                );
+              },
+            )
+          ],
+        ),
+      ),
+      floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+        onPressed: _onPressed,
+        tooltip: <span class="string">'Increment'</span>,
+        child: <span class="keyword">new</span> Icon(Icons.add),
+      ),
+    );
+  }
+}</code></pre>
+<p>从上述代码，你可以看到我把decrementCounter()向下传递给了MySecondPage的构造器。</p>
+<p>在我的MySecondPage.dart文件中：</p>
+<pre><code class="dart"><span class="keyword">import</span> <span class="string">'package:flutter/material.dart'</span>;
+
+<span class="class"><span class="keyword">class</span> <span class="title">MySecondPage</span> <span class="keyword">extends</span> <span class="title">StatefulWidget</span> </span>{
+  MySecondPage(
+    <span class="keyword">this</span>.decrementCounter, 
+    {Key key, <span class="keyword">this</span>.title, <span class="keyword">this</span>.counter}
+  ): <span class="keyword">super</span>(key: key);
+  <span class="keyword">final</span> <span class="built_in">String</span> title;
+  <span class="keyword">final</span> <span class="built_in">int</span> counter;
+  <span class="keyword">final</span> ValueChanged&lt;<span class="keyword">void</span>&gt; decrementCounter;
+  <span class="meta">@override</span>
+  _MySecondPageState createState() =&gt; <span class="keyword">new</span> _MySecondPageState();
+}
+<span class="class"><span class="keyword">class</span> <span class="title">_MySecondPageState</span> <span class="keyword">extends</span> <span class="title">State</span>&lt;<span class="title">MySecondPage</span>&gt; </span>{
+  <span class="keyword">void</span> onPressed() {
+    widget.decrementCounter(<span class="keyword">null</span>);
+  }
+  <span class="meta">@override</span>
+  Widget build(BuildContext context) {
+    <span class="keyword">return</span> <span class="keyword">new</span> Scaffold(
+      appBar: <span class="keyword">new</span> AppBar(
+        title: <span class="keyword">new</span> Text(widget.title),
+      ),
+      body: <span class="keyword">new</span> Center(
+        child: <span class="keyword">new</span> Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: &lt;Widget&gt;[
+            <span class="keyword">new</span> Text(<span class="string">'You have pushed the button this many times :'</span>),
+            <span class="keyword">new</span> Text(
+              <span class="keyword">super</span>.widget.counter.toString(),
+              style: Theme.of(context).textTheme.display1,
+            ),
+          ],
+        ),
+      ),
+    floatingActionButton: <span class="keyword">new</span> FloatingActionButton(
+      onPressed: onPressed,
+      tooltip: <span class="string">'Decrement'</span>,
+      child: <span class="keyword">new</span> Icon(Icons.indeterminate_check_box),
+      backgroundColor: Colors.red),
+    );
+  }
+}</code></pre>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>对于有着React背景的的开发者来说，玩弄Google Flutter中的基础状态管理不是已经特别难得事情。方法看起来很类似：存在一个setState()机制来对视图进行更新。StatefulWidget以及StatelessWidget的概念，对于我来说就行Component和PureComponent。Flutter把它们叫做Widget而React把它叫做Component。</p>
+<p>那么，基本上，主要的问题就是 Google Flutter 所使用的编程语言了。由于它使用了Dart,我适应了Dart所拥有的语法和范式。目前为止，不是特别困难。对于我来说，Dart就像Java和Javascript生了一个孩子。</p>
+<p>在这篇文章中，我设法解决我之前提及到的三个问题：</p>
+<p>1.如何在widget树种向下传递一个应用的状态 /通过</p>
+<p>2.如何在更新应用的状态之后对widget进行重建 /通过</p>
+<p>3.如何在在页面之间跳转的同时保持状态同步。/通过</p>
+<p>记住，这只是一个很简单的应用。在大型应用上事情会变得复杂很多。想象你要在应用所有widget中向下传递变量。这会是一件令人苦恼的事情。</p>
+<p>在React环境下，我使用Redux来管理应用状态。我得知Redux也适用于Google Flutter。事实上，我已经成功地在Google Flutter应用上实现了Redux。让我们拭目以待我是否能发布关于此内容的文章。</p>
