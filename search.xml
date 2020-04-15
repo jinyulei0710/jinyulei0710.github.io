@@ -1091,9 +1091,9 @@
             
             <tag> 状态管理 </tag>
             
-            <tag> ScopedModel </tag>
-            
             <tag> BLoC </tag>
+            
+            <tag> ScopedModel </tag>
             
             <tag> Redux </tag>
             
