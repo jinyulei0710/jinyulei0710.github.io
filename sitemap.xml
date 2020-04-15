@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jinyulei.cn/2019/11/16/Thinking/AndroidOrJava/</loc>
+    
+    <lastmod>2020-04-15T03:47:50.585Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jinyulei.cn/2020/03/26/Android/AndroidMessagePassing/</loc>
     
     <lastmod>2020-04-01T06:11:06.359Z</lastmod>
@@ -19,13 +26,6 @@
     <loc>https://jinyulei.cn/2020/02/19/DesignPattern/start/</loc>
     
     <lastmod>2020-03-14T02:00:03.875Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2019/11/16/Thinking/AndroidOrJava/</loc>
-    
-    <lastmod>2019-11-16T14:43:28.616Z</lastmod>
     
   </url>
   
