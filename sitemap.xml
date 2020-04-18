@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/intro/</loc>
+    
+    <lastmod>2020-04-18T13:50:52.262Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jinyulei.cn/2019/11/16/Thinking/AndroidOrJava/</loc>
     
     <lastmod>2020-04-15T03:47:50.585Z</lastmod>
@@ -264,13 +271,6 @@
     <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/simple/</loc>
     
     <lastmod>2019-06-25T05:04:20.675Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/intro/</loc>
-    
-    <lastmod>2019-06-25T05:03:57.831Z</lastmod>
     
   </url>
   
