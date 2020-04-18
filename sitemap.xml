@@ -2,9 +2,16 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jinyulei.cn/2019/04/16/Flutter/get-started/flutter-for/declarative/</loc>
+    
+    <lastmod>2020-04-18T14:57:04.437Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/</loc>
     
-    <lastmod>2020-04-18T14:42:12.430Z</lastmod>
+    <lastmod>2020-04-18T14:46:40.720Z</lastmod>
     
   </url>
   
@@ -173,13 +180,6 @@
     <loc>https://jinyulei.cn/2019/04/19/Flutter/test/An%20introduction%20to%20unit%20testing/</loc>
     
     <lastmod>2019-06-25T05:07:56.832Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2019/04/16/Flutter/get-started/flutter-for/declarative/</loc>
-    
-    <lastmod>2019-06-25T05:07:39.722Z</lastmod>
     
   </url>
   
