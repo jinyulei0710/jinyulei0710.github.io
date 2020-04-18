@@ -2,6 +2,13 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/</loc>
+    
+    <lastmod>2020-04-18T14:37:23.153Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/intro/</loc>
     
     <lastmod>2020-04-18T13:50:52.262Z</lastmod>
@@ -278,13 +285,6 @@
     <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/ephemeral-vs-app/</loc>
     
     <lastmod>2019-06-25T05:03:47.800Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/</loc>
-    
-    <lastmod>2019-06-25T05:03:39.004Z</lastmod>
     
   </url>
   

@@ -96,19 +96,19 @@
 
 
 
-  <meta name="description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）来到 Flutter 的，你需要从一个新的角度开始思考应用开发。">
+  <meta name="description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）转而开始学习 Flutter 的，你需要从一个新的角度开始思考应用开发。">
 <meta name="keywords" content="状态管理">
 <meta property="og:type" content="article">
-<meta property="og:title" content="(译)状态管理中的声明式编程思维">
+<meta property="og:title" content="(译)开始声明式地思考">
 <meta property="og:url" content="https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/index.html">
 <meta property="og:site_name" content="捕线程者">
-<meta property="og:description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）来到 Flutter 的，你需要从一个新的角度开始思考应用开发。">
+<meta property="og:description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）转而开始学习 Flutter 的，你需要从一个新的角度开始思考应用开发。">
 <meta property="og:locale" content="zh-Hans">
 <meta property="og:image" content="https://flutter.cn/assets/development/data-and-backend/state-mgmt/ui-equals-function-of-state-54b01b000694caf9da439bd3f774ef22b00e92a62d3b2ade4f2e95c8555b8ca7.png">
-<meta property="og:updated_time" content="2019-06-25T05:03:39.004Z">
+<meta property="og:updated_time" content="2020-04-18T14:37:23.153Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="(译)状态管理中的声明式编程思维">
-<meta name="twitter:description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）来到 Flutter 的，你需要从一个新的角度开始思考应用开发。">
+<meta name="twitter:title" content="(译)开始声明式地思考">
+<meta name="twitter:description" content="原文链接 如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）转而开始学习 Flutter 的，你需要从一个新的角度开始思考应用开发。">
 <meta name="twitter:image" content="https://flutter.cn/assets/development/data-and-backend/state-mgmt/ui-equals-function-of-state-54b01b000694caf9da439bd3f774ef22b00e92a62d3b2ade4f2e95c8555b8ca7.png">
 
 
@@ -127,7 +127,7 @@
   };
 </script>
 
-  <title>(译)状态管理中的声明式编程思维 | 捕线程者</title>
+  <title>(译)开始声明式地思考 | 捕线程者</title>
   
 
 
@@ -414,7 +414,7 @@
 
         
         
-          <h2 class="post-title" itemprop="name headline">(译)状态管理中的声明式编程思维
+          <h2 class="post-title" itemprop="name headline">(译)开始声明式地思考
 
               
             
@@ -457,7 +457,7 @@
                 
                   <span class="post-meta-item-text">更新于</span>
                 
-                <time title="修改时间：2019-06-25 13:03:39" itemprop="dateModified" datetime="2019-06-25T13:03:39+08:00">2019-06-25</time>
+                <time title="修改时间：2020-04-18 22:37:23" itemprop="dateModified" datetime="2020-04-18T22:37:23+08:00">2020-04-18</time>
               
             
           </span>
@@ -489,7 +489,7 @@
 
           
           
-            <span id="/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/" class="leancloud_visitors" data-flag-title="(译)状态管理中的声明式编程思维">
+            <span id="/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/" class="leancloud_visitors" data-flag-title="(译)开始声明式地思考">
               <span class="post-meta-divider">|</span>
               <span class="post-meta-item-icon">
                 <i class="fa fa-eye"></i>
@@ -521,17 +521,17 @@
 
       
         <p><a href="https://flutter.dev/docs/development/data-and-backend/state-mgmt/declarative" target="_blank" rel="noopener">原文链接</a></p>
-<p>如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）来到 Flutter 的，你需要从一个新的角度开始思考应用开发。</p>
+<p>如果你是从一个命令式的框架（例如 Android SDK 或是 iOS UIKit ）转而开始学习 Flutter 的，你需要从一个新的角度开始思考应用开发。</p>
 <a id="more"></a>
 
 
-<p>许多你可能有的假定在 Flutter 上不再适用。例如，在 Flutter 中从头开始重新构建你的部分 UI 而不去修改它们是没有问题的。Flutter 足够快以至于能这么做，如果需要的话甚至可以在每一帧上。</p>
-<p>Flutter 是声明式的。这就意味着 Flutter 构建它的用户界面对你应用的当前状态进行响应：</p>
+<p>许多你可能有的假定在 Flutter 上不再适用。例如，在 Flutter 中从零开始重新构建你的部分用户界面而不去修改它们是没有问题的。Flutter 足够快以至于能做到，如果需要的话甚至可以在每一帧上这么做。</p>
+<p>Flutter 是声明式的。这就意味着 Flutter 构建它的用户界面对你应用的当前状态进行反映：</p>
 <p><img src="https://flutter.cn/assets/development/data-and-backend/state-mgmt/ui-equals-function-of-state-54b01b000694caf9da439bd3f774ef22b00e92a62d3b2ade4f2e95c8555b8ca7.png" alt="img"></p>
 <p>当你的应用的状态发生变化(例如，用户点了下设置界面的一个开关按钮)，你改变了状态，并且状态触发了用户界面的重新绘制。不存在命令式地改变UI本身的方式(比如 widget.setText )-你改变了状态，然后 UI 就从头开始构建。</p>
-<p>想要知道更多关于响应式 UI 编程，就看下这篇<a href="Introduction-to-declarative-UI.html">使用指南</a>。</p>
+<p>想要知道更多关于响应式 UI 编程，就看下这篇<a href="https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/declarative/Introduction-to-declarative-UI.html">使用指南</a>。</p>
 <p>响应式的 UI 编程有许多优点。最显著的优点就是，对于UI的所有状态都只有一条代码路径。你对于所有状态下 UI 应该长什么样描述一次就够了。</p>
-<p>起初，这种编程风格可能看起来不像命令式风格那么直观。这就是本文存在的原因。继续看下去。</p>
+<p>起初，这种编程风格可能看起来不像命令式风格那么直观。这也就是本文存在的原因,让你能够进行思维方式的转变。想要知道更多关于响应式编程的内容,就继续看下去。</p>
 
       
     </div>
