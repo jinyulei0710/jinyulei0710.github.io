@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试  依赖注入基础在讲解特定于Android的依赖注入之前,这个页面会提供一个更为通用的关于依赖注入如何工作的概览. 什么是依赖注入类通常需要引用其它类,例如,Car 类可能需要一个指向 Engine">
+  <meta name="description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试">
 <meta name="keywords" content="依赖注入">
 <meta property="og:type" content="article">
 <meta property="og:title" content="(译)Android 中的依赖注入">
 <meta property="og:url" content="https://jinyulei.cn/2020/04/19/Android/dependency-injection/index.html">
 <meta property="og:site_name" content="捕线程者">
-<meta property="og:description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试  依赖注入基础在讲解特定于Android的依赖注入之前,这个页面会提供一个更为通用的关于依赖注入如何工作的概览. 什么是依赖注入类通常需要引用其它类,例如,Car 类可能需要一个指向 Engine">
+<meta property="og:description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-19T10:03:27.113Z">
+<meta property="og:updated_time" content="2020-04-19T10:08:05.179Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="(译)Android 中的依赖注入">
-<meta name="twitter:description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试  依赖注入基础在讲解特定于Android的依赖注入之前,这个页面会提供一个更为通用的关于依赖注入如何工作的概览. 什么是依赖注入类通常需要引用其它类,例如,Car 类可能需要一个指向 Engine">
+<meta name="twitter:description" content="依赖注入是编程中广泛使用的技术,并且同样适用于 Android 开发.遵循以下依赖注入的原则,为你能够开发一个优秀架构的应用打下基础. 实现依赖注入给你提供了以下好处:  代码复用 易于重构 易于测试">
 
 
 
@@ -438,7 +438,7 @@
                 
               
 
-              <time title="创建时间：2020-04-19 14:16:17 / 修改时间：18:03:27" itemprop="dateCreated datePublished" datetime="2020-04-19T14:16:17+08:00">2020-04-19</time>
+              <time title="创建时间：2020-04-19 14:16:17 / 修改时间：18:08:05" itemprop="dateCreated datePublished" datetime="2020-04-19T14:16:17+08:00">2020-04-19</time>
             
 
             
@@ -513,6 +513,9 @@
 <li>易于重构</li>
 <li>易于测试</li>
 </ul>
+<a id="more"></a>
+
+
 <h2 id="依赖注入基础"><a href="#依赖注入基础" class="headerlink" title="依赖注入基础"></a>依赖注入基础</h2><p>在讲解特定于Android的依赖注入之前,这个页面会提供一个更为通用的关于依赖注入如何工作的概览.</p>
 <h3 id="什么是依赖注入"><a href="#什么是依赖注入" class="headerlink" title="什么是依赖注入"></a>什么是依赖注入</h3><p>类通常需要引用其它类,例如,Car 类可能需要一个指向 Engine 类的引用.这些被需要的类被称作依赖,并且在这个例子中,Car类依赖于一个Engine类的实例才能够运行.</p>
 <p>对于类来说,有三种获取它需要类的方式:</p>
@@ -523,67 +526,68 @@
 </ol>
 <p>第三种选项就是依赖注入.通过这种方式你能够获取并提供一个类的依赖,而不是让类实例本身自己获取.</p>
 <p>以下是一个例子,不使用依赖注入,意味着 <code>Car</code>是像以下这样在代码中创建它自己的<code>Engine</code>依赖的:</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line">class Car&#123;</span><br><span class="line">   </span><br><span class="line">   private val engine = Engine();</span><br><span class="line">   </span><br><span class="line">   fun start()&#123;</span><br><span class="line">      engine.start();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fun main(args:Array)&#123;</span><br><span class="line">   val car = Car()</span><br><span class="line">   car.start()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">```  </span><br><span class="line"></span><br><span class="line">这不是一个依赖注入的例子,因为`Car`类构造了它自己的`Engine`.这可能是有问题的,因为:</span><br><span class="line"></span><br><span class="line">* `Car`和`Engine`是紧密耦合的-`Car`实例适用了`Engine`类型,子类和替代的实现不能够很容易实现.如果`Car`需要构造它自己的`Engine`,你会需要创建两种类型的`Car`,而不是让`Gas`和`Electric`两种引擎复用相同的`Car`.</span><br><span class="line"></span><br><span class="line">* 硬编码依赖是的测试变得更加困难. `Car`使用了真实的`Engine`实例,从而阻止你使用替身来修改`Engine`来应对不同的测试用例.</span><br><span class="line"></span><br><span class="line">使用依赖注入的代码是怎么样的? `Car`实例不是在初始化的时候构建它自己的`Engine`,它接收了一个参数作为它构造器的参数.</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Car&#123;</span><br><span class="line">   </span><br><span class="line">   private val engine = Engine();</span><br><span class="line">   </span><br><span class="line">   fun start()&#123;</span><br><span class="line">      engine.start();</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fun main(args:Array)&#123;</span><br><span class="line">   val car = Car()</span><br><span class="line">   car.start()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>class Car(private val engine:Engine){<br>    fun start(){<br>        engine.start();<br>    }<br>}</p>
-<p>fun main(args:Array){<br>   val engine=Engine();<br>   val car=Car(engine);<br>   car.start();<br>}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">`main` 函数使用了`Car`.因为`Car`依赖于`Engine`,应用能够创建一个Engine实例,并将它用于构建一个`Car`实例.这种基于依赖注入的方式的好处有:</span><br><span class="line"></span><br><span class="line">* `Car`的复用性.你可以传入`Engine`的不同实现到`Car`.例如,你可能定义了一个新的`Engine`的子类叫做 `ElectricEngine`来让`Car`来使用.如果你使用了依赖注入,你需要的是传入修改过的`EletricEngine`子类,`Car`仍旧能够工作而不需要进行进一步的修改.</span><br><span class="line"></span><br><span class="line">* 很容易对`Car`进行测试.你可以针对不同的场景,你可以传入不同的替身.例如,你能够创建一个`Engine`替身叫做`FakeEngine`并将它配置到不同的测试场景下.</span><br><span class="line"></span><br><span class="line">在Android中主要有两种依赖注入的方式:</span><br><span class="line"></span><br><span class="line">* 构造器注入.这是以上所描述的.你可以类依赖作到它的构造器.</span><br><span class="line">* 字段注入(或Setter注入).一些Android框架类,例如activity和fragment是由系统初始化的,构造器注入就不再可能了,字段注入中,依赖是在类创建完成之后初始化的.代码看起来是像这样的:</span><br></pre></td></tr></table></figure>
+<p>这不是一个依赖注入的例子,因为<code>Car</code>类构造了它自己的<code>Engine</code>.这可能是有问题的,因为:</p>
+<ul>
+<li><p><code>Car</code>和<code>Engine</code>是紧密耦合的-<code>Car</code>实例适用了<code>Engine</code>类型,子类和替代的实现不能够很容易实现.如果<code>Car</code>需要构造它自己的<code>Engine</code>,你会需要创建两种类型的<code>Car</code>,而不是让<code>Gas</code>和<code>Electric</code>两种引擎复用相同的<code>Car</code>.</p>
+</li>
+<li><p>硬编码依赖是的测试变得更加困难. <code>Car</code>使用了真实的<code>Engine</code>实例,从而阻止你使用替身来修改<code>Engine</code>来应对不同的测试用例.</p>
+</li>
+</ul>
+<p>使用依赖注入的代码是怎么样的? <code>Car</code>实例不是在初始化的时候构建它自己的<code>Engine</code>,它接收了一个参数作为它构造器的参数.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">class Car(private val engine:Engine)&#123;</span><br><span class="line">    fun start()&#123;</span><br><span class="line">        engine.start();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fun main(args:Array)&#123;</span><br><span class="line">   val engine=Engine();</span><br><span class="line">   val car=Car(engine);</span><br><span class="line">   car.start();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>class Car {<br>    lateinit var engine: Engine</p>
-<pre><code>fun start(){
-  engine.start()
-}</code></pre><p>}</p>
-<p>fun main(args:Array){<br>    val car=Car()<br>    car.engine=Engine()<br>    car.start()<br>}</p>
-<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">### 自动化的依赖注入</span><br><span class="line"></span><br><span class="line">在之前的例子中,你创建、提供以及管理不同类的依赖都是由你自己来的,没有依赖于一个库.这叫做手动依赖注入.在`Car`的例子中,只有一个依赖,但是越来越多的类和依赖会使手动依赖注入变得越来越单调乏味.手动依赖注入同样也暴露出一些问题:</span><br><span class="line"></span><br><span class="line">* 对于大型应用来说,获取所有的依赖并将它们正确连接需要大量的模版代码.在多层次的架构中,为了给高层创建一个对象,你需要提供所有这个层之下的依赖.举个具体的例子,为了建造一辆车你可能需要引擎,变速器,地盘以及其它的部分;并且引擎转而需要气缸和火花塞.</span><br><span class="line"></span><br><span class="line">* 当你不能够在传入依赖之前构造函数的时候,例如使用懒初始化或是限定对象来构成你的应用的时候,你需要写和维护一个自定义的容器(或是依赖图)来在内存中管理你的依赖的生命周期.</span><br><span class="line"></span><br><span class="line">通过自动化创建和提供依赖这个过程,存在很多解决这个问题的库.它们可以分为两类:</span><br><span class="line"></span><br><span class="line">* 基于反射的解决方案,在运行时对依赖进行连接.</span><br><span class="line">* 静态解决方案,在编译时生成代码并连接依赖.</span><br><span class="line"></span><br><span class="line">Dagger 是针对Java、Kotlin以及Android的一个流行的由Google维护的依赖注入库.Dagger通过为你创建和管理依赖图,使在你的应用中使用DI变得便利.它提供了全静态的编译时的依赖,解决了基于反射的解决方案(Guice)的开发和性能的问题.</span><br><span class="line"></span><br><span class="line">## 依赖注入的替代方案</span><br><span class="line"></span><br><span class="line">依赖注入的替代方案是使用服务定位器.服务定位器设计模式同样促进了类和具体依赖的解耦.你创建了一个服务定位类,这个类是用来创建和存储依赖用的,并按需提供这个依赖.</span><br></pre></td></tr></table></figure>
+<p><code>main</code> 函数使用了<code>Car</code>.因为<code>Car</code>依赖于<code>Engine</code>,应用能够创建一个Engine实例,并将它用于构建一个<code>Car</code>实例.这种基于依赖注入的方式的好处有:</p>
+<ul>
+<li><p><code>Car</code>的复用性.你可以传入<code>Engine</code>的不同实现到<code>Car</code>.例如,你可能定义了一个新的<code>Engine</code>的子类叫做 <code>ElectricEngine</code>来让<code>Car</code>来使用.如果你使用了依赖注入,你需要的是传入修改过的<code>EletricEngine</code>子类,<code>Car</code>仍旧能够工作而不需要进行进一步的修改.</p>
+</li>
+<li><p>很容易对<code>Car</code>进行测试.你可以针对不同的场景,你可以传入不同的替身.例如,你能够创建一个<code>Engine</code>替身叫做<code>FakeEngine</code>并将它配置到不同的测试场景下.</p>
+</li>
+</ul>
+<p>在Android中主要有两种依赖注入的方式:</p>
+<ul>
+<li>构造器注入.这是以上所描述的.你可以类依赖作到它的构造器.</li>
+<li>字段注入(或Setter注入).一些Android框架类,例如activity和fragment是由系统初始化的,构造器注入就不再可能了,字段注入中,依赖是在类创建完成之后初始化的.代码看起来是像这样的:</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">class Car &#123;</span><br><span class="line">    lateinit var engine: Engine</span><br><span class="line">    </span><br><span class="line">    fun start()&#123;</span><br><span class="line">      engine.start()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">fun main(args:Array)&#123;</span><br><span class="line">    val car=Car()</span><br><span class="line">    car.engine=Engine()</span><br><span class="line">    car.start()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-<p>object ServiceLocator{<br>     fun getEngine():Engine=Engine()<br>}</p>
-<p>class Car{<br>    private val engine=ServiceLocator.getEngine()</p>
-<pre><code>fun start(){
-   engine.start()
-}</code></pre><p>}</p>
-<p>fun main(args:Array){<br>   val car=Car();<br>   car.start()<br>}</p>
-<pre><code>
-服务定位模式和依赖注入的不同点在于元素的使用方式不同.服务定位模式中,类控制并请求对象注入;依赖注入中,应用控制并主动地注入需要的对象.
+<h3 id="自动化的依赖注入"><a href="#自动化的依赖注入" class="headerlink" title="自动化的依赖注入"></a>自动化的依赖注入</h3><p>在之前的例子中,你创建、提供以及管理不同类的依赖都是由你自己来的,没有依赖于一个库.这叫做手动依赖注入.在<code>Car</code>的例子中,只有一个依赖,但是越来越多的类和依赖会使手动依赖注入变得越来越单调乏味.手动依赖注入同样也暴露出一些问题:</p>
+<ul>
+<li><p>对于大型应用来说,获取所有的依赖并将它们正确连接需要大量的模版代码.在多层次的架构中,为了给高层创建一个对象,你需要提供所有这个层之下的依赖.举个具体的例子,为了建造一辆车你可能需要引擎,变速器,地盘以及其它的部分;并且引擎转而需要气缸和火花塞.</p>
+</li>
+<li><p>当你不能够在传入依赖之前构造函数的时候,例如使用懒初始化或是限定对象来构成你的应用的时候,你需要写和维护一个自定义的容器(或是依赖图)来在内存中管理你的依赖的生命周期.</p>
+</li>
+</ul>
+<p>通过自动化创建和提供依赖这个过程,存在很多解决这个问题的库.它们可以分为两类:</p>
+<ul>
+<li>基于反射的解决方案,在运行时对依赖进行连接.</li>
+<li>静态解决方案,在编译时生成代码并连接依赖.</li>
+</ul>
+<p>Dagger 是针对Java、Kotlin以及Android的一个流行的由Google维护的依赖注入库.Dagger通过为你创建和管理依赖图,使在你的应用中使用DI变得便利.它提供了全静态的编译时的依赖,解决了基于反射的解决方案(Guice)的开发和性能的问题.</p>
+<h2 id="依赖注入的替代方案"><a href="#依赖注入的替代方案" class="headerlink" title="依赖注入的替代方案"></a>依赖注入的替代方案</h2><p>依赖注入的替代方案是使用服务定位器.服务定位器设计模式同样促进了类和具体依赖的解耦.你创建了一个服务定位类,这个类是用来创建和存储依赖用的,并按需提供这个依赖.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">object ServiceLocator&#123;</span><br><span class="line">     fun getEngine():Engine=Engine()</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">class Car&#123;</span><br><span class="line">    private val engine=ServiceLocator.getEngine()</span><br><span class="line">    </span><br><span class="line">    fun start()&#123;</span><br><span class="line">       engine.start()</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">fun main(args:Array)&#123;</span><br><span class="line">   val car=Car();</span><br><span class="line">   car.start()</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
 
-与依赖注入相比:
+<p>服务定位模式和依赖注入的不同点在于元素的使用方式不同.服务定位模式中,类控制并请求对象注入;依赖注入中,应用控制并主动地注入需要的对象.</p>
+<p>与依赖注入相比:</p>
+<ul>
+<li>依赖集合需要一个服务定位器是的代码测试变得困难,因为所有的测试都要与同一个全局服务定位器交互.</li>
+<li>依赖在类实现中编码,而不是在API层面.结果是,从外部很难知道类需要什么,对服务定位中对Car或依赖的修改可能导致在运行时或是测试中引用不到.</li>
+<li>当你想要限定对象的生命周期不只是整个应用的生命周期的时候,管理对象的生命周期显得更为困难.</li>
+</ul>
+<h2 id="为你的应用选择正确的技术"><a href="#为你的应用选择正确的技术" class="headerlink" title="为你的应用选择正确的技术"></a>为你的应用选择正确的技术</h2><p>如上所述,有多种不同管理你应用依赖的技术.</p>
+<p>手动依赖注入只在相对较小的应用上有效,因为它扩展性很差.当项目变大,传递对象需要大量的模版代码.</p>
+<p>服务定位器起初需要较少的模版的代码,但是扩展性很差,进一步的来说,测试会变得更为困难因为它们依赖于单例对象.</p>
+<p>Dagger为扩展而生.它与构建复杂的应用相适应.</p>
+<p>如果你的小应用会变得复杂,你应该考虑尽早迁移到Dagger,因为不需要很大的代码修改量.</p>
+<h2 id="为你的库选择正确的技术"><a href="#为你的库选择正确的技术" class="headerlink" title="为你的库选择正确的技术"></a>为你的库选择正确的技术</h2><p>如果你在开发一个外部的SDK或是库,你应该基于SDK和库的大小在手动依赖注入和Dagger之间选择.注意如果你使用第三方库来做依赖注入,你的库的大小会有一定增长.</p>
+<h2 id="结论"><a href="#结论" class="headerlink" title="结论"></a>结论</h2><p>依赖注入为你的应用提供了以下的好处:</p>
+<ul>
+<li>类的复用以及依赖的解耦,使得依赖实现的置换变得简单.由于控制反转,代码的复用性提高了,类不再控制它们的依赖是如何创建的,而是由配置控制.</li>
+<li>易于重构:依赖变成了API层面的一个可变部分,所以它们能够在对象创建或编译时进行检查,而不是隐藏在具体实现后面.</li>
+<li>易于测试,类不再管理它的依赖,所以当你测试它的时候,你可以传递进不同实现来测试你的不同用例.</li>
+</ul>
 
-* 依赖集合需要一个服务定位器是的代码测试变得困难,因为所有的测试都要与同一个全局服务定位器交互.
-* 依赖在类实现中编码,而不是在API层面.结果是,从外部很难知道类需要什么,对服务定位中对Car或依赖的修改可能导致在运行时或是测试中引用不到.
-* 当你想要限定对象的生命周期不只是整个应用的生命周期的时候,管理对象的生命周期显得更为困难.
-
-## 为你的应用选择正确的技术
-
-如上所述,有多种不同管理你应用依赖的技术.
-
-手动依赖注入只在相对较小的应用上有效,因为它扩展性很差.当项目变大,传递对象需要大量的模版代码.
-
-服务定位器起初需要较少的模版的代码,但是扩展性很差,进一步的来说,测试会变得更为困难因为它们依赖于单例对象.
-
-Dagger为扩展而生.它与构建复杂的应用相适应.
-
-如果你的小应用会变得复杂,你应该考虑尽早迁移到Dagger,因为不需要很大的代码修改量.
-
-## 为你的库选择正确的技术
-
-如果你在开发一个外部的SDK或是库,你应该基于SDK和库的大小在手动依赖注入和Dagger之间选择.注意如果你使用第三方库来做依赖注入,你的库的大小会有一定增长.
-
-## 结论
-
-依赖注入为你的应用提供了以下的好处:
-
-* 类的复用以及依赖的解耦,使得依赖实现的置换变得简单.由于控制反转,代码的复用性提高了,类不再控制它们的依赖是如何创建的,而是由配置控制.
-* 易于重构:依赖变成了API层面的一个可变部分,所以它们能够在对象创建或编译时进行检查,而不是隐藏在具体实现后面.
-* 易于测试,类不再管理它的依赖,所以当你测试它的时候,你可以传递进不同实现来测试你的不同用例.
-
-
-
-
-
-
-
-
-
-</code></pre>
       
     </div>
 
@@ -848,7 +852,7 @@ Dagger为扩展而生.它与构建复杂的应用相适应.
             
 
             
-              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖注入基础"><span class="nav-number">1.</span> <span class="nav-text">依赖注入基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是依赖注入"><span class="nav-number">1.1.</span> <span class="nav-text">什么是依赖注入</span></a></li></ol></li></ol></div>
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖注入基础"><span class="nav-number">1.</span> <span class="nav-text">依赖注入基础</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#什么是依赖注入"><span class="nav-number">1.1.</span> <span class="nav-text">什么是依赖注入</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#自动化的依赖注入"><span class="nav-number">1.2.</span> <span class="nav-text">自动化的依赖注入</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#依赖注入的替代方案"><span class="nav-number">2.</span> <span class="nav-text">依赖注入的替代方案</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为你的应用选择正确的技术"><span class="nav-number">3.</span> <span class="nav-text">为你的应用选择正确的技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#为你的库选择正确的技术"><span class="nav-number">4.</span> <span class="nav-text">为你的库选择正确的技术</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#结论"><span class="nav-number">5.</span> <span class="nav-text">结论</span></a></li></ol></div>
             
 
           </div>
