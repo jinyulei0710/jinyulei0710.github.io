@@ -2,6 +2,20 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
+    <loc>https://jinyulei.cn/2020/05/05/Thinking/NoTech/</loc>
+    
+    <lastmod>2020-05-05T15:37:50.931Z</lastmod>
+    
+  </url>
+  
+  <url>
+    <loc>https://jinyulei.cn/2020/04/20/jvm/runtime_data/</loc>
+    
+    <lastmod>2020-04-20T13:08:08.414Z</lastmod>
+    
+  </url>
+  
+  <url>
     <loc>https://jinyulei.cn/2020/04/19/Android/dependency-injection/</loc>
     
     <lastmod>2020-04-19T10:08:05.179Z</lastmod>
