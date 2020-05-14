@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器  程序计数器较小的内存空间,当前线程所执行的字节码的行号指示器.获取下一条需要执行的指令,分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成. 线程独立的,线程切换之后能恢复到正确的执行位置.   J">
+  <meta name="description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器">
 <meta name="keywords" content="虚拟机">
 <meta property="og:type" content="article">
 <meta property="og:title" content="深入理解Java虚拟机笔记(—)-运行时区域">
 <meta property="og:url" content="https://jinyulei.cn/2020/04/20/jvm/runtime_data/index.html">
 <meta property="og:site_name" content="捕线程者">
-<meta property="og:description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器  程序计数器较小的内存空间,当前线程所执行的字节码的行号指示器.获取下一条需要执行的指令,分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成. 线程独立的,线程切换之后能恢复到正确的执行位置.   J">
+<meta property="og:description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-04-20T13:08:08.414Z">
+<meta property="og:updated_time" content="2020-05-14T13:49:31.022Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="深入理解Java虚拟机笔记(—)-运行时区域">
-<meta name="twitter:description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器  程序计数器较小的内存空间,当前线程所执行的字节码的行号指示器.获取下一条需要执行的指令,分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成. 线程独立的,线程切换之后能恢复到正确的执行位置.   J">
+<meta name="twitter:description" content="Java 虚拟机在执行Java程序的过程中会把它所管理的内存划分为若干个不同的数据区域. 生命周期各不相同. 分为以下几个分区:  方法区 虚拟机栈 本地方法栈 堆 程序计数器">
 
 
 
@@ -438,12 +438,24 @@
                 
               
 
-              <time title="创建时间：2020-04-20 14:16:17 / 修改时间：21:08:08" itemprop="dateCreated datePublished" datetime="2020-04-20T14:16:17+08:00">2020-04-20</time>
+              <time title="创建时间：2020-04-20 14:16:17" itemprop="dateCreated datePublished" datetime="2020-04-20T14:16:17+08:00">2020-04-20</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-05-14 21:49:31" itemprop="dateModified" datetime="2020-05-14T21:49:31+08:00">2020-05-14</time>
               
             
           </span>
@@ -516,6 +528,9 @@
 <li>堆</li>
 <li>程序计数器</li>
 </ul>
+<a id="more"></a>
+
+
 <h2 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h2><p>较小的内存空间,当前线程所执行的字节码的行号指示器.获取下一条需要执行的指令,分支、循环、跳转、异常处理、线程恢复等基础功能都需要依赖这个计数器来完成.</p>
 <p>线程独立的,线程切换之后能恢复到正确的执行位置. </p>
 <ul>
