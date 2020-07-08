@@ -2,27 +2,6 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   
   <url>
-    <loc>https://jinyulei.cn/2020/04/20/jvm/runtime_data/</loc>
-    
-    <lastmod>2020-05-14T13:52:31.094Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2020/05/05/Thinking/NoTech/</loc>
-    
-    <lastmod>2020-05-05T15:37:50.931Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2020/04/19/Android/dependency-injection/</loc>
-    
-    <lastmod>2020-04-19T10:08:05.179Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://jinyulei.cn/2019/04/16/Flutter/get-started/flutter-for/declarative/</loc>
     
     <lastmod>2020-04-18T14:57:04.437Z</lastmod>
@@ -44,30 +23,9 @@
   </url>
   
   <url>
-    <loc>https://jinyulei.cn/2019/11/16/Thinking/AndroidOrJava/</loc>
-    
-    <lastmod>2020-04-15T03:47:50.585Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2020/03/26/Android/AndroidMessagePassing/</loc>
-    
-    <lastmod>2020-04-01T06:11:06.359Z</lastmod>
-    
-  </url>
-  
-  <url>
     <loc>https://jinyulei.cn/2020/03/23/Flutter/development/add-flutter-to-existing-app/add-to-app/</loc>
     
     <lastmod>2020-03-23T03:59:56.027Z</lastmod>
-    
-  </url>
-  
-  <url>
-    <loc>https://jinyulei.cn/2020/02/19/DesignPattern/start/</loc>
-    
-    <lastmod>2020-03-14T02:00:03.875Z</lastmod>
     
   </url>
   
