@@ -96,17 +96,17 @@
 
 
 
-  <meta name="description" content="去油之旅">
+  <meta name="description" content="技术博客">
 <meta name="keywords" content="Android  Kotlin Spring Flutter Dart">
 <meta property="og:type" content="website">
-<meta property="og:title" content="捕线程者">
+<meta property="og:title" content="岩刻">
 <meta property="og:url" content="https://jinyulei.cn/page/5/index.html">
-<meta property="og:site_name" content="捕线程者">
-<meta property="og:description" content="去油之旅">
+<meta property="og:site_name" content="岩刻">
+<meta property="og:description" content="技术博客">
 <meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="捕线程者">
-<meta name="twitter:description" content="去油之旅">
+<meta name="twitter:title" content="岩刻">
+<meta name="twitter:description" content="技术博客">
 
 
 
@@ -124,7 +124,7 @@
   };
 </script>
 
-  <title>捕线程者</title>
+  <title>岩刻</title>
   
 
 
@@ -205,13 +205,13 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">捕线程者</span>
+        <span class="site-title">岩刻</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
     
       
-        <h1 class="site-subtitle" itemprop="description">死磕技术,淡然下笔</h1>
+        <h1 class="site-subtitle" itemprop="description">留下那些不应被时光抹去的美好</h1>
       
     
     
@@ -395,16 +395,208 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/ephemeral-vs-app/">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/simple/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/04/16/Flutter/development/data-and-backend/state-mgmt/simple/" class="post-title-link" itemprop="url">(译)简单的共享状态管理</a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-16 16:43:17" itemprop="dateCreated datePublished" datetime="2019-04-16T16:43:17+08:00">2019-04-16</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:04:20" itemprop="dateModified" datetime="2019-06-25T13:04:20+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/16/Flutter/development/data-and-backend/state-mgmt/simple/" class="leancloud_visitors" data-flag-title="(译)简单的共享状态管理">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><a href="https://flutter.dev/docs/development/data-and-backend/state-mgmt/simple" target="_blank" rel="noopener">原文链接</a></p>
+<p>现在你已了解<a href="Start-thinking-declaratively.html">状态管理中的声明式编程思维</a>以及<a href="Differentiate-between-ephemeral-state-and-app-state.html">短时状态和共享</a>，你已经做好了解简单的应用程序状态管理的准备。</p>
+<p>在此篇文章中，我们将使用 scoped_model 包。如果你是 Flutter 的新手并且没有充分的理由选择其他方法（Redux，Rx，钩子等），这可能是你刚开始应该使用的方法。 scoped_model很容易理解，它不会使用太多代码。它还使用适用于所有其他方法的概念。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/04/16/Flutter/development/data-and-backend/state-mgmt/simple/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/16/Flutter/development/data-and-backend/state-mgmt/ephemeral-vs-app/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="技术博客">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -590,12 +782,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -781,12 +973,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -972,12 +1164,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -1163,12 +1355,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -1360,12 +1552,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -1552,12 +1744,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -1744,12 +1936,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -1935,12 +2127,12 @@
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
+      <meta itemprop="description" content="技术博客">
       <meta itemprop="image" content="/images/avatar.gif">
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
+      <meta itemprop="name" content="岩刻">
     </span>
 
     
@@ -2107,198 +2299,6 @@
 
 
     
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="去油之旅">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="捕线程者">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/" class="post-title-link" itemprop="url">(译) Flutter 中的 JSON 序列化</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-15 10:40:17" itemprop="dateCreated datePublished" datetime="2019-04-15T10:40:17+08:00">2019-04-15</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-06-25 13:03:16" itemprop="dateModified" datetime="2019-06-25T13:03:16+08:00">2019-06-25</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/" class="leancloud_visitors" data-flag-title="(译) Flutter 中的 JSON 序列化">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><a href="https://flutter.dev/docs/development/data-and-backend/json" target="_blank" rel="noopener">原文链接</a></p>
-<p>很难想象，一个移动应用程序不需要与Web服务器通信，或者只是简单地在某一个位置存储结构化数据。制作与网络连接的应用程序的时候，迟早会需要使用一些美好的JSON。</p>
-<p>本指南介绍了如何在Flutter中使用JSON。它涵盖了在不同场景中使用哪种JSON解决方案，以及原因。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/04/15/Flutter/development/data-and-backend/json serialization/json and serialization/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
   </section>
 
   
@@ -2335,7 +2335,7 @@
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
               <p class="site-author-name" itemprop="name">顽石</p>
-              <div class="site-description motion-element" itemprop="description">去油之旅</div>
+              <div class="site-description motion-element" itemprop="description">技术博客</div>
           </div>
 
           
@@ -2345,7 +2345,7 @@
                 
                   <a href="/archives/">
                 
-                    <span class="site-state-item-count">53</span>
+                    <span class="site-state-item-count">54</span>
                     <span class="site-state-item-name">日志</span>
                   </a>
                 </div>
@@ -2364,7 +2364,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">1</span>
+                      
+                    
+                    <span class="site-state-item-count">2</span>
                     <span class="site-state-item-name">分类</span>
                   </a>
                 </div>
@@ -2421,7 +2423,9 @@
                     
                       
                     
-                    <span class="site-state-item-count">20</span>
+                      
+                    
+                    <span class="site-state-item-count">21</span>
                     <span class="site-state-item-name">标签</span>
                   </a>
                 </div>
