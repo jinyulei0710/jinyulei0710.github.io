@@ -99,13 +99,13 @@
   <meta name="description" content="分享技术的个人技术博客">
 <meta name="keywords" content="Android  Kotlin Spring Flutter Dart">
 <meta property="og:type" content="website">
-<meta property="og:title" content="岩刻 - Remember Something Important">
+<meta property="og:title" content="岩刻 - RSI">
 <meta property="og:url" content="https://jinyulei.cn/page/4/index.html">
-<meta property="og:site_name" content="岩刻 - Remember Something Important">
+<meta property="og:site_name" content="岩刻 - RSI">
 <meta property="og:description" content="分享技术的个人技术博客">
 <meta property="og:locale" content="zh-Hans">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="岩刻 - Remember Something Important">
+<meta name="twitter:title" content="岩刻 - RSI">
 <meta name="twitter:description" content="分享技术的个人技术博客">
 
 
@@ -124,7 +124,7 @@
   };
 </script>
 
-  <title>岩刻 - Remember Something Important</title>
+  <title>岩刻 - RSI</title>
   
 
 
@@ -205,7 +205,7 @@
     <div class="custom-logo-site-title">
       <a href="/" class="brand" rel="start">
         <span class="logo-line-before"><i></i></span>
-        <span class="site-title">岩刻 - Remember Something Important</span>
+        <span class="site-title">岩刻 - RSI</span>
         <span class="logo-line-after"><i></i></span>
       </a>
     </div>
@@ -395,6 +395,199 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/19/Flutter/test/Finding widgets/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="顽石">
+      <meta itemprop="description" content="分享技术的个人技术博客">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="岩刻 - RSI">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h2 class="post-title" itemprop="name headline">
+                
+                
+                <a href="/2019/04/19/Flutter/test/Finding widgets/" class="post-title-link" itemprop="url">(译)查找widget</a>
+              
+            
+          </h2>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+
+            
+            
+            
+
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">发表于</span>
+              
+
+              
+                
+              
+
+              <time title="创建时间：2019-04-19 17:55:17" itemprop="dateCreated datePublished" datetime="2019-04-19T17:55:17+08:00">2019-04-19</time>
+            
+
+            
+              
+
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2019-06-25 13:08:20" itemprop="dateModified" datetime="2019-06-25T13:08:20+08:00">2019-06-25</time>
+              
+            
+          </span>
+
+          
+            <span class="post-category">
+            
+              <span class="post-meta-divider">|</span>
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-folder-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">分类于</span>
+              
+              
+                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
+
+                
+                
+              
+            </span>
+          
+
+          
+            
+            
+          
+
+          
+          
+            <span id="/2019/04/19/Flutter/test/Finding widgets/" class="leancloud_visitors" data-flag-title="(译)查找widget">
+              <span class="post-meta-divider">|</span>
+              <span class="post-meta-item-icon">
+                <i class="fa fa-eye"></i>
+              </span>
+              
+                <span class="post-meta-item-text">阅读次数：</span>
+              
+                <span class="leancloud-visitors-count"></span>
+            </span>
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          <p><a href="https://flutter.dev/docs/cookbook/testing/widget/finders" target="_blank" rel="noopener">原文链接</a></p>
+<p>为了在测试环境中定位Widget，我们需要使用<code>Finder</code>类。虽然可以编写我们自己的<code>Finder</code>类，但使用<a href="https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html" target="_blank" rel="noopener">flutter_test</a>包提供的工具定位Widgets通常更方便。</p>
+<p>在这个配方中，我们将查看<code>flutter_test</code>包提供的<code>find</code>常量，并演示如何使用它提供的一些Finder。有关可用查找器的完整列表，请参阅<a href="https://api.flutter.dev/flutter/flutter_driver/CommonFinders-class.html" target="_blank" rel="noopener">CommonFinders文档</a>。</p>
+<p>如果您不熟悉Widget测试和<code>Finder</code>类的角色，请查看<a href="/flutter/test/2019/04/19/Anintroductiontowidgettesting/">Widget测试简介</a>。</p>
+          <!--noindex-->
+          
+            <div class="post-button text-center">
+              <a class="btn" href="/2019/04/19/Flutter/test/Finding widgets/#more" rel="contents">
+                阅读全文 &raquo;
+              </a>
+            </div>
+          
+          <!--/noindex-->
+        
+      
+    </div>
+
+    
+
+    
+    
+    
+
+    
+
+    
+      
+    
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/19/Flutter/test/Anintroductiontowidgettesting/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -404,7 +597,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -593,199 +786,6 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/19/Flutter/test/Finding widgets/">
-
-    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
-      <meta itemprop="name" content="顽石">
-      <meta itemprop="description" content="分享技术的个人技术博客">
-      <meta itemprop="image" content="/images/avatar.gif">
-    </span>
-
-    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
-    </span>
-
-    
-      <header class="post-header">
-
-        
-        
-          <h2 class="post-title" itemprop="name headline">
-                
-                
-                <a href="/2019/04/19/Flutter/test/Finding widgets/" class="post-title-link" itemprop="url">(译)查找widget</a>
-              
-            
-          </h2>
-        
-
-        <div class="post-meta">
-          <span class="post-time">
-
-            
-            
-            
-
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-calendar-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">发表于</span>
-              
-
-              
-                
-              
-
-              <time title="创建时间：2019-04-19 17:55:17" itemprop="dateCreated datePublished" datetime="2019-04-19T17:55:17+08:00">2019-04-19</time>
-            
-
-            
-              
-
-              
-                
-                <span class="post-meta-divider">|</span>
-                
-
-                <span class="post-meta-item-icon">
-                  <i class="fa fa-calendar-check-o"></i>
-                </span>
-                
-                  <span class="post-meta-item-text">更新于</span>
-                
-                <time title="修改时间：2019-06-25 13:08:20" itemprop="dateModified" datetime="2019-06-25T13:08:20+08:00">2019-06-25</time>
-              
-            
-          </span>
-
-          
-            <span class="post-category">
-            
-              <span class="post-meta-divider">|</span>
-            
-              <span class="post-meta-item-icon">
-                <i class="fa fa-folder-o"></i>
-              </span>
-              
-                <span class="post-meta-item-text">分类于</span>
-              
-              
-                <span itemprop="about" itemscope itemtype="http://schema.org/Thing"><a href="/categories/Flutter-开发/" itemprop="url" rel="index"><span itemprop="name">Flutter 开发</span></a></span>
-
-                
-                
-              
-            </span>
-          
-
-          
-            
-            
-          
-
-          
-          
-            <span id="/2019/04/19/Flutter/test/Finding widgets/" class="leancloud_visitors" data-flag-title="(译)查找widget">
-              <span class="post-meta-divider">|</span>
-              <span class="post-meta-item-icon">
-                <i class="fa fa-eye"></i>
-              </span>
-              
-                <span class="post-meta-item-text">阅读次数：</span>
-              
-                <span class="leancloud-visitors-count"></span>
-            </span>
-          
-
-          
-
-          
-
-          
-
-        </div>
-      </header>
-    
-
-    
-    
-    
-    <div class="post-body" itemprop="articleBody">
-
-      
-      
-
-      
-        
-          <p><a href="https://flutter.dev/docs/cookbook/testing/widget/finders" target="_blank" rel="noopener">原文链接</a></p>
-<p>为了在测试环境中定位Widget，我们需要使用<code>Finder</code>类。虽然可以编写我们自己的<code>Finder</code>类，但使用<a href="https://api.flutter.dev/flutter/flutter_test/flutter_test-library.html" target="_blank" rel="noopener">flutter_test</a>包提供的工具定位Widgets通常更方便。</p>
-<p>在这个配方中，我们将查看<code>flutter_test</code>包提供的<code>find</code>常量，并演示如何使用它提供的一些Finder。有关可用查找器的完整列表，请参阅<a href="https://api.flutter.dev/flutter/flutter_driver/CommonFinders-class.html" target="_blank" rel="noopener">CommonFinders文档</a>。</p>
-<p>如果您不熟悉Widget测试和<code>Finder</code>类的角色，请查看<a href="/flutter/test/2019/04/19/Anintroductiontowidgettesting/">Widget测试简介</a>。</p>
-          <!--noindex-->
-          
-            <div class="post-button text-center">
-              <a class="btn" href="/2019/04/19/Flutter/test/Finding widgets/#more" rel="contents">
-                阅读全文 &raquo;
-              </a>
-            </div>
-          
-          <!--/noindex-->
-        
-      
-    </div>
-
-    
-
-    
-    
-    
-
-    
-
-    
-      
-    
-    
-
-    
-
-    <footer class="post-footer">
-      
-
-      
-
-      
-
-      
-      
-        <div class="post-eof"></div>
-      
-    </footer>
-  </div>
-  
-  
-  
-  </article>
-
-
-    
-      
-
-  
-
-  
-  
-  
-
-  
-
-  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
-  
-  
-  
-  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="https://jinyulei.cn/2019/04/19/Flutter/test/MockdependenciesusingMockito/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -795,7 +795,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -994,7 +994,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -1187,7 +1187,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -1379,7 +1379,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -1570,7 +1570,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -1762,7 +1762,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -1958,7 +1958,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
@@ -2150,7 +2150,7 @@
     </span>
 
     <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
-      <meta itemprop="name" content="岩刻 - Remember Something Important">
+      <meta itemprop="name" content="岩刻 - RSI">
     </span>
 
     
