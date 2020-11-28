@@ -1020,9 +1020,9 @@
             
             <tag> BLoC </tag>
             
-            <tag> Redux </tag>
-            
             <tag> ScopedModel </tag>
+            
+            <tag> Redux </tag>
             
         </tags>
       
