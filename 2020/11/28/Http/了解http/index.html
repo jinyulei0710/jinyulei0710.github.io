@@ -96,18 +96,18 @@
 
 
 
-  <meta name="description" content="无论是后端开发还是前端开发,http都是一门必修课.">
+  <meta name="description" content="无论是后端开发还是前端开发,http都是一门必修课. 对于Android开发来说,Retrofit + OkHttp的方案已经成了官方标配. 但本文的主角不是它们,而是HttpURLConnection.但是HttpURLConnection跟OkHttp也有着密切的关系,在Android 4.4之后,是基于 OkHttp实现的.">
 <meta name="keywords" content="http">
 <meta property="og:type" content="article">
 <meta property="og:title" content="初识http">
 <meta property="og:url" content="https://jinyulei.cn/2020/11/28/Http/了解http/index.html">
 <meta property="og:site_name" content="竹风的BLOG">
-<meta property="og:description" content="无论是后端开发还是前端开发,http都是一门必修课.">
+<meta property="og:description" content="无论是后端开发还是前端开发,http都是一门必修课. 对于Android开发来说,Retrofit + OkHttp的方案已经成了官方标配. 但本文的主角不是它们,而是HttpURLConnection.但是HttpURLConnection跟OkHttp也有着密切的关系,在Android 4.4之后,是基于 OkHttp实现的.">
 <meta property="og:locale" content="zh-Hans">
-<meta property="og:updated_time" content="2020-11-28T10:07:01.805Z">
+<meta property="og:updated_time" content="2020-12-02T11:26:13.196Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="初识http">
-<meta name="twitter:description" content="无论是后端开发还是前端开发,http都是一门必修课.">
+<meta name="twitter:description" content="无论是后端开发还是前端开发,http都是一门必修课. 对于Android开发来说,Retrofit + OkHttp的方案已经成了官方标配. 但本文的主角不是它们,而是HttpURLConnection.但是HttpURLConnection跟OkHttp也有着密切的关系,在Android 4.4之后,是基于 OkHttp实现的.">
 
 
 
@@ -438,12 +438,24 @@
                 
               
 
-              <time title="创建时间：2020-11-28 18:05:17 / 修改时间：18:07:01" itemprop="dateCreated datePublished" datetime="2020-11-28T18:05:17+08:00">2020-11-28</time>
+              <time title="创建时间：2020-11-28 18:05:17" itemprop="dateCreated datePublished" datetime="2020-11-28T18:05:17+08:00">2020-11-28</time>
             
 
             
               
 
+              
+                
+                <span class="post-meta-divider">|</span>
+                
+
+                <span class="post-meta-item-icon">
+                  <i class="fa fa-calendar-check-o"></i>
+                </span>
+                
+                  <span class="post-meta-item-text">更新于</span>
+                
+                <time title="修改时间：2020-12-02 19:26:13" itemprop="dateModified" datetime="2020-12-02T19:26:13+08:00">2020-12-02</time>
               
             
           </span>
@@ -506,9 +518,15 @@
       
 
       
-        <p>无论是后端开发还是前端开发,http都是一门必修课.</p>
+        <p>无论是后端开发还是前端开发,http都是一门必修课. 对于Android开发来说,Retrofit + OkHttp的方案已经成了官方标配.</p>
+<p>但本文的主角不是它们,而是HttpURLConnection.但是HttpURLConnection跟OkHttp也有着密切的关系,在Android 4.4之后,是基于</p>
+<p>OkHttp实现的.</p>
 <a id="more"></a>
 
+<p>源码分析开始:</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.IOException;</span><br><span class="line"><span class="keyword">import</span> java.io.InputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.OutputStream;</span><br><span class="line"><span class="keyword">import</span> java.util.Hashtable;</span><br><span class="line"><span class="keyword">import</span> java.util.Date;</span><br><span class="line"><span class="keyword">import</span> java.util.StringTokenizer;</span><br><span class="line"><span class="keyword">import</span> java.util.Collections;</span><br><span class="line"><span class="keyword">import</span> java.util.Map;</span><br><span class="line"><span class="keyword">import</span> java.util.List;</span><br><span class="line"><span class="keyword">import</span> java.security.Permission;</span><br><span class="line"><span class="keyword">import</span> java.security.AccessController;</span><br><span class="line"><span class="keyword">import</span> sun.security.util.SecurityConstants;</span><br><span class="line"><span class="keyword">import</span> sun.net.www.MessageHeader;</span><br></pre></td></tr></table></figure>
+
+<p>所以要搞清楚这个类,你需要有Java I/O以及集合的基础知识.</p>
 
       
     </div>
